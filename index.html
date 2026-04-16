@@ -19,14 +19,14 @@
         <h1 id="title" data-i18n="title" class="text-4xl font-bold">Трекер калорий</h1>
       </div>
 
-      <!-- Кнопка языка — только эмодзи текущего языка -->
+      <!-- Большая кнопка с эмодзи текущего языка -->
       <button onclick="toggleDropdown()" id="lang-button"
-              class="flex items-center justify-center w-12 h-12 bg-zinc-900 hover:bg-zinc-800 rounded-3xl text-4xl transition-colors">
+              class="flex items-center justify-center w-14 h-14 bg-zinc-900 hover:bg-zinc-800 rounded-3xl text-5xl transition-all active:scale-95">
         <span id="current-lang-flag"></span>
       </button>
 
       <!-- Дропдаун -->
-      <div id="lang-dropdown" class="hidden absolute right-6 mt-14 w-52 bg-zinc-900 rounded-3xl shadow-2xl py-2 z-50 border border-zinc-700 overflow-hidden"></div>
+      <div id="lang-dropdown" class="hidden absolute right-6 mt-16 w-56 bg-zinc-900 rounded-3xl shadow-2xl py-2 z-50 border border-zinc-700 overflow-hidden"></div>
     </div>
 
     <!-- Прогресс -->
@@ -63,7 +63,6 @@
       <button data-tab="tab-profile" data-i18n="profile" class="tab-btn flex-1 py-4 rounded-3xl font-medium">Профиль</button>
     </div>
 
-    <!-- Сегодня -->
     <div id="tab-today" class="tab-content">
       <h2 data-i18n="today" class="text-xl mb-4 px-1">Сегодня</h2>
       <div id="todayLogs" class="space-y-3"></div>
@@ -74,7 +73,6 @@
       </button>
     </div>
 
-    <!-- Остальные табы -->
     <div id="tab-foods" class="tab-content hidden">
       <h2 data-i18n="myFoods" class="text-xl mb-4 px-1">Мои блюда</h2>
       <div id="foodsList" class="mb-6"></div>
@@ -117,7 +115,6 @@
       </div>
     </div>
 
-    <!-- Модалка -->
     <div id="addLogModal" onclick="if(event.target.id==='addLogModal')this.classList.add('hidden')" 
          class="hidden fixed inset-0 bg-black/70 flex items-end z-50">
       <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full rounded-t-3xl p-6">

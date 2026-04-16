@@ -170,3 +170,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 });
+
+// Дополнительная инициализация для GitHub Pages
+window.onload = () => {
+  setTimeout(() => {
+    renderLanguageDropdown();
+    updateLanguageButton();
+  }, 300);
+};
