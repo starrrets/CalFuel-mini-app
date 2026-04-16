@@ -49,21 +49,19 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('lang', lang);
   renderAllTexts();
-  updateLanguageDropdown();
+  updateLanguageButton();
 }
 
 function renderAllTexts() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (translations[currentLang]?.[key]) {
-      el.textContent = translations[currentLang][key];
-    }
+    if (translations[currentLang]?.[key]) el.textContent = translations[currentLang][key];
   });
 }
 
-function updateLanguageDropdown() {
-  const current = document.getElementById('current-lang');
-  current.innerHTML = `${getFlag(currentLang)} ${currentLang.toUpperCase()}`;
+function updateLanguageButton() {
+  const flagEl = document.getElementById('current-lang-flag');
+  flagEl.textContent = getFlag(currentLang);
 }
 
 function toggleDropdown() {

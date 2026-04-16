@@ -154,7 +154,7 @@ async function quickAddLog() {
 document.addEventListener("DOMContentLoaded", async () => {
   renderLanguageDropdown();
   renderAllTexts();
-  updateLanguageDropdown();
+  updateLanguageButton();
 
   await loadProfile();
   await loadFoods();
