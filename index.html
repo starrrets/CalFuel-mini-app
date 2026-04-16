@@ -19,14 +19,12 @@
         <h1 id="title" data-i18n="title" class="text-4xl font-bold">Трекер калорий</h1>
       </div>
 
-      <!-- Большая кнопка с эмодзи текущего языка -->
-      <button onclick="toggleDropdown()" id="lang-button"
-              class="flex items-center justify-center w-14 h-14 bg-zinc-900 hover:bg-zinc-800 rounded-3xl text-5xl transition-all active:scale-95">
-        <span id="current-lang-flag"></span>
-      </button>
-
-      <!-- Дропдаун -->
-      <div id="lang-dropdown" class="hidden absolute right-6 mt-16 w-56 bg-zinc-900 rounded-3xl shadow-2xl py-2 z-50 border border-zinc-700 overflow-hidden"></div>
+      <!-- Кнопка языка (флаг + код страны) -->
+      <div class="relative">
+        <span onclick="toggleDropdown()" id="current-lang-flag" 
+              class="text-4xl cursor-pointer select-none"></span>
+        <div id="lang-dropdown" class="hidden absolute right-0 top-full mt-2 w-56 bg-zinc-900 rounded-3xl shadow-2xl py-2 z-50 border border-zinc-700 overflow-hidden"></div>
+      </div>
     </div>
 
     <!-- Прогресс -->
@@ -34,7 +32,7 @@
       <div class="text-center pt-6 pb-4">
         <div data-i18n="normToday" class="text-zinc-400 text-sm mb-1">Норма сегодня</div>
         <div id="dailyNorm" class="text-6xl font-bold text-orange-400">2000</div>
-        <div class="text-orange-400 text-xl -mt-1">ккал</div>
+        <div data-i18n="unitKcal" class="text-orange-400 text-xl -mt-1">ккал</div>
       </div>
 
       <div class="flex justify-between px-6 text-sm mb-3">
@@ -44,7 +42,7 @@
         </div>
         <div class="text-right">
           <div data-i18n="remaining" class="text-zinc-400">Осталось</div>
-          <div id="remaining" class="text-3xl font-semibold text-orange-400">1180 ккал</div>
+          <div id="remaining" class="text-3xl font-semibold text-orange-400">1180 <span data-i18n="unitKcal">ккал</span></div>
         </div>
       </div>
 

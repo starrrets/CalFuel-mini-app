@@ -1,8 +1,12 @@
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
+// Проверка Telegram WebApp
+let tg = null;
+if (window.Telegram && window.Telegram.WebApp) {
+  tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
+}
 
-const tgId = tg.initDataUnsafe?.user?.id || 123456789;
+const tgId = tg ? (tg.initDataUnsafe?.user?.id || 123456789) : 123456789;
 const API_URL = "https://ВАШ_RAILWAY_URL.up.railway.app";
 
 let dailyNorm = 2000;
@@ -97,7 +101,7 @@ function renderFoods() {
 async function addLogFromFood(name, calories) {
   await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories });
   loadTodayLogs();
-  tg.showAlert(`Добавлено: ${name} — ${calories} ккал`);
+  if (tg) tg.showAlert(`Добавлено: ${name} — ${calories} ккал`);
 }
 
 async function deleteLog(id) {
@@ -126,7 +130,7 @@ async function saveProfile() {
     goal_percent: parseFloat(document.getElementById("goalPercent").value) || 0
   };
   await apiFetch("/api/profile", "POST", data);
-  tg.showAlert("Профиль сохранён! Норма пересчитана.");
+  if (tg) tg.showAlert("Профиль сохранён! Норма пересчитана.");
   loadProfile();
 }
 
@@ -138,7 +142,7 @@ async function addNewFood() {
   document.getElementById("newFoodName").value = "";
   document.getElementById("newFoodCalories").value = "";
   loadFoods();
-  tg.showAlert("Блюдо добавлено!");
+  if (tg) tg.showAlert("Блюдо добавлено!");
 }
 
 async function quickAddLog() {
@@ -148,7 +152,7 @@ async function quickAddLog() {
   await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories });
   document.getElementById("addLogModal").classList.add("hidden");
   loadTodayLogs();
-  tg.showAlert("Запись добавлена!");
+  if (tg) tg.showAlert("Запись добавлена!");
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -171,10 +175,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 
-// Дополнительная инициализация для GitHub Pages
 window.onload = () => {
   setTimeout(() => {
     renderLanguageDropdown();
     updateLanguageButton();
-  }, 300);
+  }, 100);
 };

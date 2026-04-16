@@ -13,7 +13,8 @@ const translations = {
     whatDidYouEat: "Что съел?",
     calories: "Калории",
     add: "Добавить",
-    saveProfile: "Сохранить и пересчитать"
+    saveProfile: "Сохранить и пересчитать",
+    unitKcal: "ккал"
   },
   en: {
     title: "Calorie Tracker",
@@ -29,7 +30,8 @@ const translations = {
     whatDidYouEat: "What did you eat?",
     calories: "Calories",
     add: "Add",
-    saveProfile: "Save & recalculate"
+    saveProfile: "Save & recalculate",
+    unitKcal: "kcal"
   }
 };
 
@@ -82,7 +84,7 @@ function renderLanguageDropdown() {
     div.className = 'flex items-center gap-4 px-6 py-4 hover:bg-zinc-800 cursor-pointer';
     div.innerHTML = `
       <span class="text-3xl">${getFlag(lang)}</span>
-      <span class="font-medium">${lang === 'ru' ? 'Русский' : lang === 'en' ? 'English' : lang.toUpperCase()}</span>
+      <span class="font-medium">${lang === 'ru' ? 'Русский' : 'English'}</span>
     `;
     div.onclick = () => selectLang(lang);
     dropdown.appendChild(div);
