@@ -14,6 +14,7 @@ let foods = [];
 let logs = [];
 
 async function apiFetch(endpoint, method = "GET", body = null) {
+  if (!tg) return;
   const options = { method, headers: { "Content-Type": "application/json" } };
   if (body) options.body = JSON.stringify(body);
   const res = await fetch(API_URL + endpoint, options);
@@ -22,6 +23,7 @@ async function apiFetch(endpoint, method = "GET", body = null) {
 }
 
 async function loadProfile() {
+  if (!tg) return;
   try {
     const data = await apiFetch(`/api/profile/${tgId}`);
     dailyNorm = data.daily_norm || 2000;
@@ -31,12 +33,14 @@ async function loadProfile() {
 }
 
 async function loadFoods() {
+  if (!tg) return;
   const data = await apiFetch(`/api/foods/${tgId}`);
   foods = data;
   renderFoods();
 }
 
 async function loadTodayLogs() {
+  if (!tg) return;
   const data = await apiFetch(`/api/logs/today/${tgId}`);
   logs = data.logs;
   totalToday = data.total_today || 0;
@@ -46,6 +50,7 @@ async function loadTodayLogs() {
 }
 
 async function loadHistory() {
+  if (!tg) return;
   const data = await apiFetch(`/api/history/${tgId}`);
   const container = document.getElementById("historyContainer");
   container.innerHTML = "";
@@ -98,12 +103,14 @@ function renderFoods() {
 }
 
 async function addLogFromFood(name, calories) {
+  if (!tg) return;
   await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories });
   loadTodayLogs();
   if (tg) tg.showAlert(`Добавлено: ${name} — ${calories} ккал`);
 }
 
 async function deleteLog(id) {
+  if (!tg) return;
   if (confirm("Удалить запись?")) {
     await apiFetch(`/api/log/${id}`, "DELETE");
     loadTodayLogs();
@@ -111,6 +118,7 @@ async function deleteLog(id) {
 }
 
 async function deleteFood(id) {
+  if (!tg) return;
   if (confirm("Удалить блюдо?")) {
     await apiFetch(`/api/foods/${id}`, "DELETE");
     loadFoods();
@@ -118,6 +126,7 @@ async function deleteFood(id) {
 }
 
 async function saveProfile() {
+  if (!tg) return;
   const data = {
     tg_id: tgId,
     gender: document.getElementById("gender").value,
@@ -134,6 +143,7 @@ async function saveProfile() {
 }
 
 async function addNewFood() {
+  if (!tg) return;
   const name = document.getElementById("newFoodName").value;
   const calories = parseFloat(document.getElementById("newFoodCalories").value);
   if (!name || !calories) return alert("Заполни все поля");
@@ -145,6 +155,7 @@ async function addNewFood() {
 }
 
 async function quickAddLog() {
+  if (!tg) return;
   const name = document.getElementById("quickFoodName").value;
   const calories = parseFloat(document.getElementById("quickCalories").value);
   if (!name || !calories) return;
@@ -159,10 +170,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderAllTexts();
   updateLanguageButton();
 
-  await loadProfile();
-  await loadFoods();
-  await loadTodayLogs();
-  await loadHistory();
+  if (tg) {
+    await loadProfile();
+    await loadFoods();
+    await loadTodayLogs();
+    await loadHistory();
+  }
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {

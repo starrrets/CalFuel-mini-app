@@ -16,8 +16,9 @@
 }
 
 .tab-btn.active {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fb923c;
+  background: linear-gradient(to right, #f97316, #fb923c);
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .tab-content {
@@ -40,6 +41,8 @@
   height: 32px;
   border-radius: 50%;
   overflow: hidden;
+  background-size: cover;
+  background-position: center;
 }
 
 #lang-dropdown img {
@@ -47,4 +50,6 @@
   height: 28px;
   border-radius: 50%;
   overflow: hidden;
+  background-size: cover;
+  background-position: center;
 }
