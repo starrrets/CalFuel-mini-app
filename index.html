@@ -12,7 +12,6 @@
 <body class="bg-zinc-950 text-white min-h-screen pb-20 font-google-sans">
   <div class="max-w-xl mx-auto p-5">
 
-    <!-- Header (только флаг языка) -->
     <div class="flex justify-end mb-8">
       <div class="relative">
         <img onclick="toggleDropdown()" id="current-lang-flag" class="current-flag cursor-pointer" alt="flag">
@@ -20,9 +19,7 @@
       </div>
     </div>
 
-    <!-- Progress card с апельсином -->
     <div class="glass-card mb-8 relative overflow-visible">
-      <!-- Большой эмоджи 🍊 (уменьшенное наплывание) -->
       <div class="big-emoji absolute -top-16 left-1/2 -translate-x-1/2">🍊</div>
 
       <div class="pt-16 pb-4 text-center">
@@ -32,13 +29,13 @@
         </div>
       </div>
 
-      <div class="flex justify-center items-center gap-20 text-white px-8">
-        <div class="text-center">
+      <div class="flex justify-between items-center text-white px-8">
+        <div class="text-center flex-1">
           <div data-i18n="eaten" class="text-sm opacity-70"></div>
           <div id="totalToday" class="text-4xl font-medium">820</div>
         </div>
-        <div class="h-10 w-px bg-white/30"></div>
-        <div class="text-center">
+        <div class="h-10 w-px bg-white/30 mx-4"></div>
+        <div class="text-center flex-1">
           <div data-i18n="remaining" class="text-sm opacity-70"></div>
           <div id="remaining" class="text-4xl font-medium">1180</div>
         </div>
@@ -51,12 +48,11 @@
       </div>
     </div>
 
-    <!-- Табы -->
-    <div class="flex gap-10 mb-8 justify-center">
-      <button data-tab="tab-today" data-i18n="today" class="tab-btn active text-xl"></button>
-      <button data-tab="tab-foods" data-i18n="myFoods" class="tab-btn text-xl"></button>
-      <button data-tab="tab-history" data-i18n="history" class="tab-btn text-xl"></button>
-      <button data-tab="tab-profile" data-i18n="profile" class="tab-btn text-xl"></button>
+    <div class="flex gap-6 mb-8 justify-center">
+      <button data-tab="tab-today" data-i18n="today" class="tab-btn active text-lg whitespace-nowrap"></button>
+      <button data-tab="tab-foods" data-i18n="myFoods" class="tab-btn text-lg whitespace-nowrap"></button>
+      <button data-tab="tab-history" data-i18n="history" class="tab-btn text-lg whitespace-nowrap"></button>
+      <button data-tab="tab-profile" data-i18n="profile" class="tab-btn text-lg whitespace-nowrap"></button>
     </div>
 
     <div id="tab-today" class="tab-content">
@@ -70,7 +66,23 @@
       <div class="bg-zinc-900 p-6 rounded-3xl">
         <input id="newFoodName" type="text" data-i18n-placeholder="foodNamePlaceholder" class="w-full mb-3 bg-zinc-800 text-white p-4 rounded-3xl">
         <input id="newFoodCalories" type="number" data-i18n-placeholder="caloriesPlaceholder" class="w-full mb-3 bg-zinc-800 text-white p-4 rounded-3xl">
-        <button onclick="addNewFood()" data-i18n="addFoodToBase" class="w-full py-4 gradient-btn rounded-3xl"></button>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <div data-i18n="proteins" class="text-zinc-400 text-sm mb-1"></div>
+            <input id="newFoodProteins" type="number" step="0.1" data-i18n-placeholder="proteinsPlaceholder" class="w-full bg-zinc-800 text-white p-4 rounded-3xl">
+          </div>
+          <div>
+            <div data-i18n="fats" class="text-zinc-400 text-sm mb-1"></div>
+            <input id="newFoodFats" type="number" step="0.1" data-i18n-placeholder="fatsPlaceholder" class="w-full bg-zinc-800 text-white p-4 rounded-3xl">
+          </div>
+          <div>
+            <div data-i18n="carbs" class="text-zinc-400 text-sm mb-1"></div>
+            <input id="newFoodCarbs" type="number" step="0.1" data-i18n-placeholder="carbsPlaceholder" class="w-full bg-zinc-800 text-white p-4 rounded-3xl">
+          </div>
+        </div>
+
+        <button onclick="addNewFood()" data-i18n="addFoodToBase" class="w-full mt-6 py-4 gradient-btn rounded-3xl"></button>
       </div>
     </div>
 
@@ -86,6 +98,11 @@
           <option value="male" data-i18n="genderMale"></option>
           <option value="female" data-i18n="genderFemale"></option>
         </select>
+
+        <div>
+          <div data-i18n="ageLabel" class="text-zinc-400 text-sm mb-1"></div>
+          <input id="age" type="number" data-i18n-placeholder="agePlaceholder" class="w-full bg-zinc-800 p-4 rounded-3xl">
+        </div>
 
         <div class="flex bg-zinc-800 rounded-3xl p-1">
           <button id="unit-metric" data-i18n="unitsMetric" onclick="setUnits('metric')" class="unit-btn flex-1 py-4 rounded-3xl font-medium"></button>

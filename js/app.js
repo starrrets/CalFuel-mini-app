@@ -43,6 +43,26 @@ function convertWeight(value, fromUnit, toUnit) {
 }
 
 /**
+ * Safe API fetch — только если есть tg
+ */
+async function apiFetch(endpoint, options = {}) {
+  if (!tg) {
+    console.log('[app] apiFetch SKIPPED — no Telegram WebApp');
+    return {};
+  }
+  const url = API_URL + endpoint;
+  console.log('[app] apiFetch →', url);
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers
+    }
+  });
+  return response.json();
+}
+
+/**
  * Loads user profile and daily calorie norm
  */
 async function loadProfile() {
@@ -61,7 +81,7 @@ async function loadProfile() {
     document.getElementById("dailyNorm").textContent = Math.round(dailyNorm);
     updateProgress();
     updateUnitUI();
-    toggleGoalPercent();   // скрываем/показываем процент при загрузке
+    toggleGoalPercent();
   } catch(e) {}
 }
 
