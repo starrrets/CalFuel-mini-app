@@ -21,6 +21,16 @@
   font-weight: 600;
 }
 
+.unit-btn {
+  transition: all 0.25s ease;
+}
+
+.unit-btn.active {
+  background: linear-gradient(to right, #f97316, #fb923c);
+  color: #ffffff;
+  font-weight: 600;
+}
+
 .tab-content {
   animation: fadeIn 0.3s ease forwards;
 }
@@ -30,12 +40,10 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Google Sans */
 .font-google-sans {
   font-family: 'Google Sans', system-ui, sans-serif;
 }
 
-/* Круглые флаги */
 .current-flag {
   width: 32px;
   height: 32px;

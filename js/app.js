@@ -12,26 +12,109 @@ let dailyNorm = 2000;
 let totalToday = 0;
 let foods = [];
 let logs = [];
+let currentUnits = "metric";
 
-async function apiFetch(endpoint, method = "GET", body = null) {
-  if (!tg) return;
-  const options = { method, headers: { "Content-Type": "application/json" } };
-  if (body) options.body = JSON.stringify(body);
-  const res = await fetch(API_URL + endpoint, options);
-  if (!res.ok) throw new Error("Ошибка API");
-  return res.json();
+/**
+ * Convert height between metric and imperial
+ * @param {number} value
+ * @param {string} fromUnit
+ * @param {string} toUnit
+ * @returns {number}
+ */
+function convertHeight(value, fromUnit, toUnit) {
+  if (fromUnit === toUnit || !value) return value;
+  return fromUnit === "metric" 
+    ? Math.round(value * 0.393701) 
+    : Math.round(value / 0.393701);
 }
 
+/**
+ * Convert weight between metric and imperial
+ * @param {number} value
+ * @param {string} fromUnit
+ * @param {string} toUnit
+ * @returns {number}
+ */
+function convertWeight(value, fromUnit, toUnit) {
+  if (fromUnit === toUnit || !value) return value;
+  return fromUnit === "metric" 
+    ? Math.round(value * 2.20462 * 10) / 10 
+    : Math.round(value / 2.20462 * 10) / 10;
+}
+
+/**
+ * Loads user profile and daily calorie norm
+ */
 async function loadProfile() {
   if (!tg) return;
   try {
     const data = await apiFetch(`/api/profile/${tgId}`);
     dailyNorm = data.daily_norm || 2000;
+    currentUnits = data.units || "metric";
+
+    const heightInput = document.getElementById("height");
+    const weightInput = document.getElementById("weight");
+
+    if (data.height) heightInput.value = convertHeight(data.height, "metric", currentUnits);
+    if (data.weight) weightInput.value = convertWeight(data.weight, "metric", currentUnits);
+
     document.getElementById("dailyNorm").textContent = Math.round(dailyNorm);
     updateProgress();
+    updateUnitUI();
+    toggleGoalPercent();   // скрываем/показываем процент при загрузке
   } catch(e) {}
 }
 
+/**
+ * Updates unit labels, placeholders and button states
+ */
+function updateUnitUI() {
+  const isMetric = currentUnits === "metric";
+
+  document.getElementById("unit-metric").classList.toggle("active", isMetric);
+  document.getElementById("unit-imperial").classList.toggle("active", !isMetric);
+
+  document.getElementById("height-label").textContent = translate(isMetric ? "heightMetric" : "heightImperial");
+  document.getElementById("weight-label").textContent = translate(isMetric ? "weightMetric" : "weightImperial");
+
+  const heightInput = document.getElementById("height");
+  const weightInput = document.getElementById("weight");
+  heightInput.placeholder = translate(isMetric ? "heightMetric" : "heightImperial");
+  weightInput.placeholder = translate(isMetric ? "weightMetric" : "weightImperial");
+}
+
+/**
+ * Sets unit system and converts current values
+ * @param {"metric"|"imperial"} unit
+ */
+function setUnits(unit) {
+  if (currentUnits === unit) return;
+
+  const heightInput = document.getElementById("height");
+  const weightInput = document.getElementById("weight");
+
+  const h = parseFloat(heightInput.value);
+  const w = parseFloat(weightInput.value);
+
+  if (!isNaN(h)) heightInput.value = convertHeight(h, currentUnits, unit);
+  if (!isNaN(w)) weightInput.value = convertWeight(w, currentUnits, unit);
+
+  currentUnits = unit;
+  updateUnitUI();
+}
+
+/**
+ * Shows or hides the goal percent field depending on goal type
+ */
+function toggleGoalPercent() {
+  const goalType = document.getElementById("goalType").value;
+  const percentRow = document.getElementById("goal-percent-row");
+  percentRow.style.display = (goalType === "maintain") ? "none" : "block";
+}
+
+/**
+ * Loads list of user's custom foods
+ */
 async function loadFoods() {
   if (!tg) return;
   const data = await apiFetch(`/api/foods/${tgId}`);
@@ -39,6 +122,9 @@ async function loadFoods() {
   renderFoods();
 }
 
+/**
+ * Loads today's food logs
+ */
 async function loadTodayLogs() {
   if (!tg) return;
   const data = await apiFetch(`/api/logs/today/${tgId}`);
@@ -49,6 +135,9 @@ async function loadTodayLogs() {
   updateProgress();
 }
 
+/**
+ * Loads history of calories by day
+ */
 async function loadHistory() {
   if (!tg) return;
   const data = await apiFetch(`/api/history/${tgId}`);
@@ -62,12 +151,18 @@ async function loadHistory() {
   });
 }
 
+/**
+ * Updates progress bar and remaining calories
+ */
 function updateProgress() {
   const percent = Math.min((totalToday / dailyNorm) * 100, 100);
   document.getElementById("progressBar").style.width = percent + "%";
   document.getElementById("remaining").textContent = Math.max(0, Math.round(dailyNorm - totalToday)) + " ккал";
 }
 
+/**
+ * Renders today's food logs
+ */
 function renderLogs() {
   const container = document.getElementById("todayLogs");
   container.innerHTML = "";
@@ -85,6 +180,9 @@ function renderLogs() {
   });
 }
 
+/**
+ * Renders user's custom foods list
+ */
 function renderFoods() {
   const container = document.getElementById("foodsList");
   container.innerHTML = "";
@@ -102,58 +200,86 @@ function renderFoods() {
   });
 }
 
+/**
+ * Adds a food from database to today's log
+ * @param {string} name
+ * @param {number} calories
+ */
 async function addLogFromFood(name, calories) {
   if (!tg) return;
   await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories });
   loadTodayLogs();
-  if (tg) tg.showAlert(`Добавлено: ${name} — ${calories} ккал`);
+  if (tg) tg.showAlert(translate('addedTemplate').replace('{name}', name).replace('{calories}', calories));
 }
 
+/**
+ * Deletes a log entry
+ * @param {number} id
+ */
 async function deleteLog(id) {
   if (!tg) return;
-  if (confirm("Удалить запись?")) {
+  if (confirm(translate('deleteConfirmLog'))) {
     await apiFetch(`/api/log/${id}`, "DELETE");
     loadTodayLogs();
   }
 }
 
+/**
+ * Deletes a food from user's database
+ * @param {number} id
+ */
 async function deleteFood(id) {
   if (!tg) return;
-  if (confirm("Удалить блюдо?")) {
+  if (confirm(translate('deleteConfirmFood'))) {
     await apiFetch(`/api/foods/${id}`, "DELETE");
     loadFoods();
   }
 }
 
+/**
+ * Saves profile and recalculates daily norm
+ */
 async function saveProfile() {
   if (!tg) return;
+  const heightMetric = convertHeight(parseFloat(document.getElementById("height").value) || 0, currentUnits, "metric");
+  const weightMetric = convertWeight(parseFloat(document.getElementById("weight").value) || 0, currentUnits, "metric");
   const data = {
     tg_id: tgId,
     gender: document.getElementById("gender").value,
     age: document.getElementById("age").value,
-    height: document.getElementById("height").value,
-    weight: document.getElementById("weight").value,
+    height: heightMetric,
+    weight: weightMetric,
     activity: parseFloat(document.getElementById("activity").value),
     goal_type: document.getElementById("goalType").value,
-    goal_percent: parseFloat(document.getElementById("goalPercent").value) || 0
+    goal_percent: document.getElementById("goalType").value === "maintain" ? 0 : parseFloat(document.getElementById("goalPercent").value) || 0,
+    units: currentUnits
   };
   await apiFetch("/api/profile", "POST", data);
-  if (tg) tg.showAlert("Профиль сохранён! Норма пересчитана.");
+  if (tg) tg.showAlert(translate('profileSaved'));
   loadProfile();
 }
 
+/**
+ * Adds a new food to user's database
+ */
 async function addNewFood() {
   if (!tg) return;
   const name = document.getElementById("newFoodName").value;
   const calories = parseFloat(document.getElementById("newFoodCalories").value);
-  if (!name || !calories) return alert("Заполни все поля");
+  if (!name || !calories) {
+    alert(translate('fillFields'));
+    return;
+  }
   await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories });
   document.getElementById("newFoodName").value = "";
   document.getElementById("newFoodCalories").value = "";
   loadFoods();
-  if (tg) tg.showAlert("Блюдо добавлено!");
+  if (tg) tg.showAlert(translate('dishAdded'));
 }
 
+/**
+ * Quick add of a meal
+ */
 async function quickAddLog() {
   if (!tg) return;
   const name = document.getElementById("quickFoodName").value;
@@ -162,7 +288,7 @@ async function quickAddLog() {
   await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories });
   document.getElementById("addLogModal").classList.add("hidden");
   loadTodayLogs();
-  if (tg) tg.showAlert("Запись добавлена!");
+  if (tg) tg.showAlert(translate('recordAdded'));
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -175,6 +301,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadFoods();
     await loadTodayLogs();
     await loadHistory();
+  } else {
+    updateUnitUI();
+    toggleGoalPercent();
   }
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
