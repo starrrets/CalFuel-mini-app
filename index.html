@@ -12,54 +12,56 @@
 <body class="bg-zinc-950 text-white min-h-screen pb-20 font-google-sans">
   <div class="max-w-xl mx-auto p-5">
 
-    <div class="flex items-center justify-between mb-8">
-      <div class="flex items-center gap-3">
-        <span class="text-5xl">🍊</span>
-        <h1 id="title" data-i18n="title" class="text-4xl font-semibold"></h1>
-      </div>
-
+    <!-- Header (только флаг языка) -->
+    <div class="flex justify-end mb-8">
       <div class="relative">
         <img onclick="toggleDropdown()" id="current-lang-flag" class="current-flag cursor-pointer" alt="flag">
         <div id="lang-dropdown" class="hidden absolute right-0 top-full mt-2 w-56 bg-zinc-900 rounded-3xl shadow-2xl py-2 z-50 border border-zinc-700 overflow-hidden"></div>
       </div>
     </div>
 
-    <div class="glass-card mb-8">
-      <div class="text-center pt-6 pb-4">
-        <div data-i18n="normToday" class="text-zinc-400 text-sm mb-1"></div>
-        <div id="dailyNorm" class="text-6xl font-semibold text-orange-400">2000</div>
-        <div data-i18n="unitKcal" class="text-orange-400 text-xl -mt-1"></div>
-      </div>
+    <!-- Progress card с апельсином -->
+    <div class="glass-card mb-8 relative overflow-visible">
+      <!-- Большой эмоджи 🍊 (уменьшенное наплывание) -->
+      <div class="big-emoji absolute -top-16 left-1/2 -translate-x-1/2">🍊</div>
 
-      <div class="flex justify-between px-6 text-sm mb-3">
-        <div>
-          <div data-i18n="eaten" class="text-zinc-400"></div>
-          <div id="totalToday" class="text-3xl font-medium">820</div>
-        </div>
-        <div class="text-right">
-          <div data-i18n="remaining" class="text-zinc-400"></div>
-          <div id="remaining" class="text-3xl font-medium text-orange-400">1180 <span data-i18n="unitKcal"></span></div>
+      <div class="pt-16 pb-4 text-center">
+        <div class="flex items-baseline justify-center gap-3">
+          <div id="dailyNorm" class="text-5xl font-semibold text-orange-400">2000</div>
+          <div data-i18n="unitKcal" class="text-4xl text-orange-400"></div>
         </div>
       </div>
 
-      <div class="px-6 pb-6">
-        <div class="h-3 bg-zinc-800 rounded-3xl overflow-hidden">
-          <div id="progressBar" class="h-3 bg-gradient-to-r from-orange-400 to-amber-500 rounded-3xl transition-all w-0"></div>
+      <div class="flex justify-center items-center gap-20 text-white px-8">
+        <div class="text-center">
+          <div data-i18n="eaten" class="text-sm opacity-70"></div>
+          <div id="totalToday" class="text-4xl font-medium">820</div>
+        </div>
+        <div class="h-10 w-px bg-white/30"></div>
+        <div class="text-center">
+          <div data-i18n="remaining" class="text-sm opacity-70"></div>
+          <div id="remaining" class="text-4xl font-medium">1180</div>
+        </div>
+      </div>
+
+      <div class="px-8 pt-3 pb-8">
+        <div class="h-2.5 bg-zinc-800 rounded-full overflow-hidden">
+          <div id="progressBar" class="h-2.5 bg-gradient-to-r from-orange-400 to-amber-500 rounded-full transition-all w-0"></div>
         </div>
       </div>
     </div>
 
-    <div class="flex gap-1 mb-8 bg-zinc-900 rounded-3xl p-1">
-      <button data-tab="tab-today" data-i18n="today" class="tab-btn active flex-1 py-4 rounded-3xl font-medium"></button>
-      <button data-tab="tab-foods" data-i18n="myFoods" class="tab-btn flex-1 py-4 rounded-3xl font-medium"></button>
-      <button data-tab="tab-history" data-i18n="history" class="tab-btn flex-1 py-4 rounded-3xl font-medium"></button>
-      <button data-tab="tab-profile" data-i18n="profile" class="tab-btn flex-1 py-4 rounded-3xl font-medium"></button>
+    <!-- Табы -->
+    <div class="flex gap-10 mb-8 justify-center">
+      <button data-tab="tab-today" data-i18n="today" class="tab-btn active text-xl"></button>
+      <button data-tab="tab-foods" data-i18n="myFoods" class="tab-btn text-xl"></button>
+      <button data-tab="tab-history" data-i18n="history" class="tab-btn text-xl"></button>
+      <button data-tab="tab-profile" data-i18n="profile" class="tab-btn text-xl"></button>
     </div>
 
     <div id="tab-today" class="tab-content">
-      <h2 data-i18n="today" class="text-xl mb-4 px-1"></h2>
       <div id="todayLogs" class="space-y-3"></div>
-      <button onclick="document.getElementById('addLogModal').classList.remove('hidden')" data-i18n="addMeal" class="w-full py-5 mt-8 text-xl font-medium rounded-3xl bg-gradient-to-r from-orange-400 to-amber-500 text-white shadow-xl"></button>
+      <button onclick="document.getElementById('addLogModal').classList.remove('hidden')" data-i18n="addMeal" class="w-full py-5 mt-8 text-xl font-medium rounded-3xl gradient-btn"></button>
     </div>
 
     <div id="tab-foods" class="tab-content hidden">
@@ -68,7 +70,7 @@
       <div class="bg-zinc-900 p-6 rounded-3xl">
         <input id="newFoodName" type="text" data-i18n-placeholder="foodNamePlaceholder" class="w-full mb-3 bg-zinc-800 text-white p-4 rounded-3xl">
         <input id="newFoodCalories" type="number" data-i18n-placeholder="caloriesPlaceholder" class="w-full mb-3 bg-zinc-800 text-white p-4 rounded-3xl">
-        <button onclick="addNewFood()" data-i18n="addFoodToBase" class="w-full py-4 bg-orange-400 rounded-3xl"></button>
+        <button onclick="addNewFood()" data-i18n="addFoodToBase" class="w-full py-4 gradient-btn rounded-3xl"></button>
       </div>
     </div>
 
@@ -110,7 +112,6 @@
           </select>
         </div>
 
-        <!-- Goal в одной строке -->
         <div class="flex gap-3 items-end">
           <div class="flex-1">
             <div data-i18n="goalLabel" class="text-zinc-400 text-sm mb-1"></div>
@@ -126,7 +127,7 @@
           </div>
         </div>
 
-        <button onclick="saveProfile()" data-i18n="saveProfile" class="w-full py-4 bg-orange-400 rounded-3xl text-xl"></button>
+        <button onclick="saveProfile()" data-i18n="saveProfile" class="w-full py-4 gradient-btn rounded-3xl text-xl"></button>
       </div>
     </div>
 
@@ -135,7 +136,7 @@
         <h3 data-i18n="quickAdd" class="text-2xl mb-4"></h3>
         <input id="quickFoodName" type="text" data-i18n-placeholder="whatDidYouEat" class="w-full mb-4 bg-zinc-800 p-4 rounded-3xl">
         <input id="quickCalories" type="number" data-i18n-placeholder="calories" class="w-full mb-6 bg-zinc-800 p-4 rounded-3xl">
-        <button onclick="quickAddLog()" data-i18n="add" class="w-full py-5 bg-orange-400 text-xl rounded-3xl"></button>
+        <button onclick="quickAddLog()" data-i18n="add" class="w-full py-5 gradient-btn text-xl rounded-3xl"></button>
       </div>
     </div>
   </div>
