@@ -6,7 +6,7 @@ if (window.Telegram && window.Telegram.WebApp) {
 }
 
 const tgId = tg ? (tg.initDataUnsafe?.user?.id || 123456789) : 123456789;
-const API_URL = "https://ВАШ_RAILWAY_URL.up.railway.app";
+const API_URL = "https://calfuel-backend-production.up.railway.app/";
 
 let dailyNorm = 2000;
 let totalToday = 0;
