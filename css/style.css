@@ -28,3 +28,23 @@
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Google Sans */
+.font-google-sans {
+  font-family: 'Google Sans', system-ui, sans-serif;
+}
+
+/* Круглые флаги */
+.current-flag {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+#lang-dropdown img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+}

@@ -9,20 +9,20 @@
   <script src="js/i18n.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen pb-20">
+<body class="bg-zinc-950 text-white min-h-screen pb-20 font-google-sans">
   <div class="max-w-xl mx-auto p-5">
 
     <!-- Шапка -->
     <div class="flex items-center justify-between mb-8">
       <div class="flex items-center gap-3">
         <span class="text-5xl">🍊</span>
-        <h1 id="title" data-i18n="title" class="text-4xl font-bold">Трекер калорий</h1>
+        <h1 id="title" data-i18n="title" class="text-3xl font-semibold">Трекер калорий</h1>
       </div>
 
-      <!-- Кнопка языка (флаг + код страны) -->
+      <!-- Текущий флаг -->
       <div class="relative">
-        <span onclick="toggleDropdown()" id="current-lang-flag" 
-              class="text-4xl cursor-pointer select-none"></span>
+        <img onclick="toggleDropdown()" id="current-lang-flag" 
+             class="current-flag cursor-pointer" alt="flag">
         <div id="lang-dropdown" class="hidden absolute right-0 top-full mt-2 w-56 bg-zinc-900 rounded-3xl shadow-2xl py-2 z-50 border border-zinc-700 overflow-hidden"></div>
       </div>
     </div>
@@ -31,18 +31,18 @@
     <div class="glass-card mb-8">
       <div class="text-center pt-6 pb-4">
         <div data-i18n="normToday" class="text-zinc-400 text-sm mb-1">Норма сегодня</div>
-        <div id="dailyNorm" class="text-6xl font-bold text-orange-400">2000</div>
+        <div id="dailyNorm" class="text-6xl font-semibold text-orange-400">2000</div>
         <div data-i18n="unitKcal" class="text-orange-400 text-xl -mt-1">ккал</div>
       </div>
 
       <div class="flex justify-between px-6 text-sm mb-3">
         <div>
           <div data-i18n="eaten" class="text-zinc-400">Съедено</div>
-          <div id="totalToday" class="text-3xl font-semibold">820</div>
+          <div id="totalToday" class="text-3xl font-medium">820</div>
         </div>
         <div class="text-right">
           <div data-i18n="remaining" class="text-zinc-400">Осталось</div>
-          <div id="remaining" class="text-3xl font-semibold text-orange-400">1180 <span data-i18n="unitKcal">ккал</span></div>
+          <div id="remaining" class="text-3xl font-medium text-orange-400">1180 <span data-i18n="unitKcal">ккал</span></div>
         </div>
       </div>
 

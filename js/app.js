@@ -1,4 +1,3 @@
-// Проверка Telegram WebApp
 let tg = null;
 if (window.Telegram && window.Telegram.WebApp) {
   tg = window.Telegram.WebApp;

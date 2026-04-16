@@ -1,5 +1,6 @@
 const translations = {
   ru: {
+    flag: "ru",
     title: "Трекер калорий",
     normToday: "Норма сегодня",
     eaten: "Съедено",
@@ -17,6 +18,7 @@ const translations = {
     unitKcal: "ккал"
   },
   en: {
+    flag: "gb",
     title: "Calorie Tracker",
     normToday: "Daily norm",
     eaten: "Eaten",
@@ -37,13 +39,13 @@ const translations = {
 
 let currentLang = localStorage.getItem('lang') || 'ru';
 
-function t(key) {
+function translate(key) {
   return translations[currentLang]?.[key] || key;
 }
 
-function getFlag(lang) {
-  const flags = { ru: '🇷🇺', en: '🇬🇧' };
-  return flags[lang] || '🌍';
+function getFlagUrl(lang) {
+  const code = translations[lang].flag;
+  return `https://circle-flags.cdn.skk.moe/flags/${code}.svg`;
 }
 
 function setLanguage(lang) {
@@ -63,7 +65,7 @@ function renderAllTexts() {
 
 function updateLanguageButton() {
   const flagEl = document.getElementById('current-lang-flag');
-  flagEl.textContent = getFlag(currentLang);
+  flagEl.src = getFlagUrl(currentLang);
 }
 
 function toggleDropdown() {
@@ -83,7 +85,7 @@ function renderLanguageDropdown() {
     const div = document.createElement('div');
     div.className = 'flex items-center gap-4 px-6 py-4 hover:bg-zinc-800 cursor-pointer';
     div.innerHTML = `
-      <span class="text-3xl">${getFlag(lang)}</span>
+      <img src="${getFlagUrl(lang)}" class="w-7 h-7 rounded-full" alt="">
       <span class="font-medium">${lang === 'ru' ? 'Русский' : 'English'}</span>
     `;
     div.onclick = () => selectLang(lang);
