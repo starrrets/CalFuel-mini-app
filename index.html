@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Трекер калорий</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-zinc-950 text-white min-h-screen pb-20">
+  <div class="max-w-xl mx-auto p-5">
+
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3">
+        <span class="text-5xl">🍊</span>
+        <h1 id="title" data-i18n="title" class="text-4xl font-bold">Трекер калорий</h1>
+      </div>
+
+      <div class="relative">
+        <button onclick="toggleDropdown()" id="lang-button"
+                class="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 px-6 py-3 rounded-3xl text-sm font-medium transition-colors">
+          <span id="current-lang" class="flex items-center gap-2 text-lg"></span>
+          <span class="text-zinc-400 text-xs">▼</span>
+        </button>
+
+        <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-52 bg-zinc-900 rounded-3xl shadow-2xl py-2 z-50 border border-zinc-700 overflow-hidden"></div>
+      </div>
+    </div>
+
+    <div class="glass-card mb-8">
+      <div class="text-center pt-6 pb-4">
+        <div data-i18n="normToday" class="text-zinc-400 text-sm mb-1">Норма сегодня</div>
+        <div id="dailyNorm" class="text-6xl font-bold text-orange-400">2000</div>
+        <div class="text-orange-400 text-xl -mt-1">ккал</div>
+      </div>
+
+      <div class="flex justify-between px-6 text-sm mb-3">
+        <div>
+          <div data-i18n="eaten" class="text-zinc-400">Съедено</div>
+          <div id="totalToday" class="text-3xl font-semibold">820</div>
+        </div>
+        <div class="text-right">
+          <div data-i18n="remaining" class="text-zinc-400">Осталось</div>
+          <div id="remaining" class="text-3xl font-semibold text-orange-400">1180 ккал</div>
+        </div>
+      </div>
+
+      <div class="px-6 pb-6">
+        <div class="h-3 bg-zinc-800 rounded-3xl overflow-hidden">
+          <div id="progressBar" class="h-3 bg-gradient-to-r from-orange-400 to-amber-500 rounded-3xl transition-all w-0"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-1 mb-8 bg-zinc-900 rounded-3xl p-1">
+      <button data-tab="tab-today" data-i18n="today" class="tab-btn flex-1 py-4 rounded-3xl font-medium">Сегодня</button>
+      <button data-tab="tab-foods" data-i18n="myFoods" class="tab-btn flex-1 py-4 rounded-3xl font-medium">Мои блюда</button>
+      <button data-tab="tab-history" data-i18n="history" class="tab-btn flex-1 py-4 rounded-3xl font-medium">История</button>
+      <button data-tab="tab-profile" data-i18n="profile" class="tab-btn flex-1 py-4 rounded-3xl font-medium">Профиль</button>
+    </div>
+
+    <div id="tab-today" class="tab-content">
+      <h2 data-i18n="today" class="text-xl mb-4 px-1">Сегодня</h2>
+      <div id="todayLogs" class="space-y-3"></div>
+      <button onclick="document.getElementById('addLogModal').classList.remove('hidden')" 
+              data-i18n="addMeal"
+              class="w-full py-5 mt-8 text-xl font-medium rounded-3xl bg-gradient-to-r from-orange-400 to-amber-500 text-white shadow-xl">
+        + Добавить приём пищи
+      </button>
+    </div>
+
+    <div id="tab-foods" class="tab-content hidden">
+      <h2 data-i18n="myFoods" class="text-xl mb-4 px-1">Мои блюда</h2>
+      <div id="foodsList" class="mb-6"></div>
+      <div class="bg-zinc-900 p-6 rounded-3xl">
+        <input id="newFoodName" type="text" placeholder="Название блюда" class="w-full mb-3 bg-zinc-800 text-white p-4 rounded-3xl">
+        <input id="newFoodCalories" type="number" placeholder="Калории" class="w-full mb-3 bg-zinc-800 text-white p-4 rounded-3xl">
+        <button onclick="addNewFood()" class="w-full py-4 bg-orange-400 rounded-3xl">Добавить блюдо в базу</button>
+      </div>
+    </div>
+
+    <div id="tab-history" class="tab-content hidden">
+      <h2 data-i18n="history" class="text-xl mb-4 px-1">История</h2>
+      <div id="historyContainer" class="space-y-2"></div>
+    </div>
+
+    <div id="tab-profile" class="tab-content hidden">
+      <h2 data-i18n="profile" class="text-xl mb-4 px-1">Профиль</h2>
+      <div class="bg-zinc-900 p-6 rounded-3xl space-y-4">
+        <select id="gender" class="w-full bg-zinc-800 p-4 rounded-3xl">
+          <option value="male">Мужчина</option>
+          <option value="female">Женщина</option>
+        </select>
+        <input id="age" type="number" placeholder="Возраст" class="w-full bg-zinc-800 p-4 rounded-3xl">
+        <input id="height" type="number" placeholder="Рост (см)" class="w-full bg-zinc-800 p-4 rounded-3xl">
+        <input id="weight" type="number" step="0.1" placeholder="Вес (кг)" class="w-full bg-zinc-800 p-4 rounded-3xl">
+        <select id="activity" class="w-full bg-zinc-800 p-4 rounded-3xl">
+          <option value="1.2">Сидячий</option>
+          <option value="1.375">Лёгкая активность</option>
+          <option value="1.55" selected>Средняя</option>
+          <option value="1.725">Высокая</option>
+          <option value="1.9">Очень высокая</option>
+        </select>
+        <select id="goalType" class="w-full bg-zinc-800 p-4 rounded-3xl">
+          <option value="maintain">Поддержание</option>
+          <option value="deficit">Дефицит</option>
+          <option value="surplus">Профицит</option>
+        </select>
+        <input id="goalPercent" type="number" step="0.1" value="10" placeholder="Процент (%)" class="w-full bg-zinc-800 p-4 rounded-3xl">
+        <button onclick="saveProfile()" data-i18n="saveProfile" class="w-full py-4 bg-orange-400 rounded-3xl text-xl">Сохранить и пересчитать</button>
+      </div>
+    </div>
+
+    <div id="addLogModal" onclick="if(event.target.id==='addLogModal')this.classList.add('hidden')" 
+         class="hidden fixed inset-0 bg-black/70 flex items-end z-50">
+      <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full rounded-t-3xl p-6">
+        <h3 data-i18n="quickAdd" class="text-2xl mb-4">Быстрое добавление</h3>
+        <input id="quickFoodName" type="text" data-i18n="whatDidYouEat" placeholder="Что съел?" class="w-full mb-4 bg-zinc-800 p-4 rounded-3xl">
+        <input id="quickCalories" type="number" data-i18n="calories" placeholder="Калории" class="w-full mb-6 bg-zinc-800 p-4 rounded-3xl">
+        <button onclick="quickAddLog()" data-i18n="add" class="w-full py-5 bg-orange-400 text-xl rounded-3xl">Добавить</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
