@@ -16,10 +16,29 @@ let logs = [];
 let currentUnits = "metric";
 let newFoodType = "fixed";
 
+// ── New clean stable SVG icons (different from previous version) ──
+
+const MOON_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+</svg>`;
+
+const SUN_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="5"/>
+  <line x1="12" y1="1" x2="12" y2="3"/>
+  <line x1="12" y1="21" x2="12" y2="23"/>
+  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+  <line x1="1" y1="12" x2="3" y2="12"/>
+  <line x1="21" y1="12" x2="23" y2="12"/>
+  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+</svg>`;
+
 // ── Theme ─────────────────────────────────────────────────────────
 
 function initTheme() {
-  // If running inside Telegram, respect its color scheme; otherwise use saved or default dark.
   let theme = localStorage.getItem("theme");
   if (!theme) {
     theme = (tg && tg.colorScheme === "light") ? "light" : "dark";
@@ -30,7 +49,9 @@ function initTheme() {
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem("theme", theme);
-  document.getElementById("theme-btn").textContent = theme === "dark" ? "🌙" : "☀️";
+
+  const btn = document.getElementById("theme-btn");
+  btn.innerHTML = theme === "dark" ? MOON_SVG : SUN_SVG;
 }
 
 function toggleTheme() {
@@ -75,7 +96,6 @@ async function loadProfile() {
     dailyNorm = data.daily_norm || 2000;
     currentUnits = data.units || "metric";
 
-    // always sync language from the backend (bot or last-saved mini-app choice)
     if (data.language) {
       currentLang = data.language;
       localStorage.setItem('lang', data.language);
@@ -88,7 +108,6 @@ async function loadProfile() {
     if (data.gender) document.getElementById("gender").value = data.gender;
     if (data.age)    document.getElementById("age").value = data.age;
     if (data.activity) {
-      // match against known option values to avoid float precision mismatches
       const activityOptions = ["1.2", "1.375", "1.55", "1.725", "1.9"];
       const closest = activityOptions.reduce((a, b) =>
         Math.abs(parseFloat(b) - data.activity) < Math.abs(parseFloat(a) - data.activity) ? b : a
@@ -221,7 +240,6 @@ function setModalTab(tab) {
     document.getElementById(`modal-${t}`).classList.toggle("hidden", t !== tab);
     document.getElementById(`mtab-${t}`).classList.toggle("active", t === tab);
   });
-  // hide add button on fixed tab (tap-to-add); show for quick and per100g
   document.getElementById("modal-add-btn-wrap").classList.toggle("hidden", tab === "fixed");
   if (tab === "fixed")  renderFixedDishesList();
   if (tab === "per100g") renderPer100gDishesList();
@@ -375,10 +393,7 @@ async function deleteFood(id) {
 
 // ── History / Calendar ────────────────────────────────────────────
 
-// historyData: { "YYYY-MM-DD": totalKcal, ... } — populated once on load
 let historyData = {};
-// calOffset: months back from current month (0 = this month, -1 = prev, etc.)
-// We keep it ≥ 0 so the user can go back but not forward past today's month.
 let calOffset = 0;
 
 async function loadHistory() {
@@ -390,19 +405,15 @@ async function loadHistory() {
 
 function renderCalendar() {
   const today = new Date();
-  // target month = today minus calOffset months
   const target = new Date(today.getFullYear(), today.getMonth() - calOffset, 1);
   const year  = target.getFullYear();
-  const month = target.getMonth(); // 0-based
+  const month = target.getMonth();
 
-  // update month label
   const months = translations[currentLang]?.months || translations.ru.months;
   document.getElementById("calMonthLabel").textContent = `${months[month]} ${year}`;
 
-  // disable forward nav when already at current month
   document.querySelector(".cal-nav:last-child").disabled = calOffset === 0;
 
-  // day-of-week header (Monday-first)
   const dow = translations[currentLang]?.dow || translations.ru.dow;
   const dowRow = document.getElementById("calDowRow");
   dowRow.innerHTML = "";
@@ -413,21 +424,17 @@ function renderCalendar() {
     dowRow.appendChild(cell);
   });
 
-  // build grid
   const grid = document.getElementById("calGrid");
   grid.innerHTML = "";
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  // JS getDay(): 0=Sun,1=Mon...6=Sat  →  convert to Mon-first (0=Mon...6=Sun)
   let startDow = new Date(year, month, 1).getDay();
-  startDow = (startDow + 6) % 7; // Mon-first offset
+  startDow = (startDow + 6) % 7;
 
-  // 30-day window boundary
   const cutoff = new Date(today);
   cutoff.setDate(today.getDate() - 29);
   cutoff.setHours(0, 0, 0, 0);
 
-  // empty leading cells
   for (let i = 0; i < startDow; i++) {
     const blank = document.createElement("div");
     blank.className = "cal-day empty";
@@ -481,18 +488,15 @@ function renderCalendar() {
 }
 
 function calShift(dir) {
-  // dir: -1 = go back, +1 = go forward
-  const newOffset = calOffset - dir; // -1 means go back → offset increases
-  if (newOffset < 0) return; // can't go into the future
+  const newOffset = calOffset - dir;
+  if (newOffset < 0) return;
   calOffset = newOffset;
-  // clear selected state when navigating
   document.getElementById("dayDetail").classList.add("hidden");
   document.querySelectorAll(".cal-day.selected").forEach(el => el.classList.remove("selected"));
   renderCalendar();
 }
 
 async function selectDay(dateStr, cellEl) {
-  // toggle selected visual
   document.querySelectorAll(".cal-day.selected").forEach(el => el.classList.remove("selected"));
   cellEl.classList.add("selected");
 
@@ -505,7 +509,6 @@ async function selectDay(dateStr, cellEl) {
   if (!data) { detail.classList.add("hidden"); return; }
 
   const kcal = translate("unitKcal");
-  // format date for display
   const [y, m, d] = dateStr.split("-").map(Number);
   const months = translations[currentLang]?.months || translations.ru.months;
   document.getElementById("dayDetailDate").textContent = `${d} ${months[m - 1]} ${y}`;
@@ -534,7 +537,7 @@ function toISODate(d) {
 // ── Init ──────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", async () => {
-  initTheme();
+  initTheme();                    // ← 32px button + new clean SVGs
   renderLanguageDropdown();
   renderAllTexts();
   updateLanguageButton();
@@ -557,7 +560,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  // close language dropdown on outside click
   document.addEventListener("click", e => {
     const wrapper = document.querySelector(".lang-wrapper");
     if (wrapper && !wrapper.contains(e.target)) {
