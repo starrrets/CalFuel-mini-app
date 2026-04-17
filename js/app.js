@@ -7,7 +7,7 @@ if (window.Telegram && window.Telegram.WebApp) {
 }
 
 const tgId = tg ? (tg.initDataUnsafe?.user?.id || 123456789) : 123456789;
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://web-production-fcefd.up.railway.app";
 
 let dailyNorm = 2000;
 let totalToday = 0;
