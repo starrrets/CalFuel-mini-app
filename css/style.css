@@ -386,7 +386,19 @@ h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; padding-left: 0.2
   border-radius: 1.75rem 1.75rem 0 0;
   padding: 1.5rem;
   max-height: 80svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  flex: 1;
   overflow-y: auto;
+  min-height: 0;
+}
+
+#modal-add-btn-wrap {
+  padding-top: 1rem;
+  flex-shrink: 0;
 }
 
 /* modal tabs */

@@ -198,13 +198,22 @@ function closeAddModal() {
   document.getElementById("addLogModal").classList.remove("open");
 }
 
+let activeModalTab = "quick";
+
 function setModalTab(tab) {
+  activeModalTab = tab;
   ["quick", "fixed", "per100g"].forEach(t => {
     document.getElementById(`modal-${t}`).classList.toggle("hidden", t !== tab);
     document.getElementById(`mtab-${t}`).classList.toggle("active", t === tab);
   });
+  // hide add button on fixed tab (tap-to-add); show for quick and per100g
+  document.getElementById("modal-add-btn-wrap").classList.toggle("hidden", tab === "fixed");
   if (tab === "fixed")  renderFixedDishesList();
   if (tab === "per100g") renderPer100gDishesList();
+}
+
+function modalAddAction() {
+  if (activeModalTab === "quick") quickAddLog();
 }
 
 function renderFixedDishesList() {
@@ -526,6 +535,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById(btn.dataset.tab).classList.remove("hidden");
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
+      if (btn.dataset.tab === "tab-history") {
+        loadTodayLogs();
+        loadHistory();
+      }
     });
   });
 

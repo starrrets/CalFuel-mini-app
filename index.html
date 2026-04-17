@@ -184,25 +184,31 @@
           <button onclick="setModalTab('per100g')" id="mtab-per100g" data-i18n="addMealPer100g" class="modal-tab"></button>
         </div>
 
-        <!-- quick -->
-        <div id="modal-quick">
-          <div class="form-group">
-            <input id="quickFoodName" type="text" data-i18n-placeholder="whatDidYouEat">
+        <div class="modal-body">
+          <!-- quick -->
+          <div id="modal-quick">
+            <div class="form-group">
+              <input id="quickFoodName" type="text" data-i18n-placeholder="whatDidYouEat">
+            </div>
+            <div class="form-group">
+              <input id="quickCalories" type="number" data-i18n-placeholder="calories">
+            </div>
           </div>
-          <div class="form-group">
-            <input id="quickCalories" type="number" data-i18n-placeholder="calories">
+
+          <!-- fixed dishes -->
+          <div id="modal-fixed" class="hidden">
+            <div id="fixedDishesList"></div>
           </div>
-          <button onclick="quickAddLog()" data-i18n="add" class="gradient-btn" style="font-size:1.1rem;"></button>
+
+          <!-- per-100g dishes -->
+          <div id="modal-per100g" class="hidden">
+            <div id="per100gDishesList"></div>
+          </div>
         </div>
 
-        <!-- fixed dishes -->
-        <div id="modal-fixed" class="hidden">
-          <div id="fixedDishesList"></div>
-        </div>
-
-        <!-- per-100g dishes -->
-        <div id="modal-per100g" class="hidden">
-          <div id="per100gDishesList"></div>
+        <!-- add button: shown for quick and per100g tabs, hidden for fixed -->
+        <div id="modal-add-btn-wrap">
+          <button id="modal-add-btn" onclick="modalAddAction()" data-i18n="add" class="gradient-btn" style="font-size:1.1rem;"></button>
         </div>
 
       </div>
