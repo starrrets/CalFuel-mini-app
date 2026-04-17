@@ -11,7 +11,7 @@ const API_BASE = "https://web-production-fcefd.up.railway.app";
 document.addEventListener("DOMContentLoaded", () => {
   const div = document.createElement("div");
   div.style.cssText = "position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.85);color:#fff;font-size:11px;padding:8px;z-index:9999;word-break:break-all;";
-  div.textContent = `tg=${!!tg} | id=${tgId} | raw=${JSON.stringify(tg?.initDataUnsafe?.user)}`;
+  div.textContent = `tg=${!!tg} | id=${tgId} | user=${JSON.stringify(tg?.initDataUnsafe?.user)} | initData=${tg?.initData?.slice(0,40) || 'empty'} | version=${tg?.version}`;
   document.body.appendChild(div);
 });
 let dailyNorm = 2000;
