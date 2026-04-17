@@ -60,7 +60,20 @@ const translations = {
     profileSaved: "Профиль сохранён",
     addedTemplate: "{name} ({calories} ккал) добавлено",
     deleteConfirmLog: "Удалить запись?",
-    deleteConfirmFood: "Удалить блюдо из базы?"
+    deleteConfirmFood: "Удалить блюдо из базы?",
+    noHistory: "Записей пока нет",
+    noLogsForDay: "В этот день ничего не записано",
+    dow: ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
+    months: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
+    foodTypeFixed: "Фиксированные ккал",
+    foodTypePer100g: "ккал на 100 г",
+    per100gLabel: "100 г",
+    weightGPlaceholder: "Граммы",
+    addMealQuick: "Быстро",
+    addMealFromDish: "Блюда",
+    addMealPer100g: "По весу",
+    noFixedDishes: "Нет блюд с фиксированными ккал",
+    noPer100gDishes: "Нет блюд с ккал на 100 г"
   },
   en: {
     flag: "gb", name: "English",
@@ -92,9 +105,9 @@ const translations = {
     genderFemale: "Female",
     unitsMetric: "Metric",
     unitsImperial: "Imperial",
-    heightMetric: "Height (in)",
+    heightMetric: "Height (cm)",
     heightImperial: "Height (in)",
-    weightMetric: "Weight (lbs)",
+    weightMetric: "Weight (kg)",
     weightImperial: "Weight (lbs)",
     activityLabel: "Activity level",
     activitySedentary: "Sedentary",
@@ -115,7 +128,20 @@ const translations = {
     profileSaved: "Profile saved",
     addedTemplate: "{name} ({calories} kcal) added",
     deleteConfirmLog: "Delete this log?",
-    deleteConfirmFood: "Delete this food from database?"
+    deleteConfirmFood: "Delete this food from database?",
+    noHistory: "No records yet",
+    noLogsForDay: "Nothing logged on this day",
+    dow: ["Mo","Tu","We","Th","Fr","Sa","Su"],
+    months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+    foodTypeFixed: "Fixed kcal",
+    foodTypePer100g: "kcal per 100 g",
+    per100gLabel: "100 g",
+    weightGPlaceholder: "Grams",
+    addMealQuick: "Quick",
+    addMealFromDish: "Dishes",
+    addMealPer100g: "By weight",
+    noFixedDishes: "No fixed-calorie dishes saved",
+    noPer100gDishes: "No per-100 g dishes saved"
   },
   uk: {
     flag: "ua", name: "Українська",
@@ -170,7 +196,20 @@ const translations = {
     profileSaved: "Профіль збережено",
     addedTemplate: "{name} ({calories} ккал) додано",
     deleteConfirmLog: "Видалити запис?",
-    deleteConfirmFood: "Видалити страву з бази?"
+    deleteConfirmFood: "Видалити страву з бази?",
+    noHistory: "Записів поки немає",
+    noLogsForDay: "Цього дня нічого не записано",
+    dow: ["Пн","Вт","Ср","Чт","Пт","Сб","Нд"],
+    months: ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"],
+    foodTypeFixed: "Фіксовані ккал",
+    foodTypePer100g: "ккал на 100 г",
+    per100gLabel: "100 г",
+    weightGPlaceholder: "Грами",
+    addMealQuick: "Швидко",
+    addMealFromDish: "Страви",
+    addMealPer100g: "За вагою",
+    noFixedDishes: "Немає страв із фіксованими ккал",
+    noPer100gDishes: "Немає страв із ккал на 100 г"
   },
   es: {
     flag: "es", name: "Español",
@@ -225,7 +264,20 @@ const translations = {
     profileSaved: "Perfil guardado",
     addedTemplate: "{name} ({calories} kcal) añadido",
     deleteConfirmLog: "¿Eliminar registro?",
-    deleteConfirmFood: "¿Eliminar plato de la base?"
+    deleteConfirmFood: "¿Eliminar plato de la base?",
+    noHistory: "Aún no hay registros",
+    noLogsForDay: "Nada registrado este día",
+    dow: ["Lu","Ma","Mi","Ju","Vi","Sá","Do"],
+    months: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
+    foodTypeFixed: "kcal fijas",
+    foodTypePer100g: "kcal por 100 g",
+    per100gLabel: "100 g",
+    weightGPlaceholder: "Gramos",
+    addMealQuick: "Rápido",
+    addMealFromDish: "Platos",
+    addMealPer100g: "Por peso",
+    noFixedDishes: "No hay platos con kcal fijas",
+    noPer100gDishes: "No hay platos con kcal por 100 g"
   },
   de: {
     flag: "de", name: "Deutsch",
@@ -280,7 +332,20 @@ const translations = {
     profileSaved: "Profil gespeichert",
     addedTemplate: "{name} ({calories} kcal) hinzugefügt",
     deleteConfirmLog: "Eintrag löschen?",
-    deleteConfirmFood: "Gericht aus Datenbank löschen?"
+    deleteConfirmFood: "Gericht aus Datenbank löschen?",
+    noHistory: "Noch keine Einträge",
+    noLogsForDay: "An diesem Tag nichts eingetragen",
+    dow: ["Mo","Di","Mi","Do","Fr","Sa","So"],
+    months: ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
+    foodTypeFixed: "Feste kcal",
+    foodTypePer100g: "kcal pro 100 g",
+    per100gLabel: "100 g",
+    weightGPlaceholder: "Gramm",
+    addMealQuick: "Schnell",
+    addMealFromDish: "Gerichte",
+    addMealPer100g: "Nach Gewicht",
+    noFixedDishes: "Keine Gerichte mit festen kcal",
+    noPer100gDishes: "Keine Gerichte mit kcal pro 100 g"
   },
   fr: {
     flag: "fr", name: "Français",
@@ -335,7 +400,20 @@ const translations = {
     profileSaved: "Profil enregistré",
     addedTemplate: "{name} ({calories} kcal) ajouté",
     deleteConfirmLog: "Supprimer l'enregistrement ?",
-    deleteConfirmFood: "Supprimer le plat de la base ?"
+    deleteConfirmFood: "Supprimer le plat de la base ?",
+    noHistory: "Pas encore d'enregistrements",
+    noLogsForDay: "Rien d'enregistré ce jour",
+    dow: ["Lu","Ma","Me","Je","Ve","Sa","Di"],
+    months: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
+    foodTypeFixed: "kcal fixes",
+    foodTypePer100g: "kcal pour 100 g",
+    per100gLabel: "100 g",
+    weightGPlaceholder: "Grammes",
+    addMealQuick: "Rapide",
+    addMealFromDish: "Plats",
+    addMealPer100g: "Par poids",
+    noFixedDishes: "Aucun plat avec des kcal fixes",
+    noPer100gDishes: "Aucun plat avec des kcal pour 100 g"
   },
   be: {
     flag: "by", name: "Беларуская",
@@ -390,7 +468,20 @@ const translations = {
     profileSaved: "Профіль захаваны",
     addedTemplate: "{name} ({calories} ккал) дададзена",
     deleteConfirmLog: "Выдаліць запіс?",
-    deleteConfirmFood: "Выдаліць страву з базы?"
+    deleteConfirmFood: "Выдаліць страву з базы?",
+    noHistory: "Запісаў пакуль няма",
+    noLogsForDay: "У гэты дзень нічога не запісана",
+    dow: ["Пн","Аў","Ср","Чц","Пт","Сб","Нд"],
+    months: ["Студзень","Люты","Сакавік","Красавік","Май","Чэрвень","Ліпень","Жнівень","Верасень","Кастрычнік","Лістапад","Снежань"],
+    foodTypeFixed: "Фіксаваныя ккал",
+    foodTypePer100g: "ккал на 100 г",
+    per100gLabel: "100 г",
+    weightGPlaceholder: "Грамы",
+    addMealQuick: "Хутка",
+    addMealFromDish: "Стравы",
+    addMealPer100g: "Па вазе",
+    noFixedDishes: "Няма страў з фіксаванымі ккал",
+    noPer100gDishes: "Няма страў з ккал на 100 г"
   }
 };
 
@@ -428,6 +519,10 @@ function setLanguage(lang) {
   renderAllTexts();
   updateLanguageButton();
   toggleDropdown();
+  // re-render calendar headers if history tab has been loaded
+  if (typeof renderCalendar === 'function' && Object.keys(historyData || {}).length >= 0) {
+    renderCalendar();
+  }
 }
 
 /**
@@ -443,8 +538,8 @@ function updateLanguageButton() {
  */
 function toggleDropdown() {
   const dropdown = document.getElementById('lang-dropdown');
-  dropdown.classList.toggle('hidden');
-  if (!dropdown.classList.contains('hidden')) renderLanguageDropdown();
+  const isOpen = dropdown.classList.toggle('open');
+  if (isOpen) renderLanguageDropdown();
 }
 
 /**
@@ -455,11 +550,10 @@ function renderLanguageDropdown() {
   dropdown.innerHTML = '';
   Object.keys(translations).forEach(lang => {
     const div = document.createElement('div');
-    div.className = 'flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 cursor-pointer';
+    div.className = 'lang-option';
     div.innerHTML = `
-      <img src="${getFlagUrl(lang)}" class="w-6 h-6 rounded-full" alt="${translations[lang].name}">
-      <span>${translations[lang].name}</span>
-    `;
+      <img src="${getFlagUrl(lang)}" class="lang-option-flag" alt="${translations[lang].name}">
+      <span>${translations[lang].name}</span>`;
     div.onclick = () => setLanguage(lang);
     dropdown.appendChild(div);
   });
