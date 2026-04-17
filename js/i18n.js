@@ -519,9 +519,12 @@ function setLanguage(lang) {
   renderAllTexts();
   updateLanguageButton();
   toggleDropdown();
-  // re-render calendar headers if history tab has been loaded
   if (typeof renderCalendar === 'function' && Object.keys(historyData || {}).length >= 0) {
     renderCalendar();
+  }
+  // persist to backend so bot stays in sync
+  if (typeof tgId !== 'undefined' && tgId !== 123456789) {
+    apiFetch('/api/profile/language', 'POST', { tg_id: tgId, language: lang });
   }
 }
 
@@ -580,10 +583,6 @@ function renderAllTexts() {
  * Forces Russian as default if no language was saved
  */
 window.onload = () => {
-  if (!localStorage.getItem('lang')) {
-    currentLang = 'ru';
-    localStorage.setItem('lang', 'ru');
-  }
   updateLanguageButton();
   renderAllTexts();
   renderLanguageDropdown();

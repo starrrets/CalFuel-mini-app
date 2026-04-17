@@ -75,10 +75,12 @@ async function loadProfile() {
     dailyNorm = data.daily_norm || 2000;
     currentUnits = data.units || "metric";
 
-    // sync language from bot if user hasn't explicitly chosen one in the mini app
-    if (data.language && !localStorage.getItem("lang")) {
-      setLanguage(data.language);
+    // always sync language from the backend (bot or last-saved mini-app choice)
+    if (data.language) {
+      currentLang = data.language;
+      localStorage.setItem('lang', data.language);
       renderAllTexts();
+      updateLanguageButton();
     }
 
     if (data.height) document.getElementById("height").value = Math.round(convertHeight(data.height, "metric", currentUnits));

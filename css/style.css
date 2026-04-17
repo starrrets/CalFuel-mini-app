@@ -162,10 +162,10 @@ h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; padding-left: 0.2
 }
 
 .big-emoji {
-  font-size: 86px;
+  font-size: 108px;
   filter: drop-shadow(0 0 25px rgba(249,115,22,0.55));
   position: absolute;
-  top: -4rem;
+  top: -4.5rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
