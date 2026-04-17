@@ -158,7 +158,7 @@ function updateProgress() {
   const percent = Math.min((totalToday / dailyNorm) * 100, 100);
   document.getElementById("progressBar").style.width = percent + "%";
   const rem = Math.max(0, Math.round(dailyNorm - totalToday));
-  document.getElementById("remaining").textContent = rem + " " + translate("unitKcal");
+  document.getElementById("remaining").textContent = rem;
 }
 
 function renderLogs() {
