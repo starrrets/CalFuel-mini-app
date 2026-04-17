@@ -27,7 +27,7 @@
 :root[data-theme="light"] {
   --bg:          #f4f4f5;
   --surface:     #ffffff;
-  --surface2:    #e4e4e7;
+  --surface2:    #ffffff;
   --surface3:    #d4d4d8;
   --border:      rgba(0,0,0,0.08);
   --text:        #09090b;
@@ -95,14 +95,11 @@ h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; padding-left: 0.2
 .theme-toggle {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
+  line-height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  transition: background 0.2s, transform 0.2s;
+  font-size: 32px;
   flex-shrink: 0;
 }
 .theme-toggle:hover { transform: scale(1.1); }
@@ -119,6 +116,7 @@ h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; padding-left: 0.2
   display: block;
   cursor: pointer;
   object-fit: cover;
+  border: 3px solid var(--border);
 }
 
 .lang-dropdown {
@@ -161,19 +159,8 @@ h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; padding-left: 0.2
   margin-bottom: 2rem;
 }
 
-.big-emoji {
-  font-size: 108px;
-  filter: drop-shadow(0 0 25px rgba(249,115,22,0.55));
-  position: absolute;
-  top: -4.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  line-height: 1;
-}
-
 .hero-norm {
-  padding: 5rem 0 1rem;
+  padding: 2rem 0 1rem;
   text-align: center;
   display: flex;
   align-items: baseline;
