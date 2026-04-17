@@ -75,14 +75,27 @@ async function loadProfile() {
     dailyNorm = data.daily_norm || 2000;
     currentUnits = data.units || "metric";
 
-    if (data.height) document.getElementById("height").value = convertHeight(data.height, "metric", currentUnits);
-    if (data.weight) document.getElementById("weight").value = convertWeight(data.weight, "metric", currentUnits);
+    // sync language from bot if user hasn't explicitly chosen one in the mini app
+    if (data.language && !localStorage.getItem("lang")) {
+      setLanguage(data.language);
+      renderAllTexts();
+    }
+
+    if (data.height) document.getElementById("height").value = Math.round(convertHeight(data.height, "metric", currentUnits));
+    if (data.weight) document.getElementById("weight").value = Math.round(convertWeight(data.weight, "metric", currentUnits) * 10) / 10;
     if (data.gender) document.getElementById("gender").value = data.gender;
     if (data.age)    document.getElementById("age").value = data.age;
-    if (data.activity) document.getElementById("activity").value = data.activity;
+    if (data.activity) {
+      // match against known option values to avoid float precision mismatches
+      const activityOptions = ["1.2", "1.375", "1.55", "1.725", "1.9"];
+      const closest = activityOptions.reduce((a, b) =>
+        Math.abs(parseFloat(b) - data.activity) < Math.abs(parseFloat(a) - data.activity) ? b : a
+      );
+      document.getElementById("activity").value = closest;
+    }
     if (data.goal_type) {
       document.getElementById("goalType").value = data.goal_type;
-      if (data.goal_percent) document.getElementById("goalPercent").value = data.goal_percent;
+      if (data.goal_percent) document.getElementById("goalPercent").value = Math.round(data.goal_percent * 10) / 10;
     }
     document.getElementById("dailyNorm").textContent = Math.round(dailyNorm);
     updateProgress();
