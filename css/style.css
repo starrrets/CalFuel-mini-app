@@ -91,7 +91,7 @@ h2 {
   color: var(--text2); transition: opacity 0.15s;
 }
 .theme-toggle:active { opacity: 0.6; }
-.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle svg { width: 16px; height: 16px; display: block; flex-shrink: 0; overflow: visible; }
 
 /* ── Language ──────────────────────────────────────────────────── */
 
@@ -261,18 +261,19 @@ h2 {
 .btn-cta-icon {
   display: flex; align-items: center; justify-content: center; gap: 0.4rem;
 }
-.btn-cta-icon svg { width: 18px; height: 18px; flex-shrink: 0; }
+.btn-cta-icon svg { width: 14px; height: 14px; flex-shrink: 0; }
 
 /* ── Delete button ─────────────────────────────────────────────── */
 
 .btn-delete {
+  width: 24px;
   display: flex; align-items: center; justify-content: center;
   color: var(--text3); flex-shrink: 0; margin-left: 0.5rem;
   padding: 4px; border-radius: 50%;
   transition: color 0.15s, background 0.15s;
 }
 .btn-delete:active { color: var(--red); background: rgba(255,69,58,0.12); }
-.btn-delete svg { width: 22px; height: 22px; stroke-width: 2; }
+.btn-delete svg { width: 20px; height: 20px; }
 
 /* ── List rows ─────────────────────────────────────────────────── */
 
@@ -365,7 +366,7 @@ h2 {
 
 .cal-nav {
   width: 28px; height: 28px; border-radius: 50%;
-  background: var(--bg3); color: var(--text2);
+  color: var(--text2);
   display: flex; align-items: center; justify-content: center;
   transition: opacity 0.12s; flex-shrink: 0;
 }
@@ -392,7 +393,7 @@ h2 {
 .cal-day.out-of-range { opacity: 0.3; cursor: default; pointer-events: none; }
 .cal-day.has-data { color: var(--text); }
 .cal-day.today { background: var(--accent); color: #fff; font-weight: 700; }
-.cal-day.selected { outline: 2px solid var(--accentLight); outline-offset: -2px; }
+.cal-day.selected { outline: 3px solid var(--accentLight); outline-offset: -3px; }
 .cal-day-num { line-height: 1; }
 .cal-day-dot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; margin-top: 2px; }
 
