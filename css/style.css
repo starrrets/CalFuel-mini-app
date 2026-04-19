@@ -202,7 +202,7 @@ h2 {
 .form-row:last-child { border-bottom: none; }
 .form-row input,
 .form-row select {
-  flex: 1; color: var(--text);
+  flex: 1; color: var(--text); background-color: var(--bg2);
   font-size: 1rem; min-width: 0;
   background: transparent; border: none; outline: none;
 }
@@ -215,7 +215,7 @@ h2 {
   flex-shrink: 0;
 }
 .form-row.labeled input,
-.form-row.labeled select { text-align: right; direction: rtl; color: var(--text2); flex: 1; min-width: 0; }
+.form-row.labeled select { text-align: right; direction: rtl; color: var(--text2); background-color: var(--bg2); flex: 1; min-width: 0; }
 .select-right { text-align: right; direction: rtl; }
 
 .input-suffix-wrap { position: relative; }
