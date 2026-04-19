@@ -233,7 +233,7 @@ function updateProgress() {
     fill.style.visibility = pct === 0 ? "hidden" : "visible";
   }
 
-  const rem = Math.max(0, Math.round(dailyNorm - totalToday));
+  const rem = Math.round(dailyNorm - totalToday);
   document.getElementById("remaining").textContent = rem;
 }
 
@@ -716,7 +716,8 @@ async function selectDay(dateStr, cellEl) {
   const [y, m, d] = dateStr.split("-").map(Number);
   const months = translations[currentLang]?.months || translations.ru.months;
   document.getElementById("dayDetailDate").textContent = `${d} ${months[m - 1]} ${y}`;
-  document.getElementById("dayDetailTotal").textContent = `${Math.round(data.total)} ${kcal}`;
+  const rem = Math.round(data.daily_norm - totalToday);
+  document.getElementById("dayDetailTotal").textContent = `${Math.round(data.total)} ${kcal} | ${translate("remaining")}: ${rem} ${kcal}`;
 
   logsContainer.innerHTML = "";
   if (!data.logs.length) {
