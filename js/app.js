@@ -230,6 +230,7 @@ function updateProgress() {
     const filled = pct * totalLen;
     fill.style.strokeDasharray  = `${filled.toFixed(2)} ${totalLen.toFixed(2)}`;
     fill.style.strokeDashoffset = "0";
+    fill.style.visibility = pct === 0 ? "hidden" : "visible";
   }
 
   const rem = Math.max(0, Math.round(dailyNorm - totalToday));
