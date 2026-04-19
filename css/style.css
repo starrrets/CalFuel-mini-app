@@ -215,8 +215,8 @@ h2 {
   flex-shrink: 0;
 }
 .form-row.labeled input,
-.form-row.labeled select { text-align: right; color: var(--text2); flex: 1; min-width: 0; }
-.select-right { text-align: right; }
+.form-row.labeled select { text-align: right; direction: rtl; color: var(--text2); flex: 1; min-width: 0; }
+.select-right { text-align: right; direction: rtl; }
 
 .input-suffix-wrap { position: relative; }
 .input-suffix-wrap input { padding-right: 3.5rem; }
