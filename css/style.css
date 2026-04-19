@@ -129,10 +129,10 @@ h2 {
 }
 .gauge-svg { width: 100%; display: block; }
 
-.gauge-track { stroke: var(--bg3); stroke-width: 20; }
+.gauge-track { stroke: var(--bg3); stroke-width: 10; }
 .gauge-fill  {
-  stroke-width: 20;
-  transition: stroke-dasharray 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  stroke-width: 10;
+  transition: stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .g-norm {
