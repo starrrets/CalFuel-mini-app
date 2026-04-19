@@ -3,107 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Трекер калорий</title>
+  <title>CalFuel</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/i18n.js" defer></script>
+  <script src="js/ingredients.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
   <div class="page">
 
-    <!-- top bar: theme toggle + language -->
+    <!-- top bar -->
     <div class="topbar">
-      <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Toggle theme">
-        <!-- SVG will be inserted by JS -->
-      </button>
       <div class="lang-wrapper">
-        <img onclick="toggleDropdown()" id="current-lang-flag" class="current-flag" alt="flag">
+        <button onclick="toggleDropdown()" id="current-lang-btn" class="lang-toggle"></button>
         <div id="lang-dropdown" class="lang-dropdown"></div>
       </div>
+      <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn"></button>
     </div>
 
-    <!-- hero card -->
-    <div class="glass-card">
-      <div class="hero-norm">
-        <span id="dailyNorm" class="hero-norm-value">2000</span>
-        <span data-i18n="unitKcal" class="hero-norm-unit"></span>
-      </div>
-
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div data-i18n="eaten" class="hero-stat-label"></div>
-          <div id="totalToday" class="hero-stat-value">0</div>
-        </div>
-        <div class="hero-divider"></div>
-        <div class="hero-stat">
-          <div data-i18n="remaining" class="hero-stat-label"></div>
-          <div id="remaining" class="hero-stat-value">2000</div>
-        </div>
-      </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track">
-          <div id="progressBar" class="progress-bar"></div>
-        </div>
-      </div>
+    <!-- gauge -->
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#ff375f"/>
+            <stop offset="100%" stop-color="#ff6b35"/>
+          </linearGradient>
+        </defs>
+        <path id="gaugeTrack" class="gauge-track" fill="none" stroke-linecap="round"/>
+        <path id="gaugeFill"  class="gauge-fill"  fill="none" stroke="url(#gaugeGradient)" stroke-linecap="round"/>
+        <text x="100" y="85"  class="g-norm"  id="dailyNorm"  text-anchor="middle">2000</text>
+        <text x="100" y="100" class="g-unit"  data-i18n="unitKcal" text-anchor="middle"></text>
+        <text x="62"  y="124" class="g-val"   id="totalToday" text-anchor="middle">0</text>
+        <text x="62"  y="137" class="g-label" data-i18n="eaten" text-anchor="middle"></text>
+        <line x1="100" y1="116" x2="100" y2="138" class="g-sep"/>
+        <text x="138" y="124" class="g-val"   id="remaining" text-anchor="middle">2000</text>
+        <text x="138" y="137" class="g-label" data-i18n="remaining" text-anchor="middle"></text>
+      </svg>
     </div>
 
     <!-- tab bar -->
     <div class="tabs">
-      <button data-tab="tab-today"   data-i18n="today"   class="tab-btn active"></button>
-      <button data-tab="tab-foods"   data-i18n="myFoods" class="tab-btn"></button>
-      <button data-tab="tab-history" data-i18n="history" class="tab-btn"></button>
-      <button data-tab="tab-profile" data-i18n="profile" class="tab-btn"></button>
+      <button data-tab="tab-today" class="tab-btn active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span data-i18n="today"></span>
+      </button>
+      <button data-tab="tab-foods" class="tab-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 4-3 6-3 9H8c0-3-3-5-3-9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/><path d="M9.5 18h5"/></svg>
+        <span data-i18n="myFoods"></span>
+      </button>
+      <button data-tab="tab-history" class="tab-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span data-i18n="history"></span>
+      </button>
+      <button data-tab="tab-profile" class="tab-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span data-i18n="profile"></span>
+      </button>
     </div>
 
     <!-- ── Today ── -->
     <div id="tab-today" class="tab-content">
       <div id="todayLogs"></div>
-      <button onclick="openAddModal()" data-i18n="addMeal" class="gradient-btn lg"></button>
+      <button onclick="openAddModal()" class="btn-cta btn-cta-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span data-i18n="addMeal"></span>
+      </button>
     </div>
 
     <!-- ── My Foods ── -->
     <div id="tab-foods" class="tab-content hidden">
       <h2 data-i18n="myFoods"></h2>
-      <div id="foodsList"></div>
-
-      <div class="card">
-        <!-- type toggle -->
-        <div class="seg-wrap form-group">
-          <button id="food-type-fixed"   onclick="setFoodType('fixed')"   data-i18n="foodTypeFixed"   class="unit-btn active"></button>
-          <button id="food-type-per100g" onclick="setFoodType('per100g')" data-i18n="foodTypePer100g" class="unit-btn"></button>
+      <div class="grouped-card">
+        <div class="seg-wrap">
+          <button id="food-type-fixed"   onclick="setFoodType('fixed')"   data-i18n="foodTypeFixed"   class="seg-btn active"></button>
+          <button id="food-type-per100g" onclick="setFoodType('per100g')" data-i18n="foodTypePer100g" class="seg-btn"></button>
+          <button id="food-type-builder" onclick="setFoodType('builder')" data-i18n="foodTypeBuilder" class="seg-btn"></button>
         </div>
 
-        <div class="form-group">
-          <input id="newFoodName" type="text" data-i18n-placeholder="foodNamePlaceholder">
+        <!-- fixed / per100g form rows -->
+        <div id="food-form-rows">
+          <div class="form-row">
+            <input id="newFoodName"     type="text"   data-i18n-placeholder="foodNamePlaceholder">
+          </div>
+          <div class="form-row input-suffix-wrap">
+            <input id="newFoodCalories" type="number" data-i18n-placeholder="caloriesPlaceholder">
+            <span id="cal-unit-label" class="input-suffix" data-i18n="unitKcal"></span>
+          </div>
         </div>
 
-        <div class="form-group input-suffix-wrap">
-          <input id="newFoodCalories" type="number" data-i18n-placeholder="caloriesPlaceholder">
-          <span id="cal-unit-label" class="input-suffix" data-i18n="unitKcal"></span>
+        <!-- builder panel -->
+        <div id="builder-panel" class="hidden">
+          <div class="form-row">
+            <input id="builderDishName" type="text" data-i18n-placeholder="foodNamePlaceholder">
+          </div>
+          <div class="form-row">
+            <input id="builderSearch" type="text" data-i18n-placeholder="builderSearchPlaceholder" autocomplete="off" oninput="onBuilderSearch(this.value)">
+          </div>
+          <div id="builderSuggestions"></div>
+          <div id="builderIngredients"></div>
+          <div class="form-row labeled" id="builderWeightRow" style="display:none">
+            <span class="row-label" data-i18n="builderDishWeight"></span>
+            <div class="input-suffix-wrap" style="flex:1">
+              <input id="builderDishWeight" type="number">
+              <span class="input-suffix">g</span>
+            </div>
+          </div>
         </div>
-
-        <button onclick="addNewFood()" data-i18n="addFoodToBase" class="gradient-btn"></button>
       </div>
+      <button id="foods-cta-btn" onclick="addNewFood()" data-i18n="addFoodToBase" class="btn-cta btn-cta-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span id="foods-cta-label" data-i18n="addFoodToBase"></span>
+      </button>
+      <div id="foodsList" style="margin-top: 1.25rem;"></div>
     </div>
 
     <!-- ── History ── -->
     <div id="tab-history" class="tab-content hidden">
       <h2 data-i18n="history"></h2>
-
-      <!-- calendar -->
-      <div class="cal-card">
+      <div class="grouped-card cal-card">
         <div class="cal-header">
-          <button class="cal-nav" onclick="calShift(-1)">‹</button>
+          <button class="cal-nav" onclick="calShift(-1)">
+            <svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M8 1L1.5 7.5L8 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
           <span id="calMonthLabel" class="cal-month-label"></span>
-          <button class="cal-nav" onclick="calShift(1)">›</button>
+          <button class="cal-nav" onclick="calShift(1)">
+            <svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M1 1l6.5 6.5L1 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
         <div class="cal-dow-row" id="calDowRow"></div>
         <div class="cal-grid" id="calGrid"></div>
       </div>
-
-      <!-- selected day detail -->
       <div id="dayDetail" class="day-detail hidden">
         <div class="day-detail-header">
           <span id="dayDetailDate" class="day-detail-date"></span>
@@ -116,38 +147,36 @@
     <!-- ── Profile ── -->
     <div id="tab-profile" class="tab-content hidden">
       <h2 data-i18n="profile"></h2>
-      <div class="card">
+      <div class="grouped-card">
 
-        <div class="form-group">
-          <select id="gender">
-            <option value="male"   data-i18n="genderMale"></option>
-            <option value="female" data-i18n="genderFemale"></option>
-          </select>
+        <div class="seg-wrap">
+          <button id="gender-male"   onclick="setGender('male')"   data-i18n="genderMale"   class="seg-btn active"></button>
+          <button id="gender-female" onclick="setGender('female')" data-i18n="genderFemale" class="seg-btn"></button>
         </div>
 
-        <div class="form-group">
-          <div data-i18n="ageLabel" class="field-label"></div>
+        <div class="form-row labeled">
+          <span class="row-label" data-i18n="ageLabel"></span>
           <input id="age" type="number" data-i18n-placeholder="agePlaceholder">
         </div>
 
-        <div class="seg-wrap form-group">
-          <button id="unit-metric"   data-i18n="unitsMetric"   onclick="setUnits('metric')"   class="unit-btn"></button>
-          <button id="unit-imperial" data-i18n="unitsImperial" onclick="setUnits('imperial')" class="unit-btn"></button>
+        <div class="seg-wrap">
+          <button id="unit-metric"   data-i18n="unitsMetric"   onclick="setUnits('metric')"   class="seg-btn"></button>
+          <button id="unit-imperial" data-i18n="unitsImperial" onclick="setUnits('imperial')" class="seg-btn"></button>
         </div>
 
-        <div class="form-group">
-          <div id="height-label" class="field-label"></div>
+        <div class="form-row labeled">
+          <span id="height-label" class="row-label"></span>
           <input id="height" type="number" data-i18n-placeholder="heightMetric">
         </div>
 
-        <div class="form-group">
-          <div id="weight-label" class="field-label"></div>
+        <div class="form-row labeled">
+          <span id="weight-label" class="row-label"></span>
           <input id="weight" type="number" step="0.1" data-i18n-placeholder="weightMetric">
         </div>
 
-        <div class="form-group">
-          <div data-i18n="activityLabel" class="field-label"></div>
-          <select id="activity">
+        <div class="form-row labeled">
+          <span class="row-label" data-i18n="activityLabel"></span>
+          <select id="activity" class="select-right">
             <option value="1.2"   data-i18n="activitySedentary"></option>
             <option value="1.375" data-i18n="activityLight"></option>
             <option value="1.55"  selected data-i18n="activityModerate"></option>
@@ -156,65 +185,52 @@
           </select>
         </div>
 
-        <div class="form-group" style="display:flex; gap:0.75rem; align-items:flex-end;">
-          <div style="flex:1">
-            <div data-i18n="goalLabel" class="field-label"></div>
-            <select id="goalType" onchange="toggleGoalPercent()">
-              <option value="maintain" data-i18n="goalMaintain"></option>
-              <option value="deficit"  data-i18n="goalDeficit"></option>
-              <option value="surplus"  data-i18n="goalSurplus"></option>
-            </select>
-          </div>
-          <div id="goal-percent-row" style="flex:1">
-            <div data-i18n="goalPercentLabel" class="field-label"></div>
-            <input id="goalPercent" type="number" step="0.1" value="10" data-i18n-placeholder="goalPercentPlaceholder">
-          </div>
+        <div class="form-row labeled">
+          <span class="row-label" data-i18n="goalLabel"></span>
+          <select id="goalType" onchange="toggleGoalPercent()" class="select-right">
+            <option value="maintain" data-i18n="goalMaintain"></option>
+            <option value="deficit"  data-i18n="goalDeficit"></option>
+            <option value="surplus"  data-i18n="goalSurplus"></option>
+          </select>
         </div>
 
-        <button onclick="saveProfile()" data-i18n="saveProfile" class="gradient-btn" style="margin-top:0.5rem;font-size:1.1rem;"></button>
+        <div id="goal-percent-row" class="form-row labeled">
+          <span class="row-label" data-i18n="goalPercentLabel"></span>
+          <input id="goalPercent" type="number" step="0.1" value="10" data-i18n-placeholder="goalPercentPlaceholder">
+        </div>
+
       </div>
+      <button onclick="saveProfile()" data-i18n="saveProfile" class="btn-cta"></button>
     </div>
 
     <!-- ── Add meal modal ── -->
     <div id="addLogModal" class="modal-overlay" onclick="if(event.target===this)closeAddModal()">
       <div class="modal-sheet" onclick="event.stopPropagation()">
+        <div class="modal-handle"></div>
 
-        <div class="modal-tabs">
-          <button onclick="setModalTab('quick')"  id="mtab-quick"  data-i18n="addMealQuick"    class="modal-tab"></button>
-          <button onclick="setModalTab('fixed')"  id="mtab-fixed"  data-i18n="addMealFromDish" class="modal-tab"></button>
-          <button onclick="setModalTab('per100g')" id="mtab-per100g" data-i18n="addMealPer100g" class="modal-tab"></button>
+        <div class="seg-wrap">
+          <button onclick="setModalTab('quick')"   id="mtab-quick"   data-i18n="addMealQuick"    class="seg-btn"></button>
+          <button onclick="setModalTab('fixed')"   id="mtab-fixed"   data-i18n="addMealFromDish" class="seg-btn"></button>
+          <button onclick="setModalTab('per100g')" id="mtab-per100g" data-i18n="addMealPer100g"  class="seg-btn"></button>
         </div>
 
         <div class="modal-body">
-          <!-- quick -->
           <div id="modal-quick">
-            <div class="form-group">
-              <input id="quickFoodName" type="text" data-i18n-placeholder="whatDidYouEat">
-            </div>
-            <div class="form-group">
-              <input id="quickCalories" type="number" data-i18n-placeholder="calories">
+            <div class="grouped-card" style="margin-bottom:0">
+              <div class="form-row"><input id="quickFoodName" type="text"   data-i18n-placeholder="whatDidYouEat"></div>
+              <div class="form-row"><input id="quickCalories" type="number" data-i18n-placeholder="calories"></div>
             </div>
           </div>
-
-          <!-- fixed dishes -->
-          <div id="modal-fixed" class="hidden">
-            <div id="fixedDishesList"></div>
-          </div>
-
-          <!-- per-100g dishes -->
-          <div id="modal-per100g" class="hidden">
-            <div id="per100gDishesList"></div>
-          </div>
+          <div id="modal-fixed"   class="hidden"><div id="fixedDishesList"></div></div>
+          <div id="modal-per100g" class="hidden"><div id="per100gDishesList"></div></div>
         </div>
 
-        <!-- add button: shown for quick and per100g tabs, hidden for fixed -->
-        <div id="modal-add-btn-wrap">
-          <button id="modal-add-btn" onclick="modalAddAction()" data-i18n="add" class="gradient-btn" style="font-size:1.1rem;"></button>
+        <div id="modal-add-btn-wrap" class="modal-add-wrap">
+          <button id="modal-add-btn" onclick="modalAddAction()" data-i18n="add" class="btn-cta"></button>
         </div>
-
       </div>
     </div>
 
-  </div><!-- .page -->
+  </div>
 </body>
 </html>

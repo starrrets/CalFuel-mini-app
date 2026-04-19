@@ -17,7 +17,7 @@ const translations = {
     myFoods: "Мои блюда",
     history: "История",
     profile: "Профиль",
-    addMeal: "+ Добавить приём пищи",
+    addMeal: "Добавить приём пищи",
     foodNamePlaceholder: "Название блюда",
     caloriesPlaceholder: "Калории",
     proteins: "Белки",
@@ -65,15 +65,22 @@ const translations = {
     noLogsForDay: "В этот день ничего не записано",
     dow: ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
     months: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
-    foodTypeFixed: "Фиксированные ккал",
-    foodTypePer100g: "ккал на 100 г",
+    foodTypeFixed: "Фиксированные",
+    foodTypePer100g: "На 100 г",
+    foodTypeBuilder: "Конструктор",
     per100gLabel: "100 г",
     weightGPlaceholder: "Граммы",
     addMealQuick: "Быстро",
     addMealFromDish: "Блюда",
     addMealPer100g: "По весу",
     noFixedDishes: "Нет блюд с фиксированными ккал",
-    noPer100gDishes: "Нет блюд с ккал на 100 г"
+    noPer100gDishes: "Нет блюд с ккал на 100 г",
+    builderSearchPlaceholder: "Поиск ингредиента...",
+    builderDishWeight: "Вес блюда",
+    builderSave: "Сохранить блюдо",
+    builderCustom: "Своё",
+    builderCustomKcalPh: "ккал на 100 г",
+    builderTotal: "Итого",
   },
   en: {
     flag: "gb", name: "English",
@@ -85,7 +92,7 @@ const translations = {
     myFoods: "My Foods",
     history: "History",
     profile: "Profile",
-    addMeal: "+ Add meal",
+    addMeal: "Add meal",
     foodNamePlaceholder: "Dish name",
     caloriesPlaceholder: "Calories",
     proteins: "Proteins",
@@ -133,15 +140,22 @@ const translations = {
     noLogsForDay: "Nothing logged on this day",
     dow: ["Mo","Tu","We","Th","Fr","Sa","Su"],
     months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
-    foodTypeFixed: "Fixed kcal",
-    foodTypePer100g: "kcal per 100 g",
+    foodTypeFixed: "Fixed",
+    foodTypePer100g: "Per 100g",
+    foodTypeBuilder: "Builder",
     per100gLabel: "100 g",
     weightGPlaceholder: "Grams",
     addMealQuick: "Quick",
     addMealFromDish: "Dishes",
     addMealPer100g: "By weight",
     noFixedDishes: "No fixed-calorie dishes saved",
-    noPer100gDishes: "No per-100 g dishes saved"
+    noPer100gDishes: "No per-100 g dishes saved",
+    builderSearchPlaceholder: "Search ingredient...",
+    builderDishWeight: "Dish weight",
+    builderSave: "Save dish",
+    builderCustom: "Custom",
+    builderCustomKcalPh: "kcal per 100g",
+    builderTotal: "Total",
   },
   uk: {
     flag: "ua", name: "Українська",
@@ -153,7 +167,7 @@ const translations = {
     myFoods: "Мої страви",
     history: "Історія",
     profile: "Профіль",
-    addMeal: "+ Додати прийом їжі",
+    addMeal: "Додати прийом їжі",
     foodNamePlaceholder: "Назва страви",
     caloriesPlaceholder: "Калорії",
     proteins: "Білки",
@@ -201,15 +215,22 @@ const translations = {
     noLogsForDay: "Цього дня нічого не записано",
     dow: ["Пн","Вт","Ср","Чт","Пт","Сб","Нд"],
     months: ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"],
-    foodTypeFixed: "Фіксовані ккал",
-    foodTypePer100g: "ккал на 100 г",
+    foodTypeFixed: "Фіксовані",
+    foodTypePer100g: "На 100 г",
+    foodTypeBuilder: "Конструктор",
     per100gLabel: "100 г",
     weightGPlaceholder: "Грами",
     addMealQuick: "Швидко",
     addMealFromDish: "Страви",
     addMealPer100g: "За вагою",
     noFixedDishes: "Немає страв із фіксованими ккал",
-    noPer100gDishes: "Немає страв із ккал на 100 г"
+    noPer100gDishes: "Немає страв із ккал на 100 г",
+    builderSearchPlaceholder: "Пошук інгредієнта...",
+    builderDishWeight: "Вага страви",
+    builderSave: "Зберегти страву",
+    builderCustom: "Своє",
+    builderCustomKcalPh: "ккал на 100 г",
+    builderTotal: "Разом",
   },
   es: {
     flag: "es", name: "Español",
@@ -221,7 +242,7 @@ const translations = {
     myFoods: "Mis platos",
     history: "Historial",
     profile: "Perfil",
-    addMeal: "+ Añadir comida",
+    addMeal: "Añadir comida",
     foodNamePlaceholder: "Nombre del plato",
     caloriesPlaceholder: "Calorías",
     proteins: "Proteínas",
@@ -269,15 +290,22 @@ const translations = {
     noLogsForDay: "Nada registrado este día",
     dow: ["Lu","Ma","Mi","Ju","Vi","Sá","Do"],
     months: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
-    foodTypeFixed: "kcal fijas",
-    foodTypePer100g: "kcal por 100 g",
+    foodTypeFixed: "Fijo",
+    foodTypePer100g: "Por 100g",
+    foodTypeBuilder: "Constructor",
     per100gLabel: "100 g",
     weightGPlaceholder: "Gramos",
     addMealQuick: "Rápido",
     addMealFromDish: "Platos",
     addMealPer100g: "Por peso",
     noFixedDishes: "No hay platos con kcal fijas",
-    noPer100gDishes: "No hay platos con kcal por 100 g"
+    noPer100gDishes: "No hay platos con kcal por 100 g",
+    builderSearchPlaceholder: "Buscar ingrediente...",
+    builderDishWeight: "Peso del plato",
+    builderSave: "Guardar plato",
+    builderCustom: "Personalizado",
+    builderCustomKcalPh: "kcal por 100g",
+    builderTotal: "Total",
   },
   de: {
     flag: "de", name: "Deutsch",
@@ -289,7 +317,7 @@ const translations = {
     myFoods: "Meine Gerichte",
     history: "Verlauf",
     profile: "Profil",
-    addMeal: "+ Mahlzeit hinzufügen",
+    addMeal: "Mahlzeit hinzufügen",
     foodNamePlaceholder: "Gerichtname",
     caloriesPlaceholder: "Kalorien",
     proteins: "Proteine",
@@ -337,15 +365,22 @@ const translations = {
     noLogsForDay: "An diesem Tag nichts eingetragen",
     dow: ["Mo","Di","Mi","Do","Fr","Sa","So"],
     months: ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
-    foodTypeFixed: "Feste kcal",
-    foodTypePer100g: "kcal pro 100 g",
+    foodTypeFixed: "Fest",
+    foodTypePer100g: "Pro 100g",
+    foodTypeBuilder: "Ersteller",
     per100gLabel: "100 g",
     weightGPlaceholder: "Gramm",
     addMealQuick: "Schnell",
     addMealFromDish: "Gerichte",
     addMealPer100g: "Nach Gewicht",
     noFixedDishes: "Keine Gerichte mit festen kcal",
-    noPer100gDishes: "Keine Gerichte mit kcal pro 100 g"
+    noPer100gDishes: "Keine Gerichte mit kcal pro 100 g",
+    builderSearchPlaceholder: "Zutat suchen...",
+    builderDishWeight: "Gerichtgewicht",
+    builderSave: "Gericht speichern",
+    builderCustom: "Benutzerdefiniert",
+    builderCustomKcalPh: "kcal pro 100g",
+    builderTotal: "Gesamt",
   },
   fr: {
     flag: "fr", name: "Français",
@@ -357,7 +392,7 @@ const translations = {
     myFoods: "Mes plats",
     history: "Historique",
     profile: "Profil",
-    addMeal: "+ Ajouter un repas",
+    addMeal: "Ajouter un repas",
     foodNamePlaceholder: "Nom du plat",
     caloriesPlaceholder: "Calories",
     proteins: "Protéines",
@@ -405,15 +440,22 @@ const translations = {
     noLogsForDay: "Rien d'enregistré ce jour",
     dow: ["Lu","Ma","Me","Je","Ve","Sa","Di"],
     months: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
-    foodTypeFixed: "kcal fixes",
-    foodTypePer100g: "kcal pour 100 g",
+    foodTypeFixed: "Fixe",
+    foodTypePer100g: "Pour 100g",
+    foodTypeBuilder: "Créateur",
     per100gLabel: "100 g",
     weightGPlaceholder: "Grammes",
     addMealQuick: "Rapide",
     addMealFromDish: "Plats",
     addMealPer100g: "Par poids",
     noFixedDishes: "Aucun plat avec des kcal fixes",
-    noPer100gDishes: "Aucun plat avec des kcal pour 100 g"
+    noPer100gDishes: "Aucun plat avec des kcal pour 100 g",
+    builderSearchPlaceholder: "Rechercher un ingrédient...",
+    builderDishWeight: "Poids du plat",
+    builderSave: "Enregistrer le plat",
+    builderCustom: "Personnalisé",
+    builderCustomKcalPh: "kcal pour 100g",
+    builderTotal: "Total",
   },
   be: {
     flag: "by", name: "Беларуская",
@@ -425,7 +467,7 @@ const translations = {
     myFoods: "Мае стравы",
     history: "Гісторыя",
     profile: "Профіль",
-    addMeal: "+ Дадаць прыём ежы",
+    addMeal: "Дадаць прыём ежы",
     foodNamePlaceholder: "Назва стравы",
     caloriesPlaceholder: "Калорыі",
     proteins: "Бялкі",
@@ -473,15 +515,22 @@ const translations = {
     noLogsForDay: "У гэты дзень нічога не запісана",
     dow: ["Пн","Аў","Ср","Чц","Пт","Сб","Нд"],
     months: ["Студзень","Люты","Сакавік","Красавік","Май","Чэрвень","Ліпень","Жнівень","Верасень","Кастрычнік","Лістапад","Снежань"],
-    foodTypeFixed: "Фіксаваныя ккал",
-    foodTypePer100g: "ккал на 100 г",
+    foodTypeFixed: "Фіксаваныя",
+    foodTypePer100g: "На 100 г",
+    foodTypeBuilder: "Канструктар",
     per100gLabel: "100 г",
     weightGPlaceholder: "Грамы",
     addMealQuick: "Хутка",
     addMealFromDish: "Стравы",
     addMealPer100g: "Па вазе",
     noFixedDishes: "Няма страў з фіксаванымі ккал",
-    noPer100gDishes: "Няма страў з ккал на 100 г"
+    noPer100gDishes: "Няма страў з ккал на 100 г",
+    builderSearchPlaceholder: "Пошук інгрэдыента...",
+    builderDishWeight: "Вага стравы",
+    builderSave: "Захаваць страву",
+    builderCustom: "Сваё",
+    builderCustomKcalPh: "ккал на 100 г",
+    builderTotal: "Усяго",
   }
 };
 
@@ -522,6 +571,8 @@ function setLanguage(lang) {
   if (typeof renderCalendar === 'function' && Object.keys(historyData || {}).length >= 0) {
     renderCalendar();
   }
+  if (typeof renderFoods === 'function') renderFoods();
+  if (typeof renderTodayLogs === 'function') renderTodayLogs();
   // persist to backend so bot stays in sync
   if (typeof tgId !== 'undefined' && tgId !== 123456789) {
     apiFetch('/api/profile/language', 'POST', { tg_id: tgId, language: lang });
@@ -529,11 +580,11 @@ function setLanguage(lang) {
 }
 
 /**
- * Update the current language flag in the header
+ * Update the current language code button in the header
  */
 function updateLanguageButton() {
-  const flagEl = document.getElementById('current-lang-flag');
-  flagEl.src = getFlagUrl(currentLang);
+  const btn = document.getElementById('current-lang-btn');
+  if (btn) btn.textContent = currentLang.toUpperCase();
 }
 
 /**

@@ -89,6 +89,14 @@ async function apiFetch(endpoint, method = "GET", body = null) {
 
 // ── Profile ───────────────────────────────────────────────────────
 
+let currentGender = "male";
+
+function setGender(gender) {
+  currentGender = gender;
+  document.getElementById("gender-male").classList.toggle("active", gender === "male");
+  document.getElementById("gender-female").classList.toggle("active", gender === "female");
+}
+
 async function loadProfile() {
   try {
     const data = await apiFetch(`/api/profile/${tgId}`);
@@ -105,7 +113,7 @@ async function loadProfile() {
 
     if (data.height) document.getElementById("height").value = Math.round(convertHeight(data.height, "metric", currentUnits));
     if (data.weight) document.getElementById("weight").value = Math.round(convertWeight(data.weight, "metric", currentUnits) * 10) / 10;
-    if (data.gender) document.getElementById("gender").value = data.gender;
+    if (data.gender) setGender(data.gender);
     if (data.age)    document.getElementById("age").value = data.age;
     if (data.activity) {
       const activityOptions = ["1.2", "1.375", "1.55", "1.725", "1.9"];
@@ -158,7 +166,7 @@ async function saveProfile() {
   const goalType = document.getElementById("goalType").value;
   const data = {
     tg_id: tgId,
-    gender: document.getElementById("gender").value,
+    gender: currentGender,
     age: parseInt(document.getElementById("age").value, 10),
     height: heightMetric,
     weight: weightMetric,
@@ -189,8 +197,41 @@ async function loadTodayLogs() {
 }
 
 function updateProgress() {
-  const percent = Math.min((totalToday / dailyNorm) * 100, 100);
-  document.getElementById("progressBar").style.width = percent + "%";
+  const R = 85;
+  const cx = 100, cy = 100;
+  // 240° arc: starts bottom-left (150°), sweeps clockwise to bottom-right (30°)
+  const START_DEG = 150;
+  const SWEEP_DEG = 240;
+  const toRad = d => d * Math.PI / 180;
+
+  function arcPoint(deg) {
+    return {
+      x: cx + R * Math.cos(toRad(deg)),
+      y: cy + R * Math.sin(toRad(deg))
+    };
+  }
+
+  function arcPath(sweepDeg) {
+    const s = arcPoint(START_DEG);
+    const e = arcPoint(START_DEG + sweepDeg);
+    const large = sweepDeg > 180 ? 1 : 0;
+    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${R} ${R} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
+  }
+
+  const totalLen = toRad(SWEEP_DEG) * R;
+  const track = document.getElementById("gaugeTrack");
+  const fill  = document.getElementById("gaugeFill");
+
+  if (track) track.setAttribute("d", arcPath(SWEEP_DEG));
+
+  if (fill) {
+    fill.setAttribute("d", arcPath(SWEEP_DEG));
+    const pct = dailyNorm > 0 ? Math.min(totalToday / dailyNorm, 1) : 0;
+    const filled = pct * totalLen;
+    fill.style.strokeDasharray  = `${filled.toFixed(2)} ${totalLen.toFixed(2)}`;
+    fill.style.strokeDashoffset = "0";
+  }
+
   const rem = Math.max(0, Math.round(dailyNorm - totalToday));
   document.getElementById("remaining").textContent = rem;
 }
@@ -207,7 +248,9 @@ function renderLogs() {
         <div class="list-row-name">${log.food_name}</div>
         <div class="list-row-sub">${Math.round(log.calories)} ${kcal}</div>
       </div>
-      <button onclick="deleteLog(${log.id})" class="btn-delete">✕</button>
+      <button onclick="deleteLog(${log.id})" class="btn-delete" aria-label="delete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     `;
     container.appendChild(div);
   });
@@ -327,13 +370,180 @@ async function quickAddLog() {
 
 // ── My foods ──────────────────────────────────────────────────────
 
+let builderIngredients = [];
+
 function setFoodType(type) {
   newFoodType = type;
   document.getElementById("food-type-fixed").classList.toggle("active", type === "fixed");
   document.getElementById("food-type-per100g").classList.toggle("active", type === "per100g");
+  document.getElementById("food-type-builder").classList.toggle("active", type === "builder");
+
+  const isBuilder = type === "builder";
+  document.getElementById("food-form-rows").classList.toggle("hidden", isBuilder);
+  document.getElementById("builder-panel").classList.toggle("hidden", !isBuilder);
+
   const label = document.getElementById("cal-unit-label");
   label.setAttribute("data-i18n", type === "per100g" ? "per100gLabel" : "unitKcal");
   label.textContent = translate(type === "per100g" ? "per100gLabel" : "unitKcal");
+
+  const btn = document.getElementById("foods-cta-btn");
+  const btnLabel = document.getElementById("foods-cta-label");
+  if (isBuilder) {
+    btn.onclick = saveBuilderDish;
+    btnLabel.removeAttribute("data-i18n");
+    btnLabel.textContent = translate("builderSave");
+  } else {
+    btn.onclick = addNewFood;
+    btnLabel.setAttribute("data-i18n", "addFoodToBase");
+    btnLabel.textContent = translate("addFoodToBase");
+  }
+}
+
+// ── Builder ───────────────────────────────────────────────────────
+
+function onBuilderSearch(q) {
+  const box = document.getElementById("builderSuggestions");
+  if (!q.trim()) { box.innerHTML = ""; return; }
+  const matches = searchIngredients(q);
+  const kcal = translate("unitKcal");
+  box.innerHTML = "";
+
+  const wrap = document.createElement("div");
+  wrap.className = "builder-suggestions";
+
+  matches.forEach(ing => {
+    const row = document.createElement("div");
+    row.className = "builder-suggestion-row";
+    row.innerHTML = `<span>${getIngredientName(ing)}</span><span class="builder-suggestion-kcal">${ing.kcal} ${kcal}/100g</span>`;
+    row.onclick = () => { addBuilderIngredient(ing.name, ing.kcal, false); document.getElementById("builderSearch").value = ""; box.innerHTML = ""; };
+    wrap.appendChild(row);
+  });
+
+  // custom option
+  const custom = document.createElement("div");
+  custom.className = "builder-suggestion-row";
+  custom.innerHTML = `<span>${translate("builderCustom")}: <strong>${q}</strong></span>`;
+  custom.onclick = () => { document.getElementById("builderSearch").value = ""; showBuilderCustomForm(q); };
+  wrap.appendChild(custom);
+
+  box.appendChild(wrap);
+}
+
+function showBuilderCustomForm(name) {
+  const box = document.getElementById("builderSuggestions");
+  const kcalLabel = translate("builderCustomKcalPh");
+  const addLabel  = translate("add");
+
+  const wrap = document.createElement("div");
+  wrap.className = "builder-custom-form grouped-card";
+  wrap.innerHTML = `
+    <div class="form-row labeled">
+      <span class="row-label" style="max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span>
+      <div class="input-suffix-wrap" style="flex:1">
+        <input id="builderCustomKcal" type="number" placeholder="${kcalLabel}" style="text-align:right;padding-right:3.5rem">
+        <span class="input-suffix">kcal</span>
+      </div>
+    </div>`;
+
+  const btn = document.createElement("button");
+  btn.className = "btn-cta";
+  btn.style.cssText = "margin:0.5rem 1rem;width:calc(100% - 2rem)";
+  btn.textContent = addLabel;
+  btn.onclick = () => confirmBuilderCustom(name);
+  wrap.appendChild(btn);
+
+  box.innerHTML = "";
+  box.appendChild(wrap);
+}
+
+function confirmBuilderCustom(name) {
+  const kcal = parseFloat(document.getElementById("builderCustomKcal").value);
+  if (!kcal || kcal <= 0) return;
+  addBuilderIngredient(name, kcal, true);
+  document.getElementById("builderSuggestions").innerHTML = "";
+}
+
+function addBuilderIngredient(name, kcalPer100g, isCustom) {
+  builderIngredients.push({ name, kcalPer100g, grams: 0, isCustom });
+  renderBuilderIngredients();
+}
+
+function removeBuilderIngredient(idx) {
+  builderIngredients.splice(idx, 1);
+  renderBuilderIngredients();
+}
+
+function updateBuilderGrams(idx, val) {
+  builderIngredients[idx].grams = parseFloat(val) || 0;
+  updateBuilderTotals();
+}
+
+function updateBuilderTotals() {
+  const totalKcal = builderIngredients.reduce((s, i) => s + i.kcalPer100g * i.grams / 100, 0);
+  const totalEl = document.getElementById("builderTotal");
+  if (totalEl) totalEl.textContent = `${Math.round(totalKcal)} ${translate("unitKcal")}`;
+}
+
+function renderBuilderIngredients() {
+  const container = document.getElementById("builderIngredients");
+  const kcal = translate("unitKcal");
+  container.innerHTML = "";
+
+  if (!builderIngredients.length) {
+    document.getElementById("builderWeightRow").style.display = "none";
+    return;
+  }
+
+  builderIngredients.forEach((ing, idx) => {
+    const rowKcal = Math.round(ing.kcalPer100g * ing.grams / 100);
+    const row = document.createElement("div");
+    row.className = "builder-ing-row";
+    const displayName = ing.isCustom ? ing.name : (getIngredientName({ name: ing.name }) || ing.name);
+    row.innerHTML = `
+      <span class="builder-ing-name">${displayName}</span>
+      <span class="builder-ing-meta">${ing.kcalPer100g} ${kcal}/100g</span>
+      <input class="builder-ing-weight" type="number" value="${ing.grams || ""}" placeholder="g"
+        oninput="updateBuilderGrams(${idx}, this.value)">
+      <span class="builder-ing-meta" id="ing-total-${idx}">${rowKcal > 0 ? rowKcal + " " + kcal : ""}</span>
+      <button onclick="removeBuilderIngredient(${idx})" class="btn-delete" aria-label="delete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>`;
+    container.appendChild(row);
+  });
+
+  const totalKcal = builderIngredients.reduce((s, i) => s + i.kcalPer100g * i.grams / 100, 0);
+  const totalRow = document.createElement("div");
+  totalRow.className = "builder-total-row";
+  totalRow.innerHTML = `<span>${translate("builderTotal")}</span><span id="builderTotal">${Math.round(totalKcal)} ${kcal}</span>`;
+  container.appendChild(totalRow);
+
+  document.getElementById("builderWeightRow").style.display = "flex";
+}
+
+function resetBuilder() {
+  builderIngredients = [];
+  document.getElementById("builderDishName").value = "";
+  document.getElementById("builderSearch").value = "";
+  document.getElementById("builderDishWeight").value = "";
+  document.getElementById("builderSuggestions").innerHTML = "";
+  renderBuilderIngredients();
+}
+
+async function saveBuilderDish() {
+  const name = document.getElementById("builderDishName").value.trim();
+  const dishWeight = parseFloat(document.getElementById("builderDishWeight").value);
+  if (!name || !builderIngredients.length || !dishWeight || dishWeight <= 0) {
+    const msg = translate("fillFields");
+    if (tg) tg.showAlert(msg); else alert(msg);
+    return;
+  }
+  const totalKcal = builderIngredients.reduce((s, i) => s + i.kcalPer100g * i.grams / 100, 0);
+  const kcalPer100g = Math.round(totalKcal / dishWeight * 100);
+  await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories: kcalPer100g, per100g: true });
+  resetBuilder();
+  await loadFoods();
+  const msg = translate("dishAdded");
+  if (tg) tg.showAlert(msg); else alert(msg);
 }
 
 async function loadFoods() {
@@ -362,7 +572,9 @@ function renderFoods() {
         <div class="list-row-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${food.name}${badge}</div>
         <div class="list-row-cal">${calLabel}</div>
       </div>
-      <button onclick="deleteFood(${food.id})" class="btn-delete">🗑</button>
+      <button onclick="deleteFood(${food.id})" class="btn-delete" aria-label="delete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+      </button>
     `;
     container.appendChild(div);
   });
@@ -460,17 +672,8 @@ function renderCalendar() {
       cell.className = "cal-day out-of-range";
     } else {
       const kcal = historyData[dateStr] || 0;
-      const pct  = dailyNorm > 0 ? kcal / dailyNorm : 0;
 
-      let fillClass = "";
-      if (kcal > 0) {
-        if (pct >= 1.0)       fillClass = "fill-over";
-        else if (pct >= 0.75) fillClass = "fill-high";
-        else if (pct >= 0.4)  fillClass = "fill-mid";
-        else                  fillClass = "fill-low";
-      }
-
-      cell.className = `cal-day has-data ${fillClass}`;
+      cell.className = `cal-day has-data`;
       cell.dataset.date = dateStr;
 
       if (kcal > 0) {
@@ -554,8 +757,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       if (btn.dataset.tab === "tab-history") {
-        loadTodayLogs();
-        loadHistory();
+        calOffset = 0;
+        loadHistory().then(() => {
+          const todayStr = toISODate(new Date());
+          const todayCell = document.querySelector(`.cal-day[data-date="${todayStr}"]`);
+          if (todayCell) selectDay(todayStr, todayCell);
+        });
       }
     });
   });
