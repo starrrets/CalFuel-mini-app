@@ -157,7 +157,7 @@ function setUnits(unit) {
 
 function toggleGoalPercent() {
   const goalType = document.getElementById("goalType").value;
-  document.getElementById("goal-percent-row").style.display = goalType === "maintain" ? "none" : "block";
+  document.getElementById("goal-percent-row").style.display = goalType === "maintain" ? "none" : "flex";
 }
 
 async function saveProfile() {
