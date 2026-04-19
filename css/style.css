@@ -9,8 +9,8 @@
   --text:      #ffffff;
   --text2:     #ebebf5cc;    /* ~80% white */
   --text3:     #ebebf599;    /* ~60% white */
-  --accent:    #ff375f;      /* Apple fitness red */
-  --accentLight: #ff7b96;
+  --accent:    #f24900;      /* Apple fitness red */
+  --accentLight: #ff6929;
   --blue:      #0a84ff;      /* Apple system blue */
   --green:     #30d158;      /* Apple system green */
   --red:       #ff453a;      /* Apple system red */
@@ -29,8 +29,8 @@
   --text:      #000000;
   --text2:     rgba(60,60,67,0.85);
   --text3:     rgba(60,60,67,0.55);
-  --accent:    #ff375f;
-  --accentLight: #ff7b96;
+  --accent:    #f24900;
+  --accentLight: #ff6929;
   --blue:      #007aff;
   --green:     #34c759;
   --red:       #ff3b30;
