@@ -6,9 +6,8 @@ if (window.Telegram && window.Telegram.WebApp) {
   tg.expand();
 }
 
-const tgId = tg ? (tg.initDataUnsafe?.user?.id || null) : null;
+const tgId = tg ? (tg.initDataUnsafe?.user?.id || 123456789) : 123456789;
 const API_BASE = "https://web-production-fcefd.up.railway.app";
-const HAS_BACKEND = !!tgId;
 
 let dailyNorm = 2000;
 let totalToday = 0;
@@ -16,47 +15,6 @@ let foods = [];
 let logs = [];
 let currentUnits = "metric";
 let newFoodType = "fixed";
-
-// ── Cache helpers ─────────────────────────────────────────────────
-
-const CACHE_KEY = `cf_cache_${tgId ?? "local"}`;
-
-function readCache() {
-  try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || null; }
-  catch { return null; }
-}
-
-function writeCache(profile, today, history) {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({
-      profile, today, history, ts: Date.now(),
-    }));
-  } catch {}
-}
-
-function applyCache(cache) {
-  if (!cache) return;
-  const { profile, today, history: hist } = cache;
-  if (profile) {
-    dailyNorm = profile.daily_norm || 2000;
-    currentUnits = profile.units || "metric";
-    if (profile.language) {
-      currentLang = profile.language;
-      localStorage.setItem("lang", profile.language);
-    }
-    const normEl = document.getElementById("dailyNorm");
-    if (normEl) normEl.textContent = Math.round(dailyNorm);
-  }
-  if (today) {
-    logs = today.logs || [];
-    totalToday = today.total_today || 0;
-    const el = document.getElementById("totalToday");
-    if (el) el.textContent = Math.round(totalToday);
-    renderLogs();
-  }
-  if (hist) historyData = hist;
-  updateProgress();
-}
 
 // ── New clean stable SVG icons (different from previous version) ──
 
@@ -108,18 +66,15 @@ function convertWeight(value, fromUnit, toUnit) {
 }
 
 async function apiFetch(endpoint, method = "GET", body = null) {
-  if (!HAS_BACKEND) return null;
   const url = API_BASE + endpoint;
   const options = { method, headers: { "Content-Type": "application/json" } };
   if (body) options.body = JSON.stringify(body);
-  try {
-    const response = await fetch(url, options);
-    if (!response.ok) { console.error("[apiFetch] error", response.status, url); return null; }
-    return response.json();
-  } catch (e) {
-    console.error("[apiFetch]", e);
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    console.error("[apiFetch] error", response.status, url);
     return null;
   }
+  return response.json();
 }
 
 // ── Profile ───────────────────────────────────────────────────────
@@ -652,7 +607,8 @@ let calOffset = 0;
 
 async function loadHistory() {
   const data = await apiFetch(`/api/history/${tgId}`);
-  if (data) historyData = data;
+  if (!data) return;
+  historyData = data;
   renderCalendar();
 }
 
@@ -749,15 +705,7 @@ async function selectDay(dateStr, cellEl) {
   detail.classList.remove("hidden");
   logsContainer.innerHTML = `<p class="empty-hint">…</p>`;
 
-  const todayStr = toISODate(new Date());
-  let data;
-  if (dateStr === todayStr) {
-    // Use already-loaded today data, no extra fetch needed
-    data = { total: totalToday, daily_norm: dailyNorm, logs };
-  } else {
-    data = await apiFetch(`/api/logs/day/${tgId}/${dateStr}`);
-  }
-
+  const data = await apiFetch(`/api/logs/day/${tgId}/${dateStr}`);
   if (!data) { detail.classList.add("hidden"); return; }
 
   const kcal = translate("unitKcal");
@@ -797,76 +745,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   updateUnitUI();
   toggleGoalPercent();
 
-  // Paint from cache immediately for instant perceived load
-  const cache = readCache();
-  if (cache) {
-    applyCache(cache);
-    renderAllTexts();
-    updateLanguageButton();
-    updateUnitUI();
-  }
-
-  if (!HAS_BACKEND) {
-    renderLogs();
-    renderFoods();
-    updateProgress();
-  } else {
-    // Single bootstrap round-trip + foods in parallel
-    const [bootstrap, foodsData] = await Promise.all([
-      apiFetch(`/api/bootstrap/${tgId}`),
-      apiFetch(`/api/foods/${tgId}`),
-    ]);
-
-    if (bootstrap) {
-      const { profile, today, history: hist } = bootstrap;
-
-      if (profile) {
-        dailyNorm = profile.daily_norm || 2000;
-        currentUnits = profile.units || "metric";
-        if (profile.language) {
-          currentLang = profile.language;
-          localStorage.setItem("lang", profile.language);
-          renderAllTexts();
-          updateLanguageButton();
-        }
-        if (profile.height)   document.getElementById("height").value   = Math.round(convertHeight(profile.height, "metric", currentUnits));
-        if (profile.weight)   document.getElementById("weight").value   = Math.round(convertWeight(profile.weight, "metric", currentUnits) * 10) / 10;
-        if (profile.gender)   setGender(profile.gender);
-        if (profile.age)      document.getElementById("age").value      = profile.age;
-        if (profile.activity) {
-          const opts = ["1.2", "1.375", "1.55", "1.725", "1.9"];
-          const closest = opts.reduce((a, b) =>
-            Math.abs(parseFloat(b) - profile.activity) < Math.abs(parseFloat(a) - profile.activity) ? b : a
-          );
-          document.getElementById("activity").value = closest;
-        }
-        if (profile.goal_type) {
-          document.getElementById("goalType").value = profile.goal_type;
-          if (profile.goal_percent) document.getElementById("goalPercent").value = Math.round(profile.goal_percent * 10) / 10;
-        }
-        document.getElementById("dailyNorm").textContent = Math.round(dailyNorm);
-        updateUnitUI();
-        toggleGoalPercent();
-      }
-
-      if (today) {
-        logs = today.logs || [];
-        totalToday = today.total_today || 0;
-        document.getElementById("totalToday").textContent = Math.round(totalToday);
-        renderLogs();
-      }
-
-      if (hist) historyData = hist;
-
-      updateProgress();
-      writeCache(profile, today, hist);
-    }
-
-    if (foodsData) {
-      foods = foodsData;
-      renderFoods();
-    }
-  }
+  await loadProfile();
+  await Promise.all([loadFoods(), loadTodayLogs(), loadHistory()]);
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
