@@ -81,6 +81,12 @@ const translations = {
     builderCustom: "Своё",
     builderCustomKcalPh: "ккал на 100 г",
     builderTotal: "Итого",
+    search: "Поиск...",
+    emptyTodayTitle: "Пока ничего не добавлено",
+    emptyTodaySub: "Нажмите + чтобы записать первый приём пищи",
+    themeLabel: "Тема",
+    cancel: "Отмена",
+    confirmOk: "Удалить",
   },
   en: {
     flag: "gb", name: "English",
@@ -156,6 +162,12 @@ const translations = {
     builderCustom: "Custom",
     builderCustomKcalPh: "kcal per 100g",
     builderTotal: "Total",
+    search: "Search...",
+    emptyTodayTitle: "Nothing logged yet",
+    emptyTodaySub: "Tap + to record your first meal today",
+    themeLabel: "Theme",
+    cancel: "Cancel",
+    confirmOk: "Delete",
   },
   uk: {
     flag: "ua", name: "Українська",
@@ -231,6 +243,12 @@ const translations = {
     builderCustom: "Своє",
     builderCustomKcalPh: "ккал на 100 г",
     builderTotal: "Разом",
+    search: "Пошук...",
+    emptyTodayTitle: "Ще нічого не додано",
+    emptyTodaySub: "Натисніть + щоб записати перший прийом їжі",
+    themeLabel: "Тема",
+    cancel: "Скасувати",
+    confirmOk: "Видалити",
   },
   es: {
     flag: "es", name: "Español",
@@ -306,6 +324,12 @@ const translations = {
     builderCustom: "Personalizado",
     builderCustomKcalPh: "kcal por 100g",
     builderTotal: "Total",
+    search: "Buscar...",
+    emptyTodayTitle: "Aún no hay registros",
+    emptyTodaySub: "Toca + para registrar tu primera comida",
+    themeLabel: "Tema",
+    cancel: "Cancelar",
+    confirmOk: "Eliminar",
   },
   de: {
     flag: "de", name: "Deutsch",
@@ -381,6 +405,12 @@ const translations = {
     builderCustom: "Benutzerdefiniert",
     builderCustomKcalPh: "kcal pro 100g",
     builderTotal: "Gesamt",
+    search: "Suchen...",
+    emptyTodayTitle: "Noch nichts eingetragen",
+    emptyTodaySub: "Tippe + um deine erste Mahlzeit zu erfassen",
+    themeLabel: "Design",
+    cancel: "Abbrechen",
+    confirmOk: "Löschen",
   },
   fr: {
     flag: "fr", name: "Français",
@@ -456,6 +486,12 @@ const translations = {
     builderCustom: "Personnalisé",
     builderCustomKcalPh: "kcal pour 100g",
     builderTotal: "Total",
+    search: "Rechercher...",
+    emptyTodayTitle: "Rien d'enregistré pour l'instant",
+    emptyTodaySub: "Appuyez sur + pour noter votre premier repas",
+    themeLabel: "Thème",
+    cancel: "Annuler",
+    confirmOk: "Supprimer",
   },
   be: {
     flag: "by", name: "Беларуская",
@@ -531,6 +567,12 @@ const translations = {
     builderCustom: "Сваё",
     builderCustomKcalPh: "ккал на 100 г",
     builderTotal: "Усяго",
+    search: "Пошук...",
+    emptyTodayTitle: "Яшчэ нічога не дададзена",
+    emptyTodaySub: "Націсніце + каб запісаць першы прыём ежы",
+    themeLabel: "Тэма",
+    cancel: "Адмяніць",
+    confirmOk: "Выдаліць",
   }
 };
 
@@ -568,6 +610,7 @@ function setLanguage(lang) {
   renderAllTexts();
   updateLanguageButton();
   toggleDropdown();
+  if (typeof renderTodayHeader === 'function') renderTodayHeader();
   if (typeof renderCalendar === 'function' && Object.keys(historyData || {}).length >= 0) {
     renderCalendar();
   }
@@ -583,8 +626,12 @@ function setLanguage(lang) {
  * Update the current language code button in the header
  */
 function updateLanguageButton() {
-  const btn = document.getElementById('current-lang-btn');
-  if (btn) btn.textContent = currentLang.toUpperCase();
+  const iconWrap = document.getElementById('lang-icon-wrap');
+  const label = document.getElementById('lang-toggle-label');
+  if (iconWrap) {
+    iconWrap.innerHTML = `<img src="${getFlagUrl(currentLang)}" alt="${currentLang}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;">`;
+  }
+  if (label) label.textContent = translations[currentLang]?.name || currentLang.toUpperCase();
 }
 
 /**

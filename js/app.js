@@ -26,6 +26,94 @@ const SUN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
 <path d="M10.7051 0.896484C10.7051 0.413086 10.292 0 9.80859 0C9.3252 0 8.9209 0.413086 8.9209 0.896484V2.68066C8.9209 3.16406 9.3252 3.56836 9.80859 3.56836C10.292 3.56836 10.7051 3.16406 10.7051 2.68066V0.896484ZM14.2207 4.16602C13.8779 4.50879 13.8779 5.08008 14.2295 5.42285C14.5635 5.76562 15.1436 5.76562 15.4863 5.41406L16.752 4.14844C17.0947 3.81445 17.0947 3.22559 16.752 2.88281C16.4092 2.54883 15.8379 2.54883 15.4951 2.8916L14.2207 4.16602ZM4.13086 5.41406C4.46484 5.76562 5.04492 5.76562 5.3877 5.42285C5.73047 5.08887 5.73047 4.5 5.39648 4.16602L4.13086 2.8916C3.79688 2.55762 3.2168 2.54883 2.87402 2.88281C2.53125 3.22559 2.53125 3.81445 2.86523 4.13965L4.13086 5.41406ZM9.80859 5.19434C7.27734 5.19434 5.17676 7.28613 5.17676 9.82617C5.17676 12.3662 7.27734 14.458 9.80859 14.458C12.3398 14.458 14.4316 12.3662 14.4316 9.82617C14.4316 7.28613 12.3398 5.19434 9.80859 5.19434ZM9.80859 6.85547C11.4258 6.85547 12.7793 8.2002 12.7793 9.82617C12.7793 11.4521 11.4258 12.7969 9.80859 12.7969C8.18262 12.7969 6.8291 11.4521 6.8291 9.82617C6.8291 8.2002 8.18262 6.85547 9.80859 6.85547ZM18.7295 10.7227C19.2129 10.7227 19.6172 10.3096 19.6172 9.82617C19.6172 9.34277 19.2129 8.93848 18.7295 8.93848H16.9453C16.4619 8.93848 16.0576 9.34277 16.0576 9.82617C16.0576 10.3096 16.4619 10.7227 16.9453 10.7227H18.7295ZM0.896484 8.93848C0.404297 8.93848 0 9.34277 0 9.82617C0 10.3096 0.404297 10.7227 0.896484 10.7227H2.67188C3.15527 10.7227 3.56836 10.3096 3.56836 9.82617C3.56836 9.34277 3.15527 8.93848 2.67188 8.93848H0.896484ZM15.4775 14.2383C15.1348 13.8955 14.5635 13.9043 14.2207 14.2471C13.8779 14.5811 13.8779 15.1523 14.2295 15.5039L15.5039 16.7695C15.8379 17.1123 16.418 17.1035 16.7607 16.7607C17.0947 16.418 17.0947 15.8467 16.752 15.5039L15.4775 14.2383ZM2.86523 15.4951C2.52246 15.8379 2.51367 16.418 2.84766 16.752C3.19043 17.0947 3.7793 17.1035 4.11328 16.7695L5.3877 15.5039C5.73047 15.1611 5.73047 14.5811 5.39648 14.2471C5.05371 13.9043 4.47363 13.9043 4.13086 14.2383L2.86523 15.4951ZM10.7051 16.9717C10.7051 16.4883 10.292 16.084 9.80859 16.084C9.3252 16.084 8.9209 16.4883 8.9209 16.9717V18.7559C8.9209 19.2393 9.3252 19.6523 9.80859 19.6523C10.292 19.6523 10.7051 19.2393 10.7051 18.7559V16.9717Z"/>
 </svg>`;
 
+// ── Today header ──────────────────────────────────────────────────
+
+const GREETINGS = {
+  ru: {
+    morning: [
+      "С добрым утром", "Доброе утро", "Как спалось?", "Пора завтракать", 
+      "Время подзаправиться", "Бодрого утра", "Как настрой?", "Начнем день?", 
+      "Завтрак ждет", "Просыпайся", "Вкусного начала", "С новым днем", 
+      "Готов к старту?", "Утро!", "Погнали?"
+    ],
+    afternoon: [
+      "Добрый день", "Как успехи?", "Время обеда", "Пора перекусить", 
+      "Как день?", "Не забудь поесть", "Держишь ритм?", "Как дела?", 
+      "Время паузы", "Приятного аппетита", "Экватор!", "Продолжаем?", 
+      "Всё по плану?", "Нужен перерыв?", "Привет!"
+    ],
+    evening: [
+      "Добрый вечер", "Как прошел день?", "Время ужина", "Пора отдыхать", 
+      "Уютного вечера", "Как итоги?", "День почти всё", "Время выдохнуть", 
+      "Хорошего вечера", "Закроем цели?", "Как самочувствие?", "Заслуженный отдых", 
+      "Ужинаем?", "Пора расслабиться", "Вечер!"
+    ],
+  },
+  en: {
+    morning: [
+      "Good morning", "Morning!", "Sleep well?", "Breakfast time", 
+      "Fuel up", "Rise and shine", "Ready for today?", "Let's start", 
+      "Morning vibes", "Wake up", "First meal?", "New day!", 
+      "Ready?", "Top of the morning", "Hey there"
+    ],
+    afternoon: [
+      "Good afternoon", "How's it going?", "Lunch time", "Snack break?", 
+      "Busy day?", "Don't forget to eat", "On track?", "How's your day?", 
+      "Take a break", "Enjoy your meal", "Halfway!", "Keep moving", 
+      "All good?", "Need fuel?", "Hi!"
+    ],
+    evening: [
+      "Good evening", "How was today?", "Dinner time", "Time to rest", 
+      "Cozy evening", "Daily recap?", "Day is done", "Unwind now", 
+      "Enjoy your night", "Close your goals?", "How do you feel?", "Well earned", 
+      "Dinner?", "Relax time", "Evening!"
+    ],
+  },
+  uk: {
+    morning: [
+      "Доброго ранку", "З добрим ранком", "Як спалося?", "Час снідати", 
+      "Час підзарядитись", "Бадьорого ранку", "Як настрій?", "Почнемо день?", 
+      "Сніданок чекає", "Прокидайся", "Смачного початку", "З новим днем", 
+      "Готовий?", "Ранок!", "Поїхали?"
+    ],
+    afternoon: [
+      "Добрий день", "Як успіхи?", "Час обіду", "Пора перекусити", 
+      "Як день?", "Не забудь поїсти", "Тримаєш ритм?", "Як справи?", 
+      "Час паузи", "Смачного", "Екватор!", "Продовжуємо?", 
+      "Все за планом?", "Потрібна перерва?", "Привіт!"
+    ],
+    evening: [
+      "Добрий вечір", "Як минув день?", "Час вечері", "Пора відпочити", 
+      "Затишного вечора", "Як підсумки?", "День майже все", "Час видихнути", 
+      "Гарного вечора", "Закриємо цілі?", "Як почуваєшся?", "Заслужений відпочинок", 
+      "Вечеряємо?", "Пора розслабитись", "Вечір!"
+    ],
+  }
+};
+
+const _sessionGreeting = {};
+
+function renderTodayHeader() {
+  const now = new Date();
+  const hour = now.getHours();
+  const period = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
+  const lang = typeof currentLang !== "undefined" ? currentLang : "ru";
+  const pool = (GREETINGS[lang] || GREETINGS.en)[period];
+  const cacheKey = lang + "_" + period;
+
+  if (!_sessionGreeting[cacheKey]) {
+    _sessionGreeting[cacheKey] = pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  const greetEl = document.getElementById("today-greeting");
+  const dateEl  = document.getElementById("today-date-label");
+  if (greetEl) greetEl.textContent = _sessionGreeting[cacheKey];
+  if (dateEl) {
+    const months = translations[lang]?.months || translations.ru.months;
+    dateEl.textContent = `${now.getDate()} ${months[now.getMonth()]}`;
+  }
+}
+
 // ── Theme ─────────────────────────────────────────────────────────
 
 function initTheme() {
@@ -40,13 +128,48 @@ function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem("theme", theme);
 
-  const btn = document.getElementById("theme-btn");
-  btn.innerHTML = theme === "dark" ? MOON_SVG : SUN_SVG;
+  const iconWrap = document.getElementById("theme-icon-wrap");
+  if (iconWrap) iconWrap.innerHTML = theme === "dark" ? MOON_SVG : SUN_SVG;
 }
 
 function toggleTheme() {
   const current = document.documentElement.getAttribute("data-theme");
   applyTheme(current === "dark" ? "light" : "dark");
+}
+
+// ── Toast / Confirm ───────────────────────────────────────────────
+
+function showToast(msg, duration = 2400) {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  container.appendChild(el);
+  const remove = () => {
+    el.classList.add("toast-out");
+    el.addEventListener("animationend", () => el.remove(), { once: true });
+  };
+  setTimeout(remove, duration);
+}
+
+function showConfirm(msg) {
+  return new Promise(resolve => {
+    const container = document.getElementById("toast-container");
+    if (!container) { resolve(confirm(msg)); return; }
+    const el = document.createElement("div");
+    el.className = "toast toast-confirm";
+    el.innerHTML = `
+      <p class="toast-confirm-msg">${msg}</p>
+      <div class="toast-confirm-btns">
+        <button class="toast-btn-cancel">${translate("cancel")}</button>
+        <button class="toast-btn-ok">${translate("confirmOk")}</button>
+      </div>`;
+    const close = (val) => { el.classList.add("toast-out"); el.addEventListener("animationend", () => el.remove(), { once: true }); resolve(val); };
+    el.querySelector(".toast-btn-cancel").onclick = () => close(false);
+    el.querySelector(".toast-btn-ok").onclick     = () => close(true);
+    container.appendChild(el);
+  });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -171,7 +294,7 @@ async function saveProfile() {
   document.getElementById("dailyNorm").textContent = Math.round(dailyNorm);
   updateProgress();
   const msg = translate("profileSaved");
-  if (tg) tg.showAlert(msg); else alert(msg);
+  showToast(msg);
 }
 
 // ── Today logs ────────────────────────────────────────────────────
@@ -187,38 +310,21 @@ async function loadTodayLogs() {
 }
 
 function updateProgress() {
-  const R = 85;
-  const cx = 100, cy = 100;
-  // 240° arc: starts bottom-left (150°), sweeps clockwise to bottom-right (30°)
-  const START_DEG = 150;
-  const SWEEP_DEG = 240;
-  const toRad = d => d * Math.PI / 180;
+  const R = 108;
+  const circumference = 2 * Math.PI * R;
 
-  function arcPoint(deg) {
-    return {
-      x: cx + R * Math.cos(toRad(deg)),
-      y: cy + R * Math.sin(toRad(deg))
-    };
-  }
-
-  function arcPath(sweepDeg) {
-    const s = arcPoint(START_DEG);
-    const e = arcPoint(START_DEG + sweepDeg);
-    const large = sweepDeg > 180 ? 1 : 0;
-    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${R} ${R} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
-  }
-
-  const totalLen = toRad(SWEEP_DEG) * R;
   const track = document.getElementById("gaugeTrack");
   const fill  = document.getElementById("gaugeFill");
 
-  if (track) track.setAttribute("d", arcPath(SWEEP_DEG));
+  if (track) {
+    track.style.strokeDasharray = `${circumference}`;
+    track.style.strokeDashoffset = "0";
+  }
 
   if (fill) {
-    fill.setAttribute("d", arcPath(SWEEP_DEG));
     const pct = dailyNorm > 0 ? Math.min(totalToday / dailyNorm, 1) : 0;
-    const filled = pct * totalLen;
-    fill.style.strokeDasharray  = `${filled.toFixed(2)} ${totalLen.toFixed(2)}`;
+    const drawn = pct * circumference;
+    fill.style.strokeDasharray  = `${drawn.toFixed(2)} ${circumference.toFixed(2)}`;
     fill.style.strokeDashoffset = "0";
     fill.style.visibility = pct === 0 ? "hidden" : "visible";
   }
@@ -231,13 +337,30 @@ function renderLogs() {
   const container = document.getElementById("todayLogs");
   container.innerHTML = "";
   const kcal = translate("unitKcal");
+
+  if (!logs.length) {
+    container.innerHTML = `
+      <div class="empty-today">
+        <div class="empty-today-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 11h18M3 11c0 4 3.5 7 9 7s9-3 9-7"/>
+            <path d="M12 4v3M8 5.5c0 0 1 1.5 1 2.5M16 5.5c0 0-1 1.5-1 2.5"/>
+          </svg>
+        </div>
+        <p class="empty-today-title" data-i18n="emptyTodayTitle"></p>
+        <p class="empty-today-sub" data-i18n="emptyTodaySub"></p>
+      </div>`;
+    renderAllTexts();
+    return;
+  }
+
   logs.forEach(log => {
     const div = document.createElement("div");
     div.className = "list-row";
     div.innerHTML = `
       <div>
         <div class="list-row-name">${log.food_name}</div>
-        <div class="list-row-sub">${Math.round(log.calories)} ${kcal}</div>
+        <div class="list-row-cal">${Math.round(log.calories)} ${kcal}</div>
       </div>
       <button onclick="deleteLog(${log.id})" class="btn-delete" aria-label="delete">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -251,7 +374,7 @@ function renderLogs() {
 
 async function deleteLog(id) {
   const msg = translate("deleteConfirmLog");
-  if (tg ? await new Promise(r => tg.showConfirm(msg, r)) : confirm(msg)) {
+  if (await showConfirm(msg)) {
     await apiFetch(`/api/log/${id}`, "DELETE");
     await loadTodayLogs();
   }
@@ -268,6 +391,24 @@ function closeAddModal() {
   document.getElementById("addLogModal").classList.remove("open");
 }
 
+function openAddFoodModal() {
+  document.getElementById("addFoodModal").classList.add("open");
+  setFoodType("fixed");
+}
+
+function closeAddFoodModal() {
+  document.getElementById("addFoodModal").classList.remove("open");
+  resetBuilder();
+}
+
+async function addFoodAction() {
+  if (newFoodType === "builder") {
+    await saveBuilderDish();
+  } else {
+    await addNewFood();
+  }
+}
+
 let activeModalTab = "quick";
 
 function setModalTab(tab) {
@@ -277,12 +418,15 @@ function setModalTab(tab) {
     document.getElementById(`mtab-${t}`).classList.toggle("active", t === tab);
   });
   document.getElementById("modal-add-btn-wrap").classList.toggle("hidden", tab === "fixed");
-  if (tab === "fixed")  renderFixedDishesList();
+  const btn = document.getElementById("modal-add-btn");
+  if (btn) btn.textContent = translate("add");
+  if (tab === "fixed")   renderFixedDishesList();
   if (tab === "per100g") renderPer100gDishesList();
 }
 
 function modalAddAction() {
   if (activeModalTab === "quick") quickAddLog();
+  if (activeModalTab === "per100g") bulkLogPer100g();
 }
 
 function renderFixedDishesList() {
@@ -297,12 +441,22 @@ function renderFixedDishesList() {
   fixed.forEach(food => {
     const div = document.createElement("div");
     div.className = "dish-row";
+    div.dataset.name = food.name.toLowerCase();
     div.innerHTML = `
       <span class="list-row-name">${food.name}</span>
       <span class="dish-row-cal">${Math.round(food.calories)} ${kcal}</span>
     `;
     div.onclick = () => logFixedDish(food);
     container.appendChild(div);
+  });
+  const searchEl = document.getElementById("fixedSearch");
+  if (searchEl && searchEl.value) filterFixedDishes(searchEl.value);
+}
+
+function filterFixedDishes(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll("#fixedDishesList .dish-row").forEach(row => {
+    row.classList.toggle("hidden", q.length > 0 && !row.dataset.name.includes(q));
   });
 }
 
@@ -312,6 +466,7 @@ function renderPer100gDishesList() {
   const byWeight = foods.filter(f => f.per100g);
   if (!byWeight.length) {
     container.innerHTML = `<p class="empty-hint">${translate("noPer100gDishes")}</p>`;
+    updateBulkAddBtn();
     return;
   }
   const kcal = translate("unitKcal");
@@ -319,18 +474,45 @@ function renderPer100gDishesList() {
   byWeight.forEach(food => {
     const div = document.createElement("div");
     div.className = "dish-weight-row";
+    div.dataset.foodId = food.id;
     div.innerHTML = `
       <div class="dish-weight-row-header">
         <span class="list-row-name">${food.name}</span>
         <span class="dish-weight-row-sub">${Math.round(food.calories)} ${kcal}/${gLabel}</span>
       </div>
-      <div class="dish-weight-input-row">
-        <input type="number" id="weight-${food.id}" placeholder="${translate("weightGPlaceholder")}">
-        <button onclick="logPer100gDish(${food.id})" class="btn-add">${translate("add")}</button>
-      </div>
+      <input type="number" id="weight-${food.id}" class="dish-weight-inline-input" placeholder="${translate("weightGPlaceholder")}"
+        oninput="onBulkWeightInput(${food.id}, this)">
     `;
     container.appendChild(div);
   });
+  updateBulkAddBtn();
+}
+
+function onBulkWeightInput(foodId, inputEl) {
+  const row = inputEl.closest(".dish-weight-row");
+  const hasValue = inputEl.value && parseFloat(inputEl.value) > 0;
+  row.classList.toggle("has-weight", hasValue);
+  updateBulkAddBtn();
+}
+
+function updateBulkAddBtn() {
+  const btn = document.getElementById("modal-add-btn");
+  if (!btn) return;
+  const byWeight = foods.filter(f => f.per100g);
+  const filled = byWeight.filter(food => {
+    const el = document.getElementById(`weight-${food.id}`);
+    return el && parseFloat(el.value) > 0;
+  });
+  if (filled.length === 0) {
+    btn.textContent = translate("add");
+    return;
+  }
+  const totalCal = filled.reduce((sum, food) => {
+    const g = parseFloat(document.getElementById(`weight-${food.id}`).value) || 0;
+    return sum + Math.round(food.calories * g / 100);
+  }, 0);
+  const kcal = translate("unitKcal");
+  btn.textContent = `${translate("add")} (${filled.length}) · ${totalCal} ${kcal}`;
 }
 
 async function logFixedDish(food) {
@@ -339,13 +521,18 @@ async function logFixedDish(food) {
   await loadTodayLogs();
 }
 
-async function logPer100gDish(foodId) {
-  const food = foods.find(f => f.id === foodId);
-  if (!food) return;
-  const grams = parseFloat(document.getElementById(`weight-${foodId}`).value);
-  if (!grams || grams <= 0) return;
-  const calories = Math.round(food.calories * grams / 100);
-  await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: `${food.name} (${grams}g)`, calories });
+async function bulkLogPer100g() {
+  const byWeight = foods.filter(f => f.per100g);
+  const toLog = byWeight.filter(food => {
+    const el = document.getElementById(`weight-${food.id}`);
+    return el && parseFloat(el.value) > 0;
+  });
+  if (!toLog.length) return;
+  await Promise.all(toLog.map(food => {
+    const grams = parseFloat(document.getElementById(`weight-${food.id}`).value);
+    const calories = Math.round(food.calories * grams / 100);
+    return apiFetch("/api/log", "POST", { tg_id: tgId, food_name: `${food.name} (${grams}g)`, calories });
+  }));
   closeAddModal();
   await loadTodayLogs();
 }
@@ -376,19 +563,20 @@ function setFoodType(type) {
   document.getElementById("builder-panel").classList.toggle("hidden", !isBuilder);
 
   const label = document.getElementById("cal-unit-label");
-  label.setAttribute("data-i18n", type === "per100g" ? "per100gLabel" : "unitKcal");
-  label.textContent = translate(type === "per100g" ? "per100gLabel" : "unitKcal");
+  if (label) {
+    label.setAttribute("data-i18n", type === "per100g" ? "per100gLabel" : "unitKcal");
+    label.textContent = translate(type === "per100g" ? "per100gLabel" : "unitKcal");
+  }
 
-  const btn = document.getElementById("foods-cta-btn");
   const btnLabel = document.getElementById("foods-cta-label");
-  if (isBuilder) {
-    btn.onclick = saveBuilderDish;
-    btnLabel.removeAttribute("data-i18n");
-    btnLabel.textContent = translate("builderSave");
-  } else {
-    btn.onclick = addNewFood;
-    btnLabel.setAttribute("data-i18n", "addFoodToBase");
-    btnLabel.textContent = translate("addFoodToBase");
+  if (btnLabel) {
+    if (isBuilder) {
+      btnLabel.removeAttribute("data-i18n");
+      btnLabel.textContent = translate("builderSave");
+    } else {
+      btnLabel.setAttribute("data-i18n", "addFoodToBase");
+      btnLabel.textContent = translate("addFoodToBase");
+    }
   }
 }
 
@@ -512,7 +700,7 @@ function renderBuilderIngredients() {
   totalRow.innerHTML = `<span>${translate("builderTotal")}</span><span id="builderTotal">${Math.round(totalKcal)} ${kcal}</span>`;
   container.appendChild(totalRow);
 
-  document.getElementById("builderWeightRow").style.display = "flex";
+  document.getElementById("builderWeightRow").style.display = "block";
 }
 
 function resetBuilder() {
@@ -528,17 +716,16 @@ async function saveBuilderDish() {
   const name = document.getElementById("builderDishName").value.trim();
   const dishWeight = parseFloat(document.getElementById("builderDishWeight").value);
   if (!name || !builderIngredients.length || !dishWeight || dishWeight <= 0) {
-    const msg = translate("fillFields");
-    if (tg) tg.showAlert(msg); else alert(msg);
+    showToast(translate("fillFields"));
     return;
   }
   const totalKcal = builderIngredients.reduce((s, i) => s + i.kcalPer100g * i.grams / 100, 0);
   const kcalPer100g = Math.round(totalKcal / dishWeight * 100);
   await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories: kcalPer100g, per100g: true });
   resetBuilder();
+  closeAddFoodModal();
   await loadFoods();
-  const msg = translate("dishAdded");
-  if (tg) tg.showAlert(msg); else alert(msg);
+  showToast(translate("dishAdded"));
 }
 
 async function loadFoods() {
@@ -581,20 +768,20 @@ async function addNewFood() {
   const name = document.getElementById("newFoodName").value.trim();
   const calories = parseFloat(document.getElementById("newFoodCalories").value);
   if (!name || !calories || calories <= 0) {
-    alert(translate("fillFields"));
+    showToast(translate("fillFields"));
     return;
   }
   await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories, per100g: newFoodType === "per100g" });
   document.getElementById("newFoodName").value = "";
   document.getElementById("newFoodCalories").value = "";
+  closeAddFoodModal();
   await loadFoods();
-  const msg = translate("dishAdded");
-  if (tg) tg.showAlert(msg); else alert(msg);
+  showToast(translate("dishAdded"));
 }
 
 async function deleteFood(id) {
   const msg = translate("deleteConfirmFood");
-  if (tg ? await new Promise(r => tg.showConfirm(msg, r)) : confirm(msg)) {
+  if (await showConfirm(msg)) {
     await apiFetch(`/api/foods/${id}`, "DELETE");
     await loadFoods();
   }
@@ -676,6 +863,7 @@ function renderCalendar() {
       if (kcal > 0) {
         const dot = document.createElement("span");
         dot.className = "cal-day-dot";
+        dot.classList.add(kcal <= dailyNorm ? "dot-green" : "dot-red");
         cell.appendChild(dot);
       }
 
@@ -713,7 +901,8 @@ async function selectDay(dateStr, cellEl) {
   const months = translations[currentLang]?.months || translations.ru.months;
   document.getElementById("dayDetailDate").textContent = `${d} ${months[m - 1]} ${y}`;
   const rem = Math.round(data.daily_norm - data.total);
-  document.getElementById("dayDetailTotal").textContent = `${Math.round(data.total)} ${kcal} | ${translate("remaining")}: ${rem} ${kcal}`;
+  document.getElementById("dayDetailEaten").textContent = `${Math.round(data.total)} ${kcal}`;
+  document.getElementById("dayDetailRemaining").textContent = `${rem} ${kcal}`;
 
   logsContainer.innerHTML = "";
   if (!data.logs.length) {
@@ -738,15 +927,23 @@ function toISODate(d) {
 // ── Init ──────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", async () => {
-  initTheme();                    // ← 32px button + new clean SVGs
+  initTheme();
   renderLanguageDropdown();
   renderAllTexts();
   updateLanguageButton();
   updateUnitUI();
   toggleGoalPercent();
+  renderTodayHeader();
+
+  // show skeleton state while loading
+  const gaugeWrap = document.querySelector(".gauge-wrap");
+  if (gaugeWrap) gaugeWrap.classList.add("gauge-loading");
 
   await loadProfile();
   await Promise.all([loadFoods(), loadTodayLogs(), loadHistory()]);
+
+  // data loaded — remove skeleton
+  if (gaugeWrap) gaugeWrap.classList.remove("gauge-loading");
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -754,6 +951,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById(btn.dataset.tab).classList.remove("hidden");
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
+      const fab = document.getElementById("fab-add");
+      if (fab) fab.classList.toggle("hidden", btn.dataset.tab !== "tab-today");
+      const fabFood = document.getElementById("fab-add-food");
+      if (fabFood) fabFood.classList.toggle("hidden", btn.dataset.tab !== "tab-foods");
       if (btn.dataset.tab === "tab-history") {
         calOffset = 0;
         loadHistory().then(() => {
