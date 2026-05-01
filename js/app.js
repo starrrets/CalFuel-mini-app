@@ -300,10 +300,11 @@ async function saveProfile() {
 // ── Today logs ────────────────────────────────────────────────────
 
 async function loadTodayLogs() {
-  const data = await apiFetch(`/api/logs/today/${tgId}`);
+  const todayStr = toISODate(new Date());
+  const data = await apiFetch(`/api/logs/day/${tgId}/${todayStr}`);
   if (!data) return;
   logs = data.logs || [];
-  totalToday = data.total_today || 0;
+  totalToday = data.total || 0;
   document.getElementById("totalToday").textContent = Math.round(totalToday);
   renderLogs();
   updateProgress();
@@ -516,7 +517,8 @@ function updateBulkAddBtn() {
 }
 
 async function logFixedDish(food) {
-  await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: food.name, calories: food.calories });
+  const date = toISODate(new Date());
+  await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: food.name, calories: food.calories, date });
   closeAddModal();
   await loadTodayLogs();
 }
@@ -528,10 +530,12 @@ async function bulkLogPer100g() {
     return el && parseFloat(el.value) > 0;
   });
   if (!toLog.length) return;
+  
+  const date = toISODate(new Date());
   await Promise.all(toLog.map(food => {
     const grams = parseFloat(document.getElementById(`weight-${food.id}`).value);
     const calories = Math.round(food.calories * grams / 100);
-    return apiFetch("/api/log", "POST", { tg_id: tgId, food_name: `${food.name} (${grams}g)`, calories });
+    return apiFetch("/api/log", "POST", { tg_id: tgId, food_name: `${food.name} (${grams}g)`, calories, date });
   }));
   closeAddModal();
   await loadTodayLogs();
@@ -541,7 +545,10 @@ async function quickAddLog() {
   const name = document.getElementById("quickFoodName").value.trim() || translate("whatDidYouEat");
   const calories = parseFloat(document.getElementById("quickCalories").value);
   if (!calories || calories <= 0) return;
-  await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories });
+  
+  const date = toISODate(new Date());
+  await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories, date });
+  
   document.getElementById("quickFoodName").value = "";
   document.getElementById("quickCalories").value = "";
   closeAddModal();
@@ -970,6 +977,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const wrapper = document.querySelector(".lang-wrapper");
     if (wrapper && !wrapper.contains(e.target)) {
       document.getElementById("lang-dropdown").classList.remove("open");
+    }
+  });
+
+  // Force fresh data reload when app comes back from background
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      loadTodayLogs();
     }
   });
 });
