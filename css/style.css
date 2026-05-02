@@ -758,10 +758,10 @@ h2 {
 .toast-confirm-btns button {
   flex: 1; padding: 0.55rem; border-radius: 8px;
   font: inherit; font-size: 0.88rem; font-weight: 600;
-  cursor: pointer; border: none;
+  cursor: pointer;
 }
-.toast-btn-cancel { background: var(--bg4); color: var(--text2); }
-.toast-btn-ok     { background: var(--accent); color: #fff; }
+.toast-btn-cancel { background: var(--bg4); color: var(--text2); border: 1px solid var(--sep); }
+.toast-btn-ok     { background: var(--accent); color: #fff; border: 1px solid var(--accentCTA); }
 .toast-btn-cancel:active, .toast-btn-ok:active { opacity: 0.75; }
 
 @keyframes toastIn  { from { opacity:0; transform:translateY(8px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
