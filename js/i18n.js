@@ -12,6 +12,7 @@ const translations = {
     title: "Трекер калорий",
     unitKcal: "ккал",
     unitGrams: "г",
+    eaten: "Съедено",
     remaining: "Осталось",
     today: "Сегодня",
     myFoods: "Мои блюда",
