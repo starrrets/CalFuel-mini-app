@@ -22,6 +22,8 @@ let newFoodType = "fixed";
 // "simple" = calories only  |  "full" = calories + macros
 // Stored in localStorage as a pure UI preference (not nutrition data)
 let trackingMode = localStorage.getItem("trackingMode") || "simple";
+let lastTodayData = null;
+let isBootstrapping = true;
 
 // ── Tracking mode toggle ──────────────────────────────────────────
 
@@ -48,7 +50,13 @@ function updateTrackingModeUI() {
   const newFoodMacros = document.getElementById("newFoodMacros");
   if (newFoodMacros) newFoodMacros.classList.toggle("hidden", !isFull);
 
-  if (isFull) updateMacroBars();
+  if (isFull && !isBootstrapping) {
+    if (lastTodayData) {
+      updateMacroBars(lastTodayData);
+    } else {
+      loadTodayLogs();
+    }
+  }
 }
 
 // ── New clean stable SVG icons (different from previous version) ──
@@ -344,6 +352,7 @@ async function loadTodayLogs() {
   const todayStr = toISODate(new Date());
   const data = await apiFetch(`/api/logs/day/${tgId}/${todayStr}`);
   if (!data) return;
+  lastTodayData = data;
   logs = data.logs || [];
   totalToday = data.total_calories ?? data.total ?? 0;
   // Refresh macro targets from the day response (keeps them in sync)
@@ -353,7 +362,7 @@ async function loadTodayLogs() {
   document.getElementById("totalToday").textContent = Math.round(totalToday);
   renderLogs();
   updateProgress();
-  if (trackingMode === "full") updateMacroBars(data);
+  if (trackingMode === "full") updateMacroBars(lastTodayData);
 }
 
 function updateProgress() {
@@ -1243,6 +1252,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     utc_offset: -new Date().getTimezoneOffset(),
   });
   await Promise.all([loadFoods(), loadTodayLogs(), loadHistory()]);
+  isBootstrapping = false;
 
   // data loaded — remove skeleton
   if (gaugeWrap) gaugeWrap.classList.remove("gauge-loading");
