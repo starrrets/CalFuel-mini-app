@@ -1081,7 +1081,7 @@ function renderBuilderIngredients() {
     const g = translate("unitGrams") || "г";
     const kcalPerLabel = `${ing.kcalPer100g} ${kcal}/100${g}`;
 
-    let pillsHtml = `<span class="macro-pill" style="background:var(--bg4);color:var(--text3)">${kcalPerLabel}</span>`;
+    let pillsHtml = `<span class="macro-pill">${kcalPerLabel}</span>`;
     if (ing.macros && (ing.macros.protein > 0 || ing.macros.fat > 0 || ing.macros.carbs > 0)) {
       pillsHtml += `
         <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(ing.macros.protein)}${g}</span>
@@ -1183,7 +1183,7 @@ function renderFoods() {
       ? `${Math.round(food.calories)} ${kcal}/${per100}`
       : `${Math.round(food.calories)} ${kcal}`;
     const badge = food.per100g
-      ? `<span class="badge">${translate("foodTypePer100g")}</span>`
+      ? `<div style="display: flex;margin-bottom:6px;"><span class="badge">${translate("foodTypePer100g")}</span></div>`
       : "";
     let macroHtml = "";
     if (food.protein != null || food.fat != null || food.carbs != null) {
@@ -1198,7 +1198,8 @@ function renderFoods() {
     div.className = "list-row";
     div.innerHTML = `
       <div style="flex:1;min-width:0;">
-        <div class="list-row-name" style="text-overflow:ellipsis;">${food.name}${badge}</div>
+        ${badge}
+        <div class="list-row-name" style="text-overflow:ellipsis;">${food.name}</div>
         <div class="list-row-sub-row">
           <span class="list-row-cal">${calLabel}</span>
           ${macroHtml}

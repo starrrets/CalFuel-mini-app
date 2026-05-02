@@ -10,8 +10,8 @@
   --gauge-sep: #0a0a0a;
   --text: #ffffff;
   --text2: #ebebf5cc;
-  --badge: #ebebf5;
-  --badgeBG: #ebebf534;
+  --badge: #9b9b9b;
+  --badgeBG: #9b9b9b2e;
   --text3: #ebebf599;
   --accent: #e8500a;
   --accentText: #ff9a62;
@@ -351,21 +351,22 @@ h2 {
   font-weight: 600; 
   font-size: 0.95rem; 
   line-height: 0.95rem;
+  margin-left: 2px;
 }
 .list-row-sub  { font-size: 0.82rem; color: var(--text3); margin-top: 2px; }
 .list-row-cal  {
   display: inline-flex; align-items: center;
-  font-size: 0.72rem; font-weight: 600;
+  font-size: 0.75rem; font-weight: 600;
   color: var(--accentText);
-  background: var(--accentBG); border-radius: 999px;
-  padding: 0.15rem 0.45rem;
+  background: var(--accentBG); border-radius: 5px;
+  padding: 1px 6px;
 }
 
 .badge {
-  display: inline; font-size: 0.65rem; font-weight: 500;
+  display: inline; font-size: 0.75rem; font-weight: 500;
   background: var(--badgeBG); color: var(--badge);
-  padding: 0px 7px; border-radius: 9999px;
-  vertical-align: middle; margin-left: 5px;
+  padding: 1px 6px; border-radius: 5px;
+  vertical-align: middle;
   white-space: nowrap;
 }
 
@@ -408,10 +409,10 @@ h2 {
 .dish-row:active { opacity: 0.6; }
 .dish-row-cal {
   display: inline-flex; align-items: center;
-  font-size: 0.72rem; font-weight: 600;
+  font-size: 0.75rem; font-weight: 600;
   color: var(--accentText);
-  background: var(--bg4); border-radius: 999px;
-  padding: 0.15rem 0.45rem;
+  background: var(--accentBG); border-radius: 5px;
+  padding: 1px 6px;
 }
 
 /* ── Calendar ──────────────────────────────────────────────────── */
@@ -437,14 +438,14 @@ h2 {
   display: grid; grid-template-columns: repeat(7,1fr);
   padding: 0 0.75rem; margin-bottom: 0.25rem;
 }
-.cal-dow { text-align: center; font-size: 0.7rem; font-weight: 500; color: var(--text3); padding: 0.15rem 0; }
+.cal-dow { text-align: center; font-size: 0.75rem; font-weight: 500; color: var(--text3); padding: 0.15rem 0; }
 
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; padding: 0 0.75rem 0.875rem; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 10px; padding: 0 0.75rem 0.875rem; }
 
 .cal-day {
   aspect-ratio: 1; border-radius: 8px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-size: 0.78rem; font-weight: 500; cursor: pointer; position: relative;
+  font-size: 0.88rem; font-weight: 500; cursor: pointer; position: relative;
   transition: transform 0.08s;
   background: var(--bg3); color: var(--text3); user-select: none;
 }
@@ -471,7 +472,7 @@ h2 {
 .day-detail-stat {
   display: inline-flex; align-items: center; gap: 0.3rem;
   font-size: 0.78rem; font-weight: 600;
-  background: var(--bg3); border-radius: 999px;
+  background: var(--bg3); border-radius: 6px;
   padding: 0.2rem 0.6rem;
 }
 .day-detail-stat.eaten { color: var(--accentText); background-color: var(--accentBG); }
@@ -514,7 +515,7 @@ h2 {
 .builder-ing-row:last-of-type { border-bottom: none; }
 .builder-ing-info { flex: 1; min-width: 0; }
 .builder-ing-name { font-size: 0.88rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
-.builder-ing-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 3px; }
+.builder-ing-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 6px; }
 .builder-ing-controls { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
 .builder-ing-weight {
   width: 54px; flex-shrink: 0;
@@ -583,7 +584,7 @@ h2 {
 
 /* ── Calendar dots (colored) ───────────────────────────────────── */
 
-.cal-day-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 2px; }
+.cal-day-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 4px; }
 .cal-day-dot.dot-green { background: var(--green); }
 .cal-day-dot.dot-red   { background: var(--red); }
 
@@ -855,22 +856,23 @@ h2 {
 
 .macro-pill {
   display: inline-flex; align-items: center;
-  font-size: 0.72rem; font-weight: 600;
-  background: var(--bg3); border-radius: 999px;
-  padding: 0.15rem 0.45rem;
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--accentText);
+  background: var(--accentBG); border-radius: 5px;
+  padding: 1px 6px;
 }
 .macro-pill-p { color: var(--macro-protein); background: var(--macro-protein-bg); }
 .macro-pill-f { color: var(--macro-fat); background: var(--macro-fat-bg); }
 .macro-pill-c { color: var(--macro-carbs); background: var(--macro-carbs-bg); }
 
 /* pills inside dish-row / dish-weight-row (bg3) need darker bg to be visible */
-.dish-row .macro-pill,
+/* .dish-row .macro-pill,
 .dish-row .list-row-cal,
 .dish-weight-row .macro-pill,
 .dish-weight-row .list-row-cal,
 .builder-ing-pills .macro-pill {
   background: var(--bg4);
-}
+} */
 
 .list-row-macros {
   font-size: 0.75rem;
