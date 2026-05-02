@@ -18,6 +18,8 @@ let foods = [];
 let logs = [];
 let currentUnits = "metric";
 let newFoodType = "fixed";
+let foodsLoaded = false;
+let historyLoaded = false;
 
 // "simple" = calories only  |  "full" = calories + macros
 // Stored in localStorage as a pure UI preference (not nutrition data)
@@ -258,6 +260,121 @@ function setAppBusy(active, subtitle = "Syncing your data") {
   document.body.setAttribute("aria-busy", active ? "true" : "false");
 }
 
+function applyBootstrapProfile(profile) {
+  if (!profile) return;
+
+  dailyNorm = profile.daily_norm || 2000;
+  proteinTarget = profile.protein_target || null;
+  fatTarget = profile.fat_target || null;
+  carbsTarget = profile.carbs_target || null;
+  currentUnits = profile.units || "metric";
+
+  if (profile.language) {
+    currentLang = profile.language;
+    localStorage.setItem("lang", profile.language);
+    renderAllTexts();
+    updateLanguageButton();
+  }
+
+  if (profile.height) {
+    document.getElementById("height").value = Math.round(
+      convertHeight(profile.height, "metric", currentUnits)
+    );
+  }
+
+  if (profile.weight) {
+    document.getElementById("weight").value =
+      Math.round(convertWeight(profile.weight, "metric", currentUnits) * 10) /
+      10;
+  }
+
+  if (profile.gender) setGender(profile.gender);
+  if (profile.age) document.getElementById("age").value = profile.age;
+
+  if (profile.activity) {
+    const activityOptions = ["1.2", "1.375", "1.55", "1.725", "1.9"];
+    const closest = activityOptions.reduce((a, b) =>
+      Math.abs(parseFloat(b) - profile.activity) <
+      Math.abs(parseFloat(a) - profile.activity)
+        ? b
+        : a
+    );
+    document.getElementById("activity").value = closest;
+  }
+
+  if (profile.goal_type) {
+    document.getElementById("goalType").value = profile.goal_type;
+    if (profile.goal_percent) {
+      document.getElementById("goalPercent").value =
+        Math.round(profile.goal_percent * 10) / 10;
+    }
+  }
+
+  document.getElementById("dailyNorm").textContent = Math.round(dailyNorm);
+  updateUnitUI();
+  toggleGoalPercent();
+}
+
+function applyBootstrapToday(today) {
+  if (!today) return;
+
+  logs = today.logs || [];
+  totalToday = today.total_calories ?? 0;
+
+  lastTodayData = {
+    total_calories: today.total_calories ?? 0,
+    total_protein: today.total_protein ?? 0,
+    total_fat: today.total_fat ?? 0,
+    total_carbs: today.total_carbs ?? 0,
+    protein_target: proteinTarget,
+    fat_target: fatTarget,
+    carbs_target: carbsTarget,
+    daily_norm: dailyNorm,
+    logs,
+  };
+
+  document.getElementById("totalToday").textContent = Math.round(totalToday);
+  renderLogs();
+  updateProgress();
+
+  if (trackingMode === "full") {
+    updateMacroBars(lastTodayData);
+  }
+}
+
+function applyBootstrapHistory(history) {
+  historyData = history || {};
+  historyLoaded = true;
+}
+
+function applyBootstrapFoods(items) {
+  foods = items || [];
+  foodsLoaded = true;
+}
+
+async function bootstrapApp() {
+  const data = await apiFetch(`/api/bootstrap/${tgId}`);
+  if (!data) return false;
+
+  applyBootstrapProfile(data.profile);
+  applyBootstrapToday(data.today);
+  applyBootstrapHistory(data.history);
+  applyBootstrapFoods(data.foods);
+
+  return true;
+}
+
+async function sendTimezoneInBackground() {
+  try {
+    await apiFetch("/api/profile/timezone", "POST", {
+      tg_id: tgId,
+      utc_offset: -new Date().getTimezoneOffset(),
+    });
+  } catch (e) {
+    console.error("[timezone sync]", e);
+  }
+}
+
 // ── Profile ───────────────────────────────────────────────────────
 
 let currentGender = "male";
@@ -490,7 +607,7 @@ async function deleteLog(id) {
   const msg = translate("deleteConfirmLog");
   if (await showConfirm(msg)) {
     await apiFetch(`/api/log/${id}`, "DELETE");
-    await loadTodayLogs();
+    await Promise.all([loadTodayLogs(), loadHistory(true)]);
   }
 }
 
@@ -662,10 +779,9 @@ function updateBulkAddBtn() {
 
 async function logFixedDish(food) {
   const date = toISODate(new Date());
-  // Send food_id — backend copies calories and macros as a snapshot
   await apiFetch("/api/log", "POST", { tg_id: tgId, food_id: food.id, date });
   closeAddModal();
-  await loadTodayLogs();
+  await Promise.all([loadTodayLogs(), loadHistory(true)]);
 }
 
 async function bulkLogPer100g() {
@@ -677,17 +793,21 @@ async function bulkLogPer100g() {
   if (!toLog.length) return;
 
   const date = toISODate(new Date());
-  // Send food_id + grams — backend scales calories and macros
-  await Promise.all(toLog.map(async food => {
-    const grams = parseFloat(document.getElementById(`weight-${food.id}`).value);
-    await apiFetch("/api/log", "POST", { tg_id: tgId, food_id: food.id, grams, date });
-  }));
+  await Promise.all(
+    toLog.map(async food => {
+      const grams = parseFloat(document.getElementById(`weight-${food.id}`).value);
+      await apiFetch("/api/log", "POST", { tg_id: tgId, food_id: food.id, grams, date });
+    })
+  );
+
   closeAddModal();
-  await loadTodayLogs();
+  await Promise.all([loadTodayLogs(), loadHistory(true)]);
 }
 
 async function quickAddLog() {
-  const name = document.getElementById("quickFoodName").value.trim() || translate("whatDidYouEat");
+  const name =
+    document.getElementById("quickFoodName").value.trim() ||
+    translate("whatDidYouEat");
   const calories = parseFloat(document.getElementById("quickCalories").value);
   if (!calories || calories <= 0) return;
 
@@ -696,11 +816,11 @@ async function quickAddLog() {
 
   if (trackingMode === "full") {
     const protein = parseFloat(document.getElementById("quickProtein").value) || null;
-    const fat     = parseFloat(document.getElementById("quickFat").value) || null;
-    const carbs   = parseFloat(document.getElementById("quickCarbs").value) || null;
+    const fat = parseFloat(document.getElementById("quickFat").value) || null;
+    const carbs = parseFloat(document.getElementById("quickCarbs").value) || null;
     if (protein != null) body.protein = protein;
-    if (fat != null)     body.fat = fat;
-    if (carbs != null)   body.carbs = carbs;
+    if (fat != null) body.fat = fat;
+    if (carbs != null) body.carbs = carbs;
   }
 
   await apiFetch("/api/log", "POST", body);
@@ -711,7 +831,8 @@ async function quickAddLog() {
   document.getElementById("quickFat").value = "";
   document.getElementById("quickCarbs").value = "";
   closeAddModal();
-  await loadTodayLogs();
+
+  await Promise.all([loadTodayLogs(), loadHistory(true)]);
 }
 
 // ── My foods ──────────────────────────────────────────────────────
@@ -962,14 +1083,19 @@ async function saveBuilderDish() {
 
   resetBuilder();
   closeAddFoodModal();
+  foodsLoaded = false;
   await loadFoods();
   showToast(translate("dishAdded"));
 }
 
-async function loadFoods() {
+async function loadFoods(force = false) {
+  if (foodsLoaded && !force) return;
+
   const data = await apiFetch(`/api/foods/${tgId}`);
   if (!data) return;
+
   foods = data;
+  foodsLoaded = true;
   renderFoods();
 }
 
@@ -1038,6 +1164,7 @@ async function addNewFood() {
   document.getElementById("newFoodFat").value = "";
   document.getElementById("newFoodCarbs").value = "";
   closeAddFoodModal();
+  foodsLoaded = false;
   await loadFoods();
   showToast(translate("dishAdded"));
 }
@@ -1046,6 +1173,7 @@ async function deleteFood(id) {
   const msg = translate("deleteConfirmFood");
   if (await showConfirm(msg)) {
     await apiFetch(`/api/foods/${id}`, "DELETE");
+    foodsLoaded = false;
     await loadFoods();
   }
 }
@@ -1055,10 +1183,15 @@ async function deleteFood(id) {
 let historyData = {};
 let calOffset = 0;
 
-async function loadHistory() {
-  const data = await apiFetch(`/api/history/${tgId}`);
-  if (!data) return;
-  historyData = data;
+async function loadHistory(force = false) {
+  if (!historyLoaded || force) {
+    const data = await apiFetch(`/api/history/${tgId}`);
+    if (!data) return;
+
+    historyData = data;
+    historyLoaded = true;
+  }
+
   renderCalendar();
 }
 
@@ -1249,7 +1382,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (gaugeWrap) gaugeWrap.classList.add("gauge-loading");
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       document.querySelectorAll(".tab-content").forEach(c =>
         c.classList.add("hidden")
       );
@@ -1258,21 +1391,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         b.classList.remove("active")
       );
       btn.classList.add("active");
+
       const fab = document.getElementById("fab-add");
       if (fab) fab.classList.toggle("hidden", btn.dataset.tab !== "tab-today");
+
       const fabFood = document.getElementById("fab-add-food");
       if (fabFood) {
         fabFood.classList.toggle("hidden", btn.dataset.tab !== "tab-foods");
       }
+
+      if (btn.dataset.tab === "tab-foods") {
+        if (!foodsLoaded) {
+          await loadFoods();
+        } else {
+          renderFoods();
+        }
+      }
+
       if (btn.dataset.tab === "tab-history") {
         calOffset = 0;
-        loadHistory().then(() => {
-          const todayStr = toISODate(new Date());
-          const todayCell = document.querySelector(
-            `.cal-day[data-date="${todayStr}"]`
-          );
-          if (todayCell) selectDay(todayStr, todayCell);
-        });
+        await loadHistory();
+
+        const todayStr = toISODate(new Date());
+        const todayCell = document.querySelector(
+          `.cal-day[data-date="${todayStr}"]`
+        );
+        if (todayCell) {
+          await selectDay(todayStr, todayCell);
+        }
       }
     });
   });
@@ -1309,14 +1455,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     updateTrackingModeUI();
 
-    await loadProfile();
+    const ok = await bootstrapApp();
 
-    await apiFetch("/api/profile/timezone", "POST", {
-      tg_id: tgId,
-      utc_offset: -new Date().getTimezoneOffset(),
-    });
+    if (ok) {
+      renderCalendar();
+    }
 
-    await Promise.all([loadFoods(), loadTodayLogs(), loadHistory()]);
+    if (!ok) {
+      await Promise.all([loadProfile(), loadTodayLogs(), loadHistory(true)]);
+    }
+
+    sendTimezoneInBackground();
   } catch (e) {
     console.error("[bootstrap]", e);
   } finally {
