@@ -1125,7 +1125,7 @@ function renderFoods() {
     div.className = "list-row";
     div.innerHTML = `
       <div style="flex:1;min-width:0;">
-        <div class="list-row-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${food.name}${badge}</div>
+        <div class="list-row-name" style="text-overflow:ellipsis;">${food.name}${badge}</div>
         <div class="list-row-sub-row">
           <span class="list-row-cal">${calLabel}</span>
           ${macroHtml}
