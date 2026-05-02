@@ -794,7 +794,7 @@ h2 {
 .macro-bar-label.carbs   { color: var(--macro-carbs); }
 .macro-bar-track {
   flex: 1;
-  height: 11px;
+  height: 12px;
   background: var(--bg3);
   border-radius: 9999px;
   overflow: hidden;
