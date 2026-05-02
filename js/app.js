@@ -243,6 +243,21 @@ async function apiFetch(endpoint, method = "GET", body = null) {
   return response.json();
 }
 
+function setAppBusy(active, subtitle = "Syncing your data") {
+  const overlay = document.getElementById("app-busy-overlay");
+
+  if (overlay) {
+    overlay.classList.toggle("open", active);
+    overlay.setAttribute("aria-hidden", active ? "false" : "true");
+
+    const sub = overlay.querySelector(".app-busy-subtitle");
+    if (sub && subtitle) sub.textContent = subtitle;
+  }
+
+  document.body.classList.toggle("is-busy", active);
+  document.body.setAttribute("aria-busy", active ? "true" : "false");
+}
+
 // ── Profile ───────────────────────────────────────────────────────
 
 let currentGender = "male";
@@ -1228,50 +1243,34 @@ function toISODate(d) {
 // ── Init ──────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", async () => {
-  initTheme();
-  renderLanguageDropdown();
-  renderAllTexts();
-  updateLanguageButton();
-  updateUnitUI();
-  toggleGoalPercent();
-  renderTodayHeader();
+  setAppBusy(true);
 
-  // Initialize tracking mode toggle state
-  document.getElementById("tracking-mode-simple").classList.toggle("active", trackingMode === "simple");
-  document.getElementById("tracking-mode-full").classList.toggle("active", trackingMode === "full");
-  updateTrackingModeUI();
-
-  // show skeleton state while loading
   const gaugeWrap = document.querySelector(".gauge-wrap");
   if (gaugeWrap) gaugeWrap.classList.add("gauge-loading");
 
-  await loadProfile();
-  // Send client timezone offset so the server uses the correct local date
-  apiFetch("/api/profile/timezone", "POST", {
-    tg_id: tgId,
-    utc_offset: -new Date().getTimezoneOffset(),
-  });
-  await Promise.all([loadFoods(), loadTodayLogs(), loadHistory()]);
-  isBootstrapping = false;
-
-  // data loaded — remove skeleton
-  if (gaugeWrap) gaugeWrap.classList.remove("gauge-loading");
-
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
+      document.querySelectorAll(".tab-content").forEach(c =>
+        c.classList.add("hidden")
+      );
       document.getElementById(btn.dataset.tab).classList.remove("hidden");
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(b =>
+        b.classList.remove("active")
+      );
       btn.classList.add("active");
       const fab = document.getElementById("fab-add");
       if (fab) fab.classList.toggle("hidden", btn.dataset.tab !== "tab-today");
       const fabFood = document.getElementById("fab-add-food");
-      if (fabFood) fabFood.classList.toggle("hidden", btn.dataset.tab !== "tab-foods");
+      if (fabFood) {
+        fabFood.classList.toggle("hidden", btn.dataset.tab !== "tab-foods");
+      }
       if (btn.dataset.tab === "tab-history") {
         calOffset = 0;
         loadHistory().then(() => {
           const todayStr = toISODate(new Date());
-          const todayCell = document.querySelector(`.cal-day[data-date="${todayStr}"]`);
+          const todayCell = document.querySelector(
+            `.cal-day[data-date="${todayStr}"]`
+          );
           if (todayCell) selectDay(todayStr, todayCell);
         });
       }
@@ -1285,10 +1284,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Force fresh data reload when app comes back from background
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       loadTodayLogs();
     }
   });
+
+  try {
+    initTheme();
+    renderLanguageDropdown();
+    renderAllTexts();
+    updateLanguageButton();
+    updateUnitUI();
+    toggleGoalPercent();
+    renderTodayHeader();
+
+    document.getElementById("tracking-mode-simple").classList.toggle(
+      "active",
+      trackingMode === "simple"
+    );
+    document.getElementById("tracking-mode-full").classList.toggle(
+      "active",
+      trackingMode === "full"
+    );
+    updateTrackingModeUI();
+
+    await loadProfile();
+
+    await apiFetch("/api/profile/timezone", "POST", {
+      tg_id: tgId,
+      utc_offset: -new Date().getTimezoneOffset(),
+    });
+
+    await Promise.all([loadFoods(), loadTodayLogs(), loadHistory()]);
+  } catch (e) {
+    console.error("[bootstrap]", e);
+  } finally {
+    isBootstrapping = false;
+    if (gaugeWrap) gaugeWrap.classList.remove("gauge-loading");
+    setAppBusy(false);
+  }
 });

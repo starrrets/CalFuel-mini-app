@@ -11,6 +11,19 @@
   <script src="js/app.js" defer></script>
 </head>
 <body>
+  <div
+    id="app-busy-overlay"
+    class="app-busy-overlay"
+    role="status"
+    aria-live="polite"
+    aria-hidden="true"
+  >
+    <div class="app-busy-card">
+      <div class="app-busy-spinner" aria-hidden="true"></div>
+      <div class="app-busy-title">Loading…</div>
+      <div class="app-busy-subtitle">Syncing your data</div>
+    </div>
+  </div>
   <div class="page">
 
     <!-- tab bar -->
