@@ -176,7 +176,7 @@ h2 {
   position: fixed; bottom: 0; left: 0; right: 0;
   display: flex;
   background: rgba(30, 30, 30, 0.72);
-  border-top: 0.5px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255,255,255,0.1);
   padding: 10px 0 max(env(safe-area-inset-bottom, 0px), 14px);
   z-index: 50;
   backdrop-filter: saturate(180%) blur(20px);
@@ -185,7 +185,7 @@ h2 {
 
 [data-theme="light"] .tabs {
   background: rgba(242, 242, 247, 0.82);
-  border-top: 0.5px solid rgba(60,60,67,0.15);
+  border-top: 1px solid rgba(60,60,67,0.15);
 }
 
 .tab-btn {
@@ -227,7 +227,8 @@ h2 {
   border: none;
 }
 #goal-percent-row {
-border-top: 2px solid var(--sep);
+  border-bottom: none;
+  border-top: 2px solid var(--sep);
 }
 .form-row:last-child { border-bottom: none; }
 .form-row input,
@@ -905,4 +906,9 @@ body.is-busy {
   to {
     transform: rotate(360deg);
   }
+}
+
+#tracking-mode-seg {
+  border-bottom: none;
+  border-top: 2px solid var(--sep);
 }
