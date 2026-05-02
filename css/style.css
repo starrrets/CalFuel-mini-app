@@ -14,6 +14,7 @@
   --badgeBG: #9b9b9b2e;
   --text3: #ebebf599;
   --accent: #e8500a;
+  --accentCTA: #ff7f44;
   --accentText: #ff9a62;
   --accentBG: #ff9a6226;
   --accentLight: #f06830;
@@ -126,7 +127,7 @@ h2 {
   bottom: calc(100% + 6px); top: auto;
   width: 13rem; background: var(--bg2);
   border-radius: var(--r); box-shadow: var(--shadow);
-  border: 0.5px solid var(--sep);
+  border: 1px solid var(--sep);
   overflow: hidden; z-index: 100;
 }
 .lang-dropdown.open { display: block; }
@@ -245,7 +246,7 @@ h2 {
 .grouped-card {
   background: var(--bg2);
   border-radius: var(--r);
-  border: 0.5px solid var(--sep);
+  border: 1px solid var(--sep);
   overflow: hidden;
   margin-bottom: 0.5rem;
 }
@@ -255,7 +256,7 @@ h2 {
 .form-row {
   display: flex; align-items: center;
   padding: 0.75rem 1rem;
-  border-bottom: 2px solid var(--sep);
+  border-bottom: 1px solid var(--sep);
   min-height: 44px;
 }
 #goal-type-row {
@@ -263,7 +264,7 @@ h2 {
 }
 #goal-percent-row {
   border-bottom: none;
-  border-top: 2px solid var(--sep);
+  border-top: 1px solid var(--sep);
 }
 .form-row:last-child { border-bottom: none; }
 .form-row input,
@@ -298,6 +299,10 @@ h2 {
   border-radius: 0; padding: 4px; margin-bottom: 0;
   border-bottom: 1px solid var(--sep);
 }
+#addFoodModal .seg-wrap, #addLogModal .seg-wrap {
+  border: none;
+  padding: 4px 0;
+}
 .seg-btn {
   flex: 1; padding: 0.6rem 0.25rem;
   border-radius: calc(var(--r) - 4px);
@@ -308,6 +313,7 @@ h2 {
 .seg-btn.active {
   background: var(--bg3);
   color: var(--text);
+  border: 1px solid var(--sep);
 }
 
 /* ── CTA button ────────────────────────────────────────────────── */
@@ -320,6 +326,7 @@ h2 {
   text-align: center; letter-spacing: -0.01em;
   transition: opacity 0.15s;
   margin-top: 0.75rem;
+  border: 1px solid var(--accentCTA);
 }
 .btn-cta:active { opacity: 0.75; }
 .btn-cta-icon {
@@ -345,7 +352,7 @@ h2 {
   display: flex; justify-content: space-between; align-items: center;
   background: var(--bg2); padding: 0.75rem 1rem;
   border-radius: var(--r); margin-bottom: 0.5rem;
-  border: 0.5px solid var(--sep);
+  border: 1px solid var(--sep);
 }
 .list-row-name { 
   font-weight: 600; 
@@ -360,6 +367,7 @@ h2 {
   color: var(--accentText);
   background: var(--accentBG); border-radius: 5px;
   padding: 1px 6px;
+  border: 1px solid;
 }
 
 .badge {
@@ -368,6 +376,7 @@ h2 {
   padding: 1px 6px; border-radius: 5px;
   vertical-align: middle;
   white-space: nowrap;
+  border: 1px solid;
 }
 
 .empty-hint {
@@ -405,6 +414,7 @@ h2 {
   background: var(--bg3); padding: 0.875rem 1rem;
   border-radius: var(--r); margin-bottom: 0.4rem;
   cursor: pointer; transition: opacity 0.12s;
+  border: 1px solid var(--sep);
 }
 .dish-row:active { opacity: 0.6; }
 .dish-row-cal {
@@ -413,6 +423,7 @@ h2 {
   color: var(--accentText);
   background: var(--accentBG); border-radius: 5px;
   padding: 1px 6px;
+  border: 1px solid;
 }
 
 /* ── Calendar ──────────────────────────────────────────────────── */
@@ -451,10 +462,10 @@ h2 {
 }
 .cal-day:active { transform: scale(0.9); }
 .cal-day.empty { background: transparent; cursor: default; pointer-events: none; }
-.cal-day.out-of-range { opacity: 0.3; cursor: default; pointer-events: none; }
-.cal-day.has-data { color: var(--text); }
+.cal-day.out-of-range { opacity: 0.3; cursor: default; pointer-events: none; border: 1px solid var(--sep); }
+.cal-day.has-data { color: var(--text); border: 1px solid var(--sep); }
 .cal-day.today { background: var(--accent); color: #fff; font-weight: 700; }
-.cal-day.selected { outline: 2px solid var(--accentLight); outline-offset: -2px; }
+.cal-day.selected { outline: 2px solid var(--accentCTA); outline-offset: -1px; }
 .cal-day-num { line-height: 1; }
 
 /* ── Day detail ────────────────────────────────────────────────── */
@@ -474,6 +485,7 @@ h2 {
   font-size: 0.78rem; font-weight: 600;
   background: var(--bg3); border-radius: 6px;
   padding: 0.2rem 0.6rem;
+  border: 1px solid;
 }
 .day-detail-stat.eaten { color: var(--accentText); background-color: var(--accentBG); }
 .day-detail-stat.remaining { color: var(--badge); }
@@ -501,7 +513,7 @@ h2 {
 .builder-suggestion-row {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0.7rem 1rem; cursor: pointer;
-  border-bottom: 2px solid var(--sep); font-size: 0.9rem; color: var(--text2);
+  border-bottom: 1px solid var(--sep); font-size: 0.9rem; color: var(--text2);
   transition: background 0.12s;
 }
 .builder-suggestion-row:last-child { border-bottom: none; }
@@ -522,13 +534,20 @@ h2 {
   background: var(--bg4); border-radius: 8px;
   padding: 0.28rem 0.4rem; text-align: center;
   color: var(--text); font: inherit; font-size: 0.85rem;
-  border: none; outline: none;
+  border: 1px solid var(--sep); outline: none;
 }
 .builder-ing-total { font-size: 0.72rem; color: var(--text3); white-space: nowrap; min-width: 2.5rem; text-align: right; }
 .builder-total-row {
   padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600;
   color: var(--text2); display: flex; justify-content: space-between;
-  border-top: 1px solid var(--sep);
+}
+
+#builderIngredients{
+  border: 1px solid var(--sep);
+  border-radius: var(--r);
+}
+#builderIngredients:empty {
+  border: none;
 }
 
 /* ── FAB (Floating Action Button) ──────────────────────────────── */
@@ -543,6 +562,7 @@ h2 {
   color: #fff;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 20px rgba(242, 73, 0, 0.45);
+  border: 1px solid var(--accentCTA);
   z-index: 49;
   transition: transform 0.15s, opacity 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -557,7 +577,7 @@ h2 {
 .dish-weight-row {
   background: var(--bg3); padding: 0.875rem 1rem;
   border-radius: var(--r); margin-bottom: 0.4rem;
-  border: 0.5px solid transparent;
+  border: 1px solid var(--sep);
   transition: border-color 0.18s;
 }
 .dish-weight-row.has-weight {
@@ -575,6 +595,7 @@ h2 {
   padding: 0.5rem 0.75rem; border-radius: 8px;
   border: none; font: inherit; font-size: 0.95rem; outline: none;
   text-align: right;
+  border: 1px solid var(--sep);
 }
 .dish-weight-inline-input::placeholder { color: var(--text3); text-align: left; }
 .dish-weight-row.has-weight {
@@ -594,7 +615,7 @@ h2 {
   background: var(--bg2); border-radius: var(--r);
    margin-bottom: 0; overflow: hidden;
   animation: fadeUp 0.18s ease forwards;
-  border: 0.5px solid var(--sep);
+  border: 1px solid var(--sep);
 }
 
 /* ── Empty today state ─────────────────────────────────────────── */
@@ -606,7 +627,7 @@ h2 {
 .empty-today-icon {
   width: 60px; height: 60px; border-radius: 50%;
   background: var(--bg2);
-  border: 0.5px solid var(--sep);
+  border: 1px solid var(--sep);
   display: flex; align-items: center; justify-content: center;
   color: var(--accentText); margin-bottom: 0.4rem;
 }
@@ -653,7 +674,7 @@ h2 {
   width: 100%;
   display: flex; align-items: center; justify-content: center; gap: 0.5rem;
   background: var(--bg2); color: var(--text2);
-  border-radius: var(--r); border: 0.5px solid var(--sep);
+  border-radius: var(--r); border: 1px solid var(--sep);
   padding: 0.75rem 0.5rem; font-size: 0.88rem; font-weight: 500;
   transition: opacity 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -713,7 +734,7 @@ h2 {
 }
 .toast {
   background: var(--bg3);
-  border: 0.5px solid var(--sep);
+  border: 1px solid var(--sep);
   border-radius: 999px;
   padding: 0.65rem 1.25rem;
   font-size: 0.88rem; font-weight: 500;
@@ -773,14 +794,15 @@ h2 {
 .macro-bar-label.carbs   { color: var(--macro-carbs); }
 .macro-bar-track {
   flex: 1;
-  height: 7px;
+  height: 11px;
   background: var(--bg3);
   border-radius: 9999px;
   overflow: hidden;
+  outline-offset: -1px;
 }
-.macro-bar-track.protein-track { background: var(--macro-protein-bg); }
-.macro-bar-track.fat-track { background: var(--macro-fat-bg); }
-.macro-bar-track.carbs-track { background: var(--macro-carbs-bg); }
+.macro-bar-track.protein-track { background: var(--macro-protein-bg); outline: 1px solid var(--macro-protein); }
+.macro-bar-track.fat-track { background: var(--macro-fat-bg); outline: 1px solid var(--macro-fat); }
+.macro-bar-track.carbs-track { background: var(--macro-carbs-bg); outline: 1px solid var(--macro-carbs); }
 .macro-bar-fill {
   height: 100%;
   border-radius: 9999px;
@@ -788,25 +810,13 @@ h2 {
   min-width: 0;
 }
 .macro-bar-fill.protein {
-  background: linear-gradient(
-    90deg,
-    var(--macro-protein-fill-start) 0%,
-    var(--macro-protein-fill-end) 100%
-  );
+  background: var(--macro-protein);
 }
 .macro-bar-fill.fat {
-  background: linear-gradient(
-    90deg,
-    var(--macro-fat-fill-start) 0%,
-    var(--macro-fat-fill-end) 100%
-  );
+  background: var(--macro-fat);
 }
 .macro-bar-fill.carbs {
-  background: linear-gradient(
-    90deg,
-    var(--macro-carbs-fill-start) 0%,
-    var(--macro-carbs-fill-end) 100%
-  );
+  background: var(--macro-carbs);
 }
 .macro-bar-val {
   font-size: 0.72rem;
@@ -841,7 +851,7 @@ h2 {
 /* ── Macro inputs in food form ─────────────────────────────────── */
 
 .macro-inputs-group .form-row {
-  border-bottom: 2px solid var(--sep);
+  border-bottom: 1px solid var(--sep);
 }
 .macro-inputs-group .form-row:last-child {
   border-bottom: none;
@@ -860,6 +870,7 @@ h2 {
   color: var(--accentText);
   background: var(--accentBG); border-radius: 5px;
   padding: 1px 6px;
+  border: 1px solid;
 }
 .macro-pill-p { color: var(--macro-protein); background: var(--macro-protein-bg); }
 .macro-pill-f { color: var(--macro-fat); background: var(--macro-fat-bg); }
@@ -977,5 +988,5 @@ body.is-busy {
 
 #tracking-mode-seg {
   border-bottom: none;
-  border-top: 2px solid var(--sep);
+  border-top: 1px solid var(--sep);
 }
