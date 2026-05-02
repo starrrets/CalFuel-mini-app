@@ -10,6 +10,7 @@
   --text2:     #ebebf5cc;
   --text3:     #ebebf599;
   --accent:    #e8500a;
+  --accentText: #e8500a;
   --accentLight: #f06830;
   --blue:      #0a84ff;
   --green:     #30d158;
@@ -23,13 +24,14 @@
 [data-theme="light"] {
   --bg:        #f2f2f7;
   --bg2:       #ffffff;
-  --bg3:       #e5e5ea;
+  --bg3:       #ebebf0;
   --bg4:       #d1d1d6;
   --sep:       rgba(60,60,67,0.1);
   --text:      #000000;
   --text2:     rgba(60,60,67,0.85);
   --text3:     rgba(60,60,67,0.55);
   --accent:    #e8500a;
+  --accentText: #d44000;
   --accentLight: #f06830;
   --blue:      #007aff;
   --green:     #34c759;
@@ -183,7 +185,7 @@ h2 {
   transition: color 0.15s;
 }
 .tab-btn svg { width: 24px; height: 24px; transition: transform 0.15s; }
-.tab-btn.active { color: var(--accent); }
+.tab-btn.active { color: var(--accentText); }
 .tab-btn.active svg { transform: scale(1.08); }
 
 /* ── Tab content ───────────────────────────────────────────────── */
@@ -300,7 +302,13 @@ border-top: 2px solid var(--sep);
 }
 .list-row-name { font-weight: 600; font-size: 0.95rem; }
 .list-row-sub  { font-size: 0.82rem; color: var(--text3); margin-top: 2px; }
-.list-row-cal  { font-size: 0.82rem; color: var(--accent); margin-top: 2px; font-weight: 600; }
+.list-row-cal  {
+  display: inline-flex; align-items: center;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--accentText);
+  background: var(--bg3); border-radius: 999px;
+  padding: 0.15rem 0.45rem;
+}
 
 .badge {
   display: inline-block; font-size: 0.65rem; font-weight: 500;
@@ -346,7 +354,13 @@ border-top: 2px solid var(--sep);
   cursor: pointer; transition: opacity 0.12s;
 }
 .dish-row:active { opacity: 0.6; }
-.dish-row-cal { color: var(--accent); font-weight: 600; font-size: 0.9rem; }
+.dish-row-cal {
+  display: inline-flex; align-items: center;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--accentText);
+  background: var(--bg4); border-radius: 999px;
+  padding: 0.15rem 0.45rem;
+}
 
 /* ── Calendar ──────────────────────────────────────────────────── */
 
@@ -408,7 +422,7 @@ border-top: 2px solid var(--sep);
   background: var(--bg3); border-radius: 999px;
   padding: 0.2rem 0.6rem;
 }
-.day-detail-stat.eaten { color: var(--accent); }
+.day-detail-stat.eaten { color: var(--accentText); }
 .day-detail-stat.remaining { color: var(--text3); }
 .day-detail-stat-label { font-weight: 500; color: inherit; opacity: 0.75; }
 .day-log-row {
@@ -441,19 +455,22 @@ border-top: 2px solid var(--sep);
 .builder-suggestion-kcal { color: var(--text3); font-size: 0.78rem; white-space: nowrap; margin-left: 0.5rem; }
 
 .builder-ing-row {
-  display: flex; align-items: center; gap: 0.4rem;
-  padding: 0.55rem 1rem; border-bottom: 1px solid var(--sep);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.5rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--sep);
 }
 .builder-ing-row:last-of-type { border-bottom: none; }
-.builder-ing-name { flex: 1; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.builder-ing-meta { font-size: 0.72rem; color: var(--text3); white-space: nowrap; flex-shrink: 0; }
+.builder-ing-info { flex: 1; min-width: 0; }
+.builder-ing-name { font-size: 0.88rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.builder-ing-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 3px; }
+.builder-ing-controls { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
 .builder-ing-weight {
-  width: 58px; flex-shrink: 0;
+  width: 54px; flex-shrink: 0;
   background: var(--bg4); border-radius: 8px;
   padding: 0.28rem 0.4rem; text-align: center;
   color: var(--text); font: inherit; font-size: 0.85rem;
   border: none; outline: none;
 }
+.builder-ing-total { font-size: 0.72rem; color: var(--text3); white-space: nowrap; min-width: 2.5rem; text-align: right; }
 .builder-total-row {
   padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600;
   color: var(--text2); display: flex; justify-content: space-between;
@@ -493,7 +510,7 @@ border-top: 2px solid var(--sep);
   border-color: var(--accent);
 }
 .dish-weight-row-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;
+  display: flex; flex-direction: column; margin-bottom: 0.5rem;
 }
 .dish-weight-row-sub { font-size: 0.78rem; color: var(--text3); }
 
@@ -537,7 +554,7 @@ border-top: 2px solid var(--sep);
   background: var(--bg2);
   border: 0.5px solid var(--sep);
   display: flex; align-items: center; justify-content: center;
-  color: var(--accent); margin-bottom: 0.4rem;
+  color: var(--accentText); margin-bottom: 0.4rem;
 }
 .empty-today-title {
   font-size: 1rem; font-weight: 600; color: var(--text);
@@ -674,3 +691,146 @@ border-top: 2px solid var(--sep);
 
 @keyframes toastIn  { from { opacity:0; transform:translateY(8px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
 @keyframes toastOut { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(6px) scale(0.96); } }
+
+/* ── Macro progress bars ───────────────────────────────────────── */
+
+.macro-bars {
+  padding: 0.5rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.macro-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.macro-bar-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  width: 1rem;
+  text-align: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.macro-bar-label.protein { color: #FFE082; }
+.macro-bar-label.fat     { color: #89CFF0; }
+.macro-bar-label.carbs   { color: #F8BBD0; }
+.macro-bar-track {
+  flex: 1;
+  height: 7px;
+  background: var(--bg3);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.macro-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+}
+.macro-bar-fill.protein { background: #FFE082; }
+.macro-bar-fill.fat     { background: #89CFF0; }
+.macro-bar-fill.carbs   { background: #F8BBD0; }
+.macro-bar-val {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text2);
+  white-space: nowrap;
+  min-width: 5.5rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Suffix wrap inside any labeled form row — always full-width ── */
+
+.form-row.labeled .input-suffix-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.form-row.labeled .input-suffix-wrap input {
+  flex: 1;
+  width: 100%;
+  direction: ltr;
+  text-align: right;
+  padding-right: 2.5rem;
+  background: transparent;
+  color: var(--text2);
+}
+
+/* ── Macro inputs in food form ─────────────────────────────────── */
+
+.macro-inputs-group {
+  /* no border-top — the row above already has border-bottom */
+}
+.macro-inputs-group .form-row {
+  border-bottom: 2px solid var(--sep);
+}
+.macro-inputs-group .form-row:last-child {
+  border-bottom: none;
+}
+
+/* ── Macro tag on foods list ───────────────────────────────────── */
+
+.list-row-sub-row {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 0.3rem; margin-top: 3px;
+}
+
+.macro-pill {
+  display: inline-flex; align-items: center;
+  font-size: 0.72rem; font-weight: 600;
+  background: var(--bg3); border-radius: 999px;
+  padding: 0.15rem 0.45rem;
+}
+.macro-pill-p { color: #FFE082; }
+.macro-pill-f { color: #89CFF0; }
+.macro-pill-c { color: #F8BBD0; }
+
+/* pills inside dish-row / dish-weight-row (bg3) need darker bg to be visible */
+.dish-row .macro-pill,
+.dish-row .list-row-cal,
+.dish-weight-row .macro-pill,
+.dish-weight-row .list-row-cal,
+.builder-ing-pills .macro-pill {
+  background: var(--bg4);
+}
+
+.list-row-macros {
+  font-size: 0.75rem;
+  color: var(--text3);
+  margin-top: 2px;
+  display: flex;
+  gap: 0.5rem;
+}
+.macro-tag-p { color: #FFE082; font-weight: 600; }
+.macro-tag-f { color: #89CFF0; font-weight: 600; }
+.macro-tag-c { color: #F8BBD0; font-weight: 600; }
+
+/* light-mode macro colors — vivid, AA compliant on white */
+[data-theme="light"] .macro-bar-label.protein,
+[data-theme="light"] .macro-pill-p,
+[data-theme="light"] .macro-tag-p { color: #b87800; }
+[data-theme="light"] .macro-bar-label.fat,
+[data-theme="light"] .macro-pill-f,
+[data-theme="light"] .macro-tag-f { color: #1A7AAF; }
+[data-theme="light"] .macro-bar-label.carbs,
+[data-theme="light"] .macro-pill-c,
+[data-theme="light"] .macro-tag-c { color: #C02060; }
+[data-theme="light"] .macro-bar-fill.protein { background: #F5C842; }
+[data-theme="light"] .macro-bar-fill.fat     { background: #5AADDC; }
+[data-theme="light"] .macro-bar-fill.carbs   { background: #EE8FAB; }
+
+/* ── Macro day detail separator ────────────────────────────────── */
+
+#dayDetailMacros {
+  border-bottom: 1px solid var(--sep);
+}
+
+/* ── Macro mode seg-wrap (no border-bottom) ────────────────────── */
+
+#macro-mode-seg {
+  border-bottom: none;
+}

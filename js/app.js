@@ -15,6 +15,82 @@ let foods = [];
 let logs = [];
 let currentUnits = "metric";
 let newFoodType = "fixed";
+let macroMode = localStorage.getItem("macroMode") || "simple"; // "simple" | "detailed"
+
+// ── Macro storage (localStorage keyed by tgId + date) ────────────
+// Format: { [tgId_date]: { [logId]: {protein, fat, carbs} } }
+
+function getMacroStore() {
+  try { return JSON.parse(localStorage.getItem("macroStore") || "{}"); } catch { return {}; }
+}
+function saveMacroStore(store) {
+  localStorage.setItem("macroStore", JSON.stringify(store));
+}
+function getMacrosForLog(logId, dateStr) {
+  const store = getMacroStore();
+  return store[`${tgId}_${dateStr}`]?.[logId] || null;
+}
+function setMacrosForLog(logId, dateStr, protein, fat, carbs) {
+  const store = getMacroStore();
+  const key = `${tgId}_${dateStr}`;
+  if (!store[key]) store[key] = {};
+  store[key][logId] = { protein: protein || 0, fat: fat || 0, carbs: carbs || 0 };
+  saveMacroStore(store);
+}
+function getMacrosForDay(dateStr) {
+  const store = getMacroStore();
+  const dayData = store[`${tgId}_${dateStr}`] || {};
+  return Object.values(dayData).reduce(
+    (acc, m) => ({ protein: acc.protein + (m.protein||0), fat: acc.fat + (m.fat||0), carbs: acc.carbs + (m.carbs||0) }),
+    { protein: 0, fat: 0, carbs: 0 }
+  );
+}
+
+// ── Food macros storage (localStorage keyed by food id) ──────────
+// Format: { [foodId]: {protein, fat, carbs} }
+
+function getFoodMacroStore() {
+  try { return JSON.parse(localStorage.getItem("foodMacroStore") || "{}"); } catch { return {}; }
+}
+function saveFoodMacroStore(store) {
+  localStorage.setItem("foodMacroStore", JSON.stringify(store));
+}
+function getFoodMacros(foodId) {
+  return getFoodMacroStore()[foodId] || null;
+}
+function setFoodMacros(foodId, protein, fat, carbs) {
+  const store = getFoodMacroStore();
+  store[foodId] = { protein: protein || 0, fat: fat || 0, carbs: carbs || 0 };
+  saveFoodMacroStore(store);
+}
+
+// ── Macro mode toggle ─────────────────────────────────────────────
+
+function setMacroMode(mode) {
+  macroMode = mode;
+  localStorage.setItem("macroMode", mode);
+  document.getElementById("macro-mode-simple").classList.toggle("active", mode === "simple");
+  document.getElementById("macro-mode-detailed").classList.toggle("active", mode === "detailed");
+  updateMacroModeUI();
+}
+
+function updateMacroModeUI() {
+  const isMacros = macroMode === "detailed";
+
+  // Today tab macro bars
+  const macroBarsToday = document.getElementById("macroBarsToday");
+  if (macroBarsToday) macroBarsToday.classList.toggle("hidden", !isMacros);
+
+  // Quick add macro inputs
+  const quickMacros = document.getElementById("quickMacros");
+  if (quickMacros) quickMacros.classList.toggle("hidden", !isMacros);
+
+  // New food macro inputs
+  const newFoodMacros = document.getElementById("newFoodMacros");
+  if (newFoodMacros) newFoodMacros.classList.toggle("hidden", !isMacros);
+
+  if (isMacros) updateMacroBars();
+}
 
 // ── New clean stable SVG icons (different from previous version) ──
 
@@ -308,6 +384,7 @@ async function loadTodayLogs() {
   document.getElementById("totalToday").textContent = Math.round(totalToday);
   renderLogs();
   updateProgress();
+  if (macroMode === "detailed") updateMacroBars();
 }
 
 function updateProgress() {
@@ -334,6 +411,35 @@ function updateProgress() {
   document.getElementById("remaining").textContent = rem;
 }
 
+function updateMacroBars() {
+  const todayStr = toISODate(new Date());
+  updateMacroBarSection("macroBarProtein", "macroBarFat", "macroBarCarbs",
+    "macroValProtein", "macroValFat", "macroValCarbs", todayStr);
+}
+
+function updateMacroBarSection(barPId, barFId, barCId, valPId, valFId, valCId, dateStr) {
+  const totals = getMacrosForDay(dateStr);
+  const refP = Math.max(dailyNorm * 0.075, 50);
+  const refF = Math.max(dailyNorm * 0.033, 30);
+  const refC = Math.max(dailyNorm * 0.125, 100);
+
+  const g = translate("unitGrams") || "g";
+
+  const barP = document.getElementById(barPId);
+  const barF = document.getElementById(barFId);
+  const barC = document.getElementById(barCId);
+  const valP = document.getElementById(valPId);
+  const valF = document.getElementById(valFId);
+  const valC = document.getElementById(valCId);
+
+  if (barP) barP.style.width = `${Math.min(totals.protein / refP * 100, 100).toFixed(1)}%`;
+  if (barF) barF.style.width = `${Math.min(totals.fat / refF * 100, 100).toFixed(1)}%`;
+  if (barC) barC.style.width = `${Math.min(totals.carbs / refC * 100, 100).toFixed(1)}%`;
+  if (valP) valP.textContent = `${Math.round(totals.protein)} / ${Math.round(refP)} ${g}`;
+  if (valF) valF.textContent = `${Math.round(totals.fat)} / ${Math.round(refF)} ${g}`;
+  if (valC) valC.textContent = `${Math.round(totals.carbs)} / ${Math.round(refC)} ${g}`;
+}
+
 function renderLogs() {
   const container = document.getElementById("todayLogs");
   container.innerHTML = "";
@@ -355,13 +461,30 @@ function renderLogs() {
     return;
   }
 
+  const todayStr = toISODate(new Date());
+
   logs.forEach(log => {
+    const macros = getMacrosForLog(log.id, todayStr);
+    const hasMacros = macros && (macros.protein > 0 || macros.fat > 0 || macros.carbs > 0);
+    const g = translate("unitGrams") || "г";
+
+    let macroHtml = "";
+    if (hasMacros) {
+      macroHtml = `
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(macros.protein)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(macros.fat)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(macros.carbs)}${g}</span>`;
+    }
+
     const div = document.createElement("div");
     div.className = "list-row";
     div.innerHTML = `
       <div>
         <div class="list-row-name">${log.food_name}</div>
-        <div class="list-row-cal">${Math.round(log.calories)} ${kcal}</div>
+        <div class="list-row-sub-row">
+          <span class="list-row-cal">${Math.round(log.calories)} ${kcal}</span>
+          ${macroHtml}
+        </div>
       </div>
       <button onclick="deleteLog(${log.id})" class="btn-delete" aria-label="delete">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -386,6 +509,8 @@ async function deleteLog(id) {
 function openAddModal() {
   document.getElementById("addLogModal").classList.add("open");
   setModalTab("quick");
+  const quickMacros = document.getElementById("quickMacros");
+  if (quickMacros) quickMacros.classList.toggle("hidden", macroMode !== "detailed");
 }
 
 function closeAddModal() {
@@ -395,6 +520,8 @@ function closeAddModal() {
 function openAddFoodModal() {
   document.getElementById("addFoodModal").classList.add("open");
   setFoodType("fixed");
+  const newFoodMacros = document.getElementById("newFoodMacros");
+  if (newFoodMacros) newFoodMacros.classList.toggle("hidden", macroMode !== "detailed");
 }
 
 function closeAddFoodModal() {
@@ -439,13 +566,28 @@ function renderFixedDishesList() {
     return;
   }
   const kcal = translate("unitKcal");
+  const g = translate("unitGrams") || "g";
   fixed.forEach(food => {
+    const fm = getFoodMacros(food.id);
+    const hasMacros = fm && (fm.protein > 0 || fm.fat > 0 || fm.carbs > 0);
+    let macroHtml = "";
+    if (hasMacros) {
+      macroHtml = `
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(fm.protein)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(fm.fat)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(fm.carbs)}${g}</span>`;
+    }
     const div = document.createElement("div");
     div.className = "dish-row";
     div.dataset.name = food.name.toLowerCase();
     div.innerHTML = `
-      <span class="list-row-name">${food.name}</span>
-      <span class="dish-row-cal">${Math.round(food.calories)} ${kcal}</span>
+      <div>
+        <span class="list-row-name">${food.name}</span>
+        <div class="list-row-sub-row" style="margin-top:3px">
+          <span class="dish-row-cal">${Math.round(food.calories)} ${kcal}</span>
+          ${macroHtml}
+        </div>
+      </div>
     `;
     div.onclick = () => logFixedDish(food);
     container.appendChild(div);
@@ -472,14 +614,26 @@ function renderPer100gDishesList() {
   }
   const kcal = translate("unitKcal");
   const gLabel = translate("per100gLabel");
+  const g = translate("unitGrams") || "g";
   byWeight.forEach(food => {
+    const fm = getFoodMacros(food.id);
+    let macroHtml = "";
+    if (fm && (fm.protein > 0 || fm.fat > 0 || fm.carbs > 0)) {
+      macroHtml = `
+        <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(fm.protein)}${g}</span>
+        <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(fm.fat)}${g}</span>
+        <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(fm.carbs)}${g}</span>`;
+    }
     const div = document.createElement("div");
     div.className = "dish-weight-row";
     div.dataset.foodId = food.id;
     div.innerHTML = `
       <div class="dish-weight-row-header">
         <span class="list-row-name">${food.name}</span>
-        <span class="dish-weight-row-sub">${Math.round(food.calories)} ${kcal}/${gLabel}</span>
+        <div class="list-row-sub-row" style="margin-top:3px">
+          <span class="dish-row-cal" style="font-size:0.72rem">${Math.round(food.calories)} ${kcal}/${gLabel}</span>
+          ${macroHtml}
+        </div>
       </div>
       <input type="number" id="weight-${food.id}" class="dish-weight-inline-input" placeholder="${translate("weightGPlaceholder")}"
         oninput="onBulkWeightInput(${food.id}, this)">
@@ -518,7 +672,11 @@ function updateBulkAddBtn() {
 
 async function logFixedDish(food) {
   const date = toISODate(new Date());
-  await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: food.name, calories: food.calories, date });
+  const result = await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: food.name, calories: food.calories, date });
+  if (result && result.id) {
+    const fm = getFoodMacros(food.id);
+    if (fm) setMacrosForLog(result.id, date, fm.protein, fm.fat, fm.carbs);
+  }
   closeAddModal();
   await loadTodayLogs();
 }
@@ -530,12 +688,22 @@ async function bulkLogPer100g() {
     return el && parseFloat(el.value) > 0;
   });
   if (!toLog.length) return;
-  
+
   const date = toISODate(new Date());
-  await Promise.all(toLog.map(food => {
+  await Promise.all(toLog.map(async food => {
     const grams = parseFloat(document.getElementById(`weight-${food.id}`).value);
     const calories = Math.round(food.calories * grams / 100);
-    return apiFetch("/api/log", "POST", { tg_id: tgId, food_name: `${food.name} (${grams}g)`, calories, date });
+    const result = await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: `${food.name} (${grams}g)`, calories, date });
+    if (result && result.id) {
+      const fm = getFoodMacros(food.id);
+      if (fm) {
+        setMacrosForLog(result.id, date,
+          fm.protein * grams / 100,
+          fm.fat * grams / 100,
+          fm.carbs * grams / 100
+        );
+      }
+    }
   }));
   closeAddModal();
   await loadTodayLogs();
@@ -545,12 +713,24 @@ async function quickAddLog() {
   const name = document.getElementById("quickFoodName").value.trim() || translate("whatDidYouEat");
   const calories = parseFloat(document.getElementById("quickCalories").value);
   if (!calories || calories <= 0) return;
-  
+
   const date = toISODate(new Date());
-  await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories, date });
-  
+  const result = await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories, date });
+
+  if (result && macroMode === "detailed") {
+    const protein = parseFloat(document.getElementById("quickProtein").value) || 0;
+    const fat     = parseFloat(document.getElementById("quickFat").value) || 0;
+    const carbs   = parseFloat(document.getElementById("quickCarbs").value) || 0;
+    if (protein > 0 || fat > 0 || carbs > 0) {
+      setMacrosForLog(result.id, date, protein, fat, carbs);
+    }
+  }
+
   document.getElementById("quickFoodName").value = "";
   document.getElementById("quickCalories").value = "";
+  document.getElementById("quickProtein").value = "";
+  document.getElementById("quickFat").value = "";
+  document.getElementById("quickCarbs").value = "";
   closeAddModal();
   await loadTodayLogs();
 }
@@ -603,7 +783,7 @@ function onBuilderSearch(q) {
     const row = document.createElement("div");
     row.className = "builder-suggestion-row";
     row.innerHTML = `<span>${getIngredientName(ing)}</span><span class="builder-suggestion-kcal">${ing.kcal} ${kcal}/100g</span>`;
-    row.onclick = () => { addBuilderIngredient(ing.name, ing.kcal, false); document.getElementById("builderSearch").value = ""; box.innerHTML = ""; };
+    row.onclick = () => { addBuilderIngredient(ing.name, ing.kcal, false, { protein: ing.protein || 0, fat: ing.fat || 0, carbs: ing.carbs || 0 }); document.getElementById("builderSearch").value = ""; box.innerHTML = ""; };
     wrap.appendChild(row);
   });
 
@@ -621,17 +801,46 @@ function showBuilderCustomForm(name) {
   const box = document.getElementById("builderSuggestions");
   const kcalLabel = translate("builderCustomKcalPh");
   const addLabel  = translate("add");
+  const isMacros  = macroMode === "detailed";
 
   const wrap = document.createElement("div");
   wrap.className = "builder-custom-form grouped-card";
+
+  let macroFields = "";
+  if (isMacros) {
+    const g = translate("unitGrams") || "g";
+    macroFields = `
+      <div class="form-row labeled">
+        <span class="row-label">${translate("proteins")}</span>
+        <div class="input-suffix-wrap">
+          <input id="builderCustomProtein" type="number" step="0.1" placeholder="${translate("proteinsPlaceholder")}">
+          <span class="input-suffix">${g}</span>
+        </div>
+      </div>
+      <div class="form-row labeled">
+        <span class="row-label">${translate("fats")}</span>
+        <div class="input-suffix-wrap">
+          <input id="builderCustomFat" type="number" step="0.1" placeholder="${translate("fatsPlaceholder")}">
+          <span class="input-suffix">${g}</span>
+        </div>
+      </div>
+      <div class="form-row labeled" style="border-bottom:none">
+        <span class="row-label">${translate("carbs")}</span>
+        <div class="input-suffix-wrap">
+          <input id="builderCustomCarbs" type="number" step="0.1" placeholder="${translate("carbsPlaceholder")}">
+          <span class="input-suffix">${g}</span>
+        </div>
+      </div>`;
+  }
+
   wrap.innerHTML = `
     <div class="form-row labeled">
-      <span class="row-label" style="max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span>
-      <div class="input-suffix-wrap" style="flex:1">
-        <input id="builderCustomKcal" type="number" placeholder="${kcalLabel}" style="text-align:right;padding-right:3.5rem">
-        <span class="input-suffix">kcal</span>
+      <span class="row-label" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 1 auto">${name}</span>
+      <div class="input-suffix-wrap">
+        <input id="builderCustomKcal" type="number" placeholder="${kcalLabel}">
+        <span class="input-suffix">${translate("unitKcal")}</span>
       </div>
-    </div>`;
+    </div>${macroFields}`;
 
   const btn = document.createElement("button");
   btn.className = "btn-cta";
@@ -647,12 +856,15 @@ function showBuilderCustomForm(name) {
 function confirmBuilderCustom(name) {
   const kcal = parseFloat(document.getElementById("builderCustomKcal").value);
   if (!kcal || kcal <= 0) return;
-  addBuilderIngredient(name, kcal, true);
+  const protein = parseFloat(document.getElementById("builderCustomProtein")?.value) || 0;
+  const fat     = parseFloat(document.getElementById("builderCustomFat")?.value) || 0;
+  const carbs   = parseFloat(document.getElementById("builderCustomCarbs")?.value) || 0;
+  addBuilderIngredient(name, kcal, true, { protein, fat, carbs });
   document.getElementById("builderSuggestions").innerHTML = "";
 }
 
-function addBuilderIngredient(name, kcalPer100g, isCustom) {
-  builderIngredients.push({ name, kcalPer100g, grams: 0, isCustom });
+function addBuilderIngredient(name, kcalPer100g, isCustom, macros = null) {
+  builderIngredients.push({ name, kcalPer100g, grams: 0, isCustom, macros });
   renderBuilderIngredients();
 }
 
@@ -667,9 +879,15 @@ function updateBuilderGrams(idx, val) {
 }
 
 function updateBuilderTotals() {
+  const kcal = translate("unitKcal");
+  builderIngredients.forEach((ing, idx) => {
+    const rowKcal = Math.round(ing.kcalPer100g * ing.grams / 100);
+    const el = document.getElementById(`ing-total-${idx}`);
+    if (el) el.textContent = rowKcal > 0 ? `${rowKcal} ${kcal}` : "—";
+  });
   const totalKcal = builderIngredients.reduce((s, i) => s + i.kcalPer100g * i.grams / 100, 0);
   const totalEl = document.getElementById("builderTotal");
-  if (totalEl) totalEl.textContent = `${Math.round(totalKcal)} ${translate("unitKcal")}`;
+  if (totalEl) totalEl.textContent = `${Math.round(totalKcal)} ${kcal}`;
 }
 
 function renderBuilderIngredients() {
@@ -687,17 +905,32 @@ function renderBuilderIngredients() {
     const row = document.createElement("div");
     row.className = "builder-ing-row";
     const displayName = ing.isCustom ? ing.name : (getIngredientName({ name: ing.name }) || ing.name);
+    const g = translate("unitGrams") || "г";
+    const kcalPerLabel = `${ing.kcalPer100g} ${kcal}/100${g}`;
+
+    let pillsHtml = `<span class="macro-pill" style="background:var(--bg4);color:var(--text3)">${kcalPerLabel}</span>`;
+    if (ing.macros && (ing.macros.protein > 0 || ing.macros.fat > 0 || ing.macros.carbs > 0)) {
+      pillsHtml += `
+        <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(ing.macros.protein)}${g}</span>
+        <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(ing.macros.fat)}${g}</span>
+        <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(ing.macros.carbs)}${g}</span>`;
+    }
+
     row.innerHTML = `
-      <span class="builder-ing-name">${displayName}</span>
-      <span class="builder-ing-meta">${ing.kcalPer100g} ${kcal}/100g</span>
-      <input class="builder-ing-weight" type="number" value="${ing.grams || ""}" placeholder="g"
-        oninput="updateBuilderGrams(${idx}, this.value)">
-      <span class="builder-ing-meta" id="ing-total-${idx}">${rowKcal > 0 ? rowKcal + " " + kcal : ""}</span>
-      <button onclick="removeBuilderIngredient(${idx})" class="btn-delete" aria-label="delete">
-        <svg width="20" height="17" viewBox="0 0 20 17" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16.2949 16.4092C18.1934 16.4092 19.1777 15.5039 19.1777 13.623V2.85645C19.1777 0.975586 18.1934 0 16.2949 0H8.69238C7.51465 0 6.65332 0.290039 5.8623 1.15137L0.887695 6.43359C0.246094 7.12793 0 7.6377 0 8.19141C0 8.74512 0.246094 9.26367 0.887695 9.94922L5.87109 15.2051C6.66211 16.0664 7.52344 16.4004 8.69238 16.4004L16.2949 16.4092ZM16.1895 14.6865H8.62207C8.00684 14.6865 7.61133 14.5283 7.18066 14.0801L2.23242 8.85938C1.96875 8.58691 1.88965 8.39355 1.88965 8.19141C1.88965 7.98926 1.97754 7.80469 2.23242 7.53223L7.17188 2.28516C7.60254 1.83691 8.00684 1.72266 8.61328 1.72266H16.1895C17.0068 1.72266 17.4551 2.14453 17.4551 2.99707V13.4033C17.4551 14.2559 17.0068 14.6865 16.1895 14.6865ZM8.32324 11.8916C8.55176 11.8916 8.74512 11.8125 8.89453 11.6543L11.2148 9.33398L13.5352 11.6543C13.6846 11.8037 13.8779 11.8916 14.1152 11.8916C14.5547 11.8916 14.9062 11.54 14.9062 11.0918C14.9062 10.8721 14.8184 10.6875 14.6689 10.5381L12.3398 8.20898L14.6689 5.87109C14.8359 5.71289 14.915 5.52832 14.915 5.31738C14.915 4.87793 14.5635 4.52637 14.1152 4.52637C13.9043 4.52637 13.7285 4.60547 13.5615 4.77246L11.2148 7.10156L8.88574 4.77246C8.72754 4.61426 8.55176 4.54395 8.32324 4.54395C7.88379 4.54395 7.53223 4.88672 7.53223 5.32617C7.53223 5.53711 7.62012 5.73047 7.76953 5.87988L10.0986 8.20898L7.76953 10.5469C7.62012 10.6875 7.53223 10.8809 7.53223 11.0918C7.53223 11.54 7.88379 11.8916 8.32324 11.8916Z"/>
-        </svg>
-      </button>`;
+      <div class="builder-ing-info">
+        <span class="builder-ing-name">${displayName}</span>
+        <div class="builder-ing-pills">${pillsHtml}</div>
+      </div>
+      <div class="builder-ing-controls">
+        <input class="builder-ing-weight" type="number" value="${ing.grams || ""}" placeholder="${g}"
+          oninput="updateBuilderGrams(${idx}, this.value)">
+        <span class="builder-ing-total" id="ing-total-${idx}">${rowKcal > 0 ? rowKcal + " " + kcal : "—"}</span>
+        <button onclick="removeBuilderIngredient(${idx})" class="btn-delete" aria-label="delete">
+          <svg width="20" height="17" viewBox="0 0 20 17" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16.2949 16.4092C18.1934 16.4092 19.1777 15.5039 19.1777 13.623V2.85645C19.1777 0.975586 18.1934 0 16.2949 0H8.69238C7.51465 0 6.65332 0.290039 5.8623 1.15137L0.887695 6.43359C0.246094 7.12793 0 7.6377 0 8.19141C0 8.74512 0.246094 9.26367 0.887695 9.94922L5.87109 15.2051C6.66211 16.0664 7.52344 16.4004 8.69238 16.4004L16.2949 16.4092ZM16.1895 14.6865H8.62207C8.00684 14.6865 7.61133 14.5283 7.18066 14.0801L2.23242 8.85938C1.96875 8.58691 1.88965 8.39355 1.88965 8.19141C1.88965 7.98926 1.97754 7.80469 2.23242 7.53223L7.17188 2.28516C7.60254 1.83691 8.00684 1.72266 8.61328 1.72266H16.1895C17.0068 1.72266 17.4551 2.14453 17.4551 2.99707V13.4033C17.4551 14.2559 17.0068 14.6865 16.1895 14.6865ZM8.32324 11.8916C8.55176 11.8916 8.74512 11.8125 8.89453 11.6543L11.2148 9.33398L13.5352 11.6543C13.6846 11.8037 13.8779 11.8916 14.1152 11.8916C14.5547 11.8916 14.9062 11.54 14.9062 11.0918C14.9062 10.8721 14.8184 10.6875 14.6689 10.5381L12.3398 8.20898L14.6689 5.87109C14.8359 5.71289 14.915 5.52832 14.915 5.31738C14.915 4.87793 14.5635 4.52637 14.1152 4.52637C13.9043 4.52637 13.7285 4.60547 13.5615 4.77246L11.2148 7.10156L8.88574 4.77246C8.72754 4.61426 8.55176 4.54395 8.32324 4.54395C7.88379 4.54395 7.53223 4.88672 7.53223 5.32617C7.53223 5.53711 7.62012 5.73047 7.76953 5.87988L10.0986 8.20898L7.76953 10.5469C7.62012 10.6875 7.53223 10.8809 7.53223 11.0918C7.53223 11.54 7.88379 11.8916 8.32324 11.8916Z"/>
+          </svg>
+        </button>
+      </div>`;
     container.appendChild(row);
   });
 
@@ -728,7 +961,21 @@ async function saveBuilderDish() {
   }
   const totalKcal = builderIngredients.reduce((s, i) => s + i.kcalPer100g * i.grams / 100, 0);
   const kcalPer100g = Math.round(totalKcal / dishWeight * 100);
-  await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories: kcalPer100g, per100g: true });
+
+  const result = await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories: kcalPer100g, per100g: true });
+
+  if (result && result.id) {
+    const totalP = builderIngredients.reduce((s, i) => s + (i.macros?.protein || 0) * i.grams / 100, 0);
+    const totalF = builderIngredients.reduce((s, i) => s + (i.macros?.fat || 0) * i.grams / 100, 0);
+    const totalC = builderIngredients.reduce((s, i) => s + (i.macros?.carbs || 0) * i.grams / 100, 0);
+    if (totalP > 0 || totalF > 0 || totalC > 0) {
+      const pPer100 = totalP / dishWeight * 100;
+      const fPer100 = totalF / dishWeight * 100;
+      const cPer100 = totalC / dishWeight * 100;
+      setFoodMacros(result.id, pPer100, fPer100, cPer100);
+    }
+  }
+
   resetBuilder();
   closeAddFoodModal();
   await loadFoods();
@@ -747,6 +994,7 @@ function renderFoods() {
   container.innerHTML = "";
   const kcal = translate("unitKcal");
   const per100 = translate("per100gLabel");
+  const g = translate("unitGrams") || "г";
   foods.forEach(food => {
     const calLabel = food.per100g
       ? `${Math.round(food.calories)} ${kcal}/${per100}`
@@ -754,12 +1002,23 @@ function renderFoods() {
     const badge = food.per100g
       ? `<span class="badge">${translate("foodTypePer100g")}</span>`
       : "";
+    const fm = getFoodMacros(food.id);
+    let macroHtml = "";
+    if (fm && (fm.protein > 0 || fm.fat > 0 || fm.carbs > 0)) {
+      macroHtml = `
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(fm.protein)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(fm.fat)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(fm.carbs)}${g}</span>`;
+    }
     const div = document.createElement("div");
     div.className = "list-row";
     div.innerHTML = `
       <div style="flex:1;min-width:0;">
         <div class="list-row-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${food.name}${badge}</div>
-        <div class="list-row-cal">${calLabel}</div>
+        <div class="list-row-sub-row">
+          <span class="list-row-cal">${calLabel}</span>
+          ${macroHtml}
+        </div>
       </div>
       <button onclick="deleteFood(${food.id})" class="btn-delete" aria-label="delete">
         <svg width="18" height="20" viewBox="0 0 18 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -778,9 +1037,20 @@ async function addNewFood() {
     showToast(translate("fillFields"));
     return;
   }
-  await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories, per100g: newFoodType === "per100g" });
+  const result = await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories, per100g: newFoodType === "per100g" });
+  if (result && result.id && macroMode === "detailed") {
+    const protein = parseFloat(document.getElementById("newFoodProtein").value) || 0;
+    const fat     = parseFloat(document.getElementById("newFoodFat").value) || 0;
+    const carbs   = parseFloat(document.getElementById("newFoodCarbs").value) || 0;
+    if (protein > 0 || fat > 0 || carbs > 0) {
+      setFoodMacros(result.id, protein, fat, carbs);
+    }
+  }
   document.getElementById("newFoodName").value = "";
   document.getElementById("newFoodCalories").value = "";
+  document.getElementById("newFoodProtein").value = "";
+  document.getElementById("newFoodFat").value = "";
+  document.getElementById("newFoodCarbs").value = "";
   closeAddFoodModal();
   await loadFoods();
   showToast(translate("dishAdded"));
@@ -911,6 +1181,21 @@ async function selectDay(dateStr, cellEl) {
   document.getElementById("dayDetailEaten").textContent = `${Math.round(data.total)} ${kcal}`;
   document.getElementById("dayDetailRemaining").textContent = `${rem} ${kcal}`;
 
+  // Macro bars in history
+  const macroSection = document.getElementById("dayDetailMacros");
+  if (macroSection) {
+    if (macroMode === "detailed") {
+      macroSection.classList.remove("hidden");
+      updateMacroBarSection(
+        "histMacroBarProtein", "histMacroBarFat", "histMacroBarCarbs",
+        "histMacroValProtein", "histMacroValFat", "histMacroValCarbs",
+        dateStr
+      );
+    } else {
+      macroSection.classList.add("hidden");
+    }
+  }
+
   logsContainer.innerHTML = "";
   if (!data.logs.length) {
     logsContainer.innerHTML = `<p class="empty-hint">${translate("noLogsForDay")}</p>`;
@@ -942,11 +1227,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   toggleGoalPercent();
   renderTodayHeader();
 
+  // Initialize macro mode toggle state
+  document.getElementById("macro-mode-simple").classList.toggle("active", macroMode === "simple");
+  document.getElementById("macro-mode-detailed").classList.toggle("active", macroMode === "detailed");
+  updateMacroModeUI();
+
   // show skeleton state while loading
   const gaugeWrap = document.querySelector(".gauge-wrap");
   if (gaugeWrap) gaugeWrap.classList.add("gauge-loading");
 
   await loadProfile();
+  // Send client timezone offset so the server uses the correct local date
+  apiFetch("/api/profile/timezone", "POST", {
+    tg_id: tgId,
+    utc_offset: -new Date().getTimezoneOffset(),
+  });
   await Promise.all([loadFoods(), loadTodayLogs(), loadHistory()]);
 
   // data loaded — remove skeleton

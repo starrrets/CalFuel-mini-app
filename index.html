@@ -72,6 +72,27 @@
         </svg>
       </div>
 
+      <!-- macro progress bars (shown only in macros mode) -->
+      <div id="macroBarsToday" class="grouped-card hidden" style="margin-bottom:0.75rem">
+        <div class="macro-bars">
+          <div class="macro-bar-row">
+            <span class="macro-bar-label protein" data-i18n="proteinsShort"></span>
+            <div class="macro-bar-track"><div id="macroBarProtein" class="macro-bar-fill protein" style="width:0%"></div></div>
+            <span id="macroValProtein" class="macro-bar-val">— г</span>
+          </div>
+          <div class="macro-bar-row">
+            <span class="macro-bar-label fat" data-i18n="fatsShort"></span>
+            <div class="macro-bar-track"><div id="macroBarFat" class="macro-bar-fill fat" style="width:0%"></div></div>
+            <span id="macroValFat" class="macro-bar-val">— г</span>
+          </div>
+          <div class="macro-bar-row">
+            <span class="macro-bar-label carbs" data-i18n="carbsShort"></span>
+            <div class="macro-bar-track"><div id="macroBarCarbs" class="macro-bar-fill carbs" style="width:0%"></div></div>
+            <span id="macroValCarbs" class="macro-bar-val">— г</span>
+          </div>
+        </div>
+      </div>
+
       <div id="todayLogs"></div>
     </div>
 
@@ -128,6 +149,23 @@
               <span class="day-detail-stat-label" data-i18n="remaining"></span>
               <span id="dayDetailRemaining"></span>
             </span>
+          </div>
+        </div>
+        <div id="dayDetailMacros" class="macro-bars hidden">
+          <div class="macro-bar-row">
+            <span class="macro-bar-label protein" data-i18n="proteinsShort"></span>
+            <div class="macro-bar-track"><div id="histMacroBarProtein" class="macro-bar-fill protein" style="width:0%"></div></div>
+            <span id="histMacroValProtein" class="macro-bar-val">— г</span>
+          </div>
+          <div class="macro-bar-row">
+            <span class="macro-bar-label fat" data-i18n="fatsShort"></span>
+            <div class="macro-bar-track"><div id="histMacroBarFat" class="macro-bar-fill fat" style="width:0%"></div></div>
+            <span id="histMacroValFat" class="macro-bar-val">— г</span>
+          </div>
+          <div class="macro-bar-row">
+            <span class="macro-bar-label carbs" data-i18n="carbsShort"></span>
+            <div class="macro-bar-track"><div id="histMacroBarCarbs" class="macro-bar-fill carbs" style="width:0%"></div></div>
+            <span id="histMacroValCarbs" class="macro-bar-val">— г</span>
           </div>
         </div>
         <div id="dayDetailLogs"></div>
@@ -189,6 +227,11 @@
           <input id="goalPercent" type="number" step="0.1" value="10" data-i18n-placeholder="goalPercentPlaceholder">
         </div>
 
+        <div id="macro-mode-seg" class="seg-wrap">
+          <button id="macro-mode-simple"   onclick="setMacroMode('simple')"   data-i18n="macroModeSimple"   class="seg-btn active"></button>
+          <button id="macro-mode-detailed" onclick="setMacroMode('detailed')" data-i18n="macroModeDetailed" class="seg-btn"></button>
+        </div>
+
       </div>
       <div class="profile-bottom">
         <button onclick="saveProfile()" data-i18n="saveProfile" class="btn-cta"></button>
@@ -228,6 +271,29 @@
             <div class="grouped-card" style="margin-bottom:0">
               <div class="form-row"><input id="quickFoodName" type="text"   data-i18n-placeholder="whatDidYouEat"></div>
               <div class="form-row"><input id="quickCalories" type="number" data-i18n-placeholder="calories"></div>
+              <div id="quickMacros" class="macro-inputs-group">
+                <div class="form-row labeled">
+                  <span class="row-label" data-i18n="proteins"></span>
+                  <div class="input-suffix-wrap">
+                    <input id="quickProtein" type="number" step="0.1">
+                    <span class="input-suffix" data-i18n="unitGrams"></span>
+                  </div>
+                </div>
+                <div class="form-row labeled">
+                  <span class="row-label" data-i18n="fats"></span>
+                  <div class="input-suffix-wrap">
+                    <input id="quickFat" type="number" step="0.1">
+                    <span class="input-suffix" data-i18n="unitGrams"></span>
+                  </div>
+                </div>
+                <div class="form-row labeled">
+                  <span class="row-label" data-i18n="carbs"></span>
+                  <div class="input-suffix-wrap">
+                    <input id="quickCarbs" type="number" step="0.1">
+                    <span class="input-suffix" data-i18n="unitGrams"></span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div id="modal-fixed" class="hidden">
@@ -274,6 +340,29 @@
                 <input id="newFoodCalories" type="number" data-i18n-placeholder="caloriesPlaceholder">
                 <span id="cal-unit-label" class="input-suffix" data-i18n="unitKcal"></span>
               </div>
+              <div id="newFoodMacros" class="macro-inputs-group">
+                <div class="form-row labeled">
+                  <span class="row-label" data-i18n="proteins"></span>
+                  <div class="input-suffix-wrap">
+                    <input id="newFoodProtein" type="number" step="0.1" data-i18n-placeholder="proteinsPlaceholder">
+                    <span class="input-suffix" data-i18n="unitGrams"></span>
+                  </div>
+                </div>
+                <div class="form-row labeled">
+                  <span class="row-label" data-i18n="fats"></span>
+                  <div class="input-suffix-wrap">
+                    <input id="newFoodFat" type="number" step="0.1" data-i18n-placeholder="fatsPlaceholder">
+                    <span class="input-suffix" data-i18n="unitGrams"></span>
+                  </div>
+                </div>
+                <div class="form-row labeled">
+                  <span class="row-label" data-i18n="carbs"></span>
+                  <div class="input-suffix-wrap">
+                    <input id="newFoodCarbs" type="number" step="0.1" data-i18n-placeholder="carbsPlaceholder">
+                    <span class="input-suffix" data-i18n="unitGrams"></span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -292,9 +381,9 @@
             <div class="grouped-card" id="builderWeightRow" style="display:none;margin-top:0.5rem">
               <div class="form-row labeled">
                 <span class="row-label" data-i18n="builderDishWeight"></span>
-                <div class="input-suffix-wrap" style="flex:1">
+                <div class="input-suffix-wrap">
                   <input id="builderDishWeight" type="number">
-                  <span class="input-suffix">g</span>
+                  <span class="input-suffix" data-i18n="unitGrams"></span>
                 </div>
               </div>
             </div>
@@ -310,5 +399,6 @@
     </div>
 
   </div>
+
 </body>
 </html>
