@@ -1,44 +1,55 @@
 /* ── Tokens ────────────────────────────────────────────────────── */
 
-:root, [data-theme="dark"] {
-  --bg:        #000000;
-  --bg2:       #1c1c1e;
-  --bg3:       #2c2c2e;
-  --bg4:       #3a3a3c;
-  --sep:       rgba(255,255,255,0.08);
-  --text:      #ffffff;
-  --text2:     #ebebf5cc;
-  --text3:     #ebebf599;
-  --accent:    #e8500a;
-  --accentText: #e8500a;
+:root,
+[data-theme="dark"] {
+  --bg: #000000;
+  --bg2: #1c1c1e;
+  --bg3: #2c2c2e;
+  --bg4: #3a3a3c;
+  --sep: rgba(255, 255, 255, 0.08);
+  --text: #ffffff;
+  --text2: #ebebf5cc;
+  --text3: #ebebf599;
+  --accent: #e8500a;
+  --accentText: #ff9a62;
   --accentLight: #f06830;
-  --blue:      #0a84ff;
-  --green:     #30d158;
-  --red:       #ff453a;
-  --overlay:   rgba(0,0,0,0.6);
-  --shadow:    0 4px 24px rgba(0,0,0,0.5);
-  --r:         12px;
+  --blue: #0a84ff;
+  --green: #30d158;
+  --red: #ff453a;
+  --overlay: rgba(0, 0, 0, 0.6);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --r: 12px;
+
+  --macro-protein: #e4bc59;
+  --macro-fat: #57b5ab;
+  --macro-carbs: #b78bdd;
+
   color-scheme: dark;
 }
 
 [data-theme="light"] {
-  --bg:        #f2f2f7;
-  --bg2:       #ffffff;
-  --bg3:       #ebebf0;
-  --bg4:       #d1d1d6;
-  --sep:       rgba(60,60,67,0.1);
-  --text:      #000000;
-  --text2:     rgba(60,60,67,0.85);
-  --text3:     rgba(60,60,67,0.55);
-  --accent:    #e8500a;
-  --accentText: #d44000;
+  --bg: #f2f2f7;
+  --bg2: #ffffff;
+  --bg3: #ebebf0;
+  --bg4: #d1d1d6;
+  --sep: rgba(60, 60, 67, 0.1);
+  --text: #000000;
+  --text2: rgba(60, 60, 67, 0.85);
+  --text3: rgba(60, 60, 67, 0.55);
+  --accent: #e8500a;
+  --accentText: #9f3509;
   --accentLight: #f06830;
-  --blue:      #007aff;
-  --green:     #34c759;
-  --red:       #ff3b30;
-  --overlay:   rgba(0,0,0,0.35);
-  --shadow:    0 2px 12px rgba(0,0,0,0.12);
-  --r:         12px;
+  --blue: #007aff;
+  --green: #34c759;
+  --red: #ff3b30;
+  --overlay: rgba(0, 0, 0, 0.35);
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  --r: 12px;
+
+  --macro-protein: #8a6300;
+  --macro-fat: #006d67;
+  --macro-carbs: #7841a0;
+
   color-scheme: light;
 }
 
@@ -185,7 +196,7 @@ h2 {
   transition: color 0.15s;
 }
 .tab-btn svg { width: 24px; height: 24px; transition: transform 0.15s; }
-.tab-btn.active { color: var(--accentText); }
+.tab-btn.active { color: var(--accent); }
 .tab-btn.active svg { transform: scale(1.08); }
 
 /* ── Tab content ───────────────────────────────────────────────── */
@@ -714,9 +725,9 @@ border-top: 2px solid var(--sep);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.macro-bar-label.protein { color: #FFE082; }
-.macro-bar-label.fat     { color: #89CFF0; }
-.macro-bar-label.carbs   { color: #F8BBD0; }
+.macro-bar-label.protein { color: var(--macro-protein); }
+.macro-bar-label.fat     { color: var(--macro-fat); }
+.macro-bar-label.carbs   { color: var(--macro-carbs); }
 .macro-bar-track {
   flex: 1;
   height: 7px;
@@ -730,9 +741,9 @@ border-top: 2px solid var(--sep);
   transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 0;
 }
-.macro-bar-fill.protein { background: #FFE082; }
-.macro-bar-fill.fat     { background: #89CFF0; }
-.macro-bar-fill.carbs   { background: #F8BBD0; }
+.macro-bar-fill.protein { background: var(--macro-protein); }
+.macro-bar-fill.fat     { background: var(--macro-fat); }
+.macro-bar-fill.carbs   { background: var(--macro-carbs); }
 .macro-bar-val {
   font-size: 0.72rem;
   font-weight: 600;
@@ -785,9 +796,9 @@ border-top: 2px solid var(--sep);
   background: var(--bg3); border-radius: 999px;
   padding: 0.15rem 0.45rem;
 }
-.macro-pill-p { color: #FFE082; }
-.macro-pill-f { color: #89CFF0; }
-.macro-pill-c { color: #F8BBD0; }
+.macro-pill-p { color: var(--macro-protein); }
+.macro-pill-f { color: var(--macro-fat); }
+.macro-pill-c { color: var(--macro-carbs); }
 
 /* pills inside dish-row / dish-weight-row (bg3) need darker bg to be visible */
 .dish-row .macro-pill,
@@ -805,23 +816,20 @@ border-top: 2px solid var(--sep);
   display: flex;
   gap: 0.5rem;
 }
-.macro-tag-p { color: #FFE082; font-weight: 600; }
-.macro-tag-f { color: #89CFF0; font-weight: 600; }
-.macro-tag-c { color: #F8BBD0; font-weight: 600; }
+.macro-tag-p {
+  color: var(--macro-protein);
+  font-weight: 600;
+}
 
-/* light-mode macro colors — vivid, AA compliant on white */
-[data-theme="light"] .macro-bar-label.protein,
-[data-theme="light"] .macro-pill-p,
-[data-theme="light"] .macro-tag-p { color: #b87800; }
-[data-theme="light"] .macro-bar-label.fat,
-[data-theme="light"] .macro-pill-f,
-[data-theme="light"] .macro-tag-f { color: #1A7AAF; }
-[data-theme="light"] .macro-bar-label.carbs,
-[data-theme="light"] .macro-pill-c,
-[data-theme="light"] .macro-tag-c { color: #C02060; }
-[data-theme="light"] .macro-bar-fill.protein { background: #F5C842; }
-[data-theme="light"] .macro-bar-fill.fat     { background: #5AADDC; }
-[data-theme="light"] .macro-bar-fill.carbs   { background: #EE8FAB; }
+.macro-tag-f {
+  color: var(--macro-fat);
+  font-weight: 600;
+}
+
+.macro-tag-c {
+  color: var(--macro-carbs);
+  font-weight: 600;
+}
 
 /* ── Macro day detail separator ────────────────────────────────── */
 

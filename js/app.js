@@ -10,86 +10,45 @@ const tgId = tg ? (tg.initDataUnsafe?.user?.id || 123456789) : 123456789;
 const API_BASE = "https://web-production-fcefd.up.railway.app";
 
 let dailyNorm = 2000;
+let proteinTarget = null;
+let fatTarget = null;
+let carbsTarget = null;
 let totalToday = 0;
 let foods = [];
 let logs = [];
 let currentUnits = "metric";
 let newFoodType = "fixed";
-let macroMode = localStorage.getItem("macroMode") || "simple"; // "simple" | "detailed"
 
-// ── Macro storage (localStorage keyed by tgId + date) ────────────
-// Format: { [tgId_date]: { [logId]: {protein, fat, carbs} } }
+// "simple" = calories only  |  "full" = calories + macros
+// Stored in localStorage as a pure UI preference (not nutrition data)
+let trackingMode = localStorage.getItem("trackingMode") || "simple";
 
-function getMacroStore() {
-  try { return JSON.parse(localStorage.getItem("macroStore") || "{}"); } catch { return {}; }
-}
-function saveMacroStore(store) {
-  localStorage.setItem("macroStore", JSON.stringify(store));
-}
-function getMacrosForLog(logId, dateStr) {
-  const store = getMacroStore();
-  return store[`${tgId}_${dateStr}`]?.[logId] || null;
-}
-function setMacrosForLog(logId, dateStr, protein, fat, carbs) {
-  const store = getMacroStore();
-  const key = `${tgId}_${dateStr}`;
-  if (!store[key]) store[key] = {};
-  store[key][logId] = { protein: protein || 0, fat: fat || 0, carbs: carbs || 0 };
-  saveMacroStore(store);
-}
-function getMacrosForDay(dateStr) {
-  const store = getMacroStore();
-  const dayData = store[`${tgId}_${dateStr}`] || {};
-  return Object.values(dayData).reduce(
-    (acc, m) => ({ protein: acc.protein + (m.protein||0), fat: acc.fat + (m.fat||0), carbs: acc.carbs + (m.carbs||0) }),
-    { protein: 0, fat: 0, carbs: 0 }
-  );
+// ── Tracking mode toggle ──────────────────────────────────────────
+
+function setTrackingMode(mode) {
+  trackingMode = mode;
+  localStorage.setItem("trackingMode", mode);
+  document.getElementById("tracking-mode-simple").classList.toggle("active", mode === "simple");
+  document.getElementById("tracking-mode-full").classList.toggle("active", mode === "full");
+  updateTrackingModeUI();
 }
 
-// ── Food macros storage (localStorage keyed by food id) ──────────
-// Format: { [foodId]: {protein, fat, carbs} }
-
-function getFoodMacroStore() {
-  try { return JSON.parse(localStorage.getItem("foodMacroStore") || "{}"); } catch { return {}; }
-}
-function saveFoodMacroStore(store) {
-  localStorage.setItem("foodMacroStore", JSON.stringify(store));
-}
-function getFoodMacros(foodId) {
-  return getFoodMacroStore()[foodId] || null;
-}
-function setFoodMacros(foodId, protein, fat, carbs) {
-  const store = getFoodMacroStore();
-  store[foodId] = { protein: protein || 0, fat: fat || 0, carbs: carbs || 0 };
-  saveFoodMacroStore(store);
-}
-
-// ── Macro mode toggle ─────────────────────────────────────────────
-
-function setMacroMode(mode) {
-  macroMode = mode;
-  localStorage.setItem("macroMode", mode);
-  document.getElementById("macro-mode-simple").classList.toggle("active", mode === "simple");
-  document.getElementById("macro-mode-detailed").classList.toggle("active", mode === "detailed");
-  updateMacroModeUI();
-}
-
-function updateMacroModeUI() {
-  const isMacros = macroMode === "detailed";
+function updateTrackingModeUI() {
+  const isFull = trackingMode === "full";
 
   // Today tab macro bars
   const macroBarsToday = document.getElementById("macroBarsToday");
-  if (macroBarsToday) macroBarsToday.classList.toggle("hidden", !isMacros);
+  if (macroBarsToday) macroBarsToday.classList.toggle("hidden", !isFull);
 
   // Quick add macro inputs
   const quickMacros = document.getElementById("quickMacros");
-  if (quickMacros) quickMacros.classList.toggle("hidden", !isMacros);
+  if (quickMacros) quickMacros.classList.toggle("hidden", !isFull);
 
   // New food macro inputs
   const newFoodMacros = document.getElementById("newFoodMacros");
-  if (newFoodMacros) newFoodMacros.classList.toggle("hidden", !isMacros);
+  if (newFoodMacros) newFoodMacros.classList.toggle("hidden", !isFull);
 
-  if (isMacros) updateMacroBars();
+  if (isFull) updateMacroBars();
 }
 
 // ── New clean stable SVG icons (different from previous version) ──
@@ -107,61 +66,61 @@ const SUN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
 const GREETINGS = {
   ru: {
     morning: [
-      "С добрым утром", "Доброе утро", "Как спалось?", "Пора завтракать", 
-      "Время подзаправиться", "Бодрого утра", "Как настрой?", "Начнем день?", 
-      "Завтрак ждет", "Просыпайся", "Вкусного начала", "С новым днем", 
+      "С добрым утром", "Доброе утро", "Как спалось?", "Пора завтракать",
+      "Время подзаправиться", "Бодрого утра", "Как настрой?", "Начнем день?",
+      "Завтрак ждет", "Просыпайся", "Вкусного начала", "С новым днем",
       "Готов к старту?", "Утро!", "Погнали?"
     ],
     afternoon: [
-      "Добрый день", "Как успехи?", "Время обеда", "Пора перекусить", 
-      "Как день?", "Не забудь поесть", "Держишь ритм?", "Как дела?", 
-      "Время паузы", "Приятного аппетита", "Экватор!", "Продолжаем?", 
+      "Добрый день", "Как успехи?", "Время обеда", "Пора перекусить",
+      "Как день?", "Не забудь поесть", "Держишь ритм?", "Как дела?",
+      "Время паузы", "Приятного аппетита", "Экватор!", "Продолжаем?",
       "Всё по плану?", "Нужен перерыв?", "Привет!"
     ],
     evening: [
-      "Добрый вечер", "Как прошел день?", "Время ужина", "Пора отдыхать", 
-      "Уютного вечера", "Как итоги?", "День почти всё", "Время выдохнуть", 
-      "Хорошего вечера", "Закроем цели?", "Как самочувствие?", "Заслуженный отдых", 
+      "Добрый вечер", "Как прошел день?", "Время ужина", "Пора отдыхать",
+      "Уютного вечера", "Как итоги?", "День почти всё", "Время выдохнуть",
+      "Хорошего вечера", "Закроем цели?", "Как самочувствие?", "Заслуженный отдых",
       "Ужинаем?", "Пора расслабиться", "Вечер!"
     ],
   },
   en: {
     morning: [
-      "Good morning", "Morning!", "Sleep well?", "Breakfast time", 
-      "Fuel up", "Rise and shine", "Ready for today?", "Let's start", 
-      "Morning vibes", "Wake up", "First meal?", "New day!", 
+      "Good morning", "Morning!", "Sleep well?", "Breakfast time",
+      "Fuel up", "Rise and shine", "Ready for today?", "Let's start",
+      "Morning vibes", "Wake up", "First meal?", "New day!",
       "Ready?", "Top of the morning", "Hey there"
     ],
     afternoon: [
-      "Good afternoon", "How's it going?", "Lunch time", "Snack break?", 
-      "Busy day?", "Don't forget to eat", "On track?", "How's your day?", 
-      "Take a break", "Enjoy your meal", "Halfway!", "Keep moving", 
+      "Good afternoon", "How's it going?", "Lunch time", "Snack break?",
+      "Busy day?", "Don't forget to eat", "On track?", "How's your day?",
+      "Take a break", "Enjoy your meal", "Halfway!", "Keep moving",
       "All good?", "Need fuel?", "Hi!"
     ],
     evening: [
-      "Good evening", "How was today?", "Dinner time", "Time to rest", 
-      "Cozy evening", "Daily recap?", "Day is done", "Unwind now", 
-      "Enjoy your night", "Close your goals?", "How do you feel?", "Well earned", 
+      "Good evening", "How was today?", "Dinner time", "Time to rest",
+      "Cozy evening", "Daily recap?", "Day is done", "Unwind now",
+      "Enjoy your night", "Close your goals?", "How do you feel?", "Well earned",
       "Dinner?", "Relax time", "Evening!"
     ],
   },
   uk: {
     morning: [
-      "Доброго ранку", "З добрим ранком", "Як спалося?", "Час снідати", 
-      "Час підзарядитись", "Бадьорого ранку", "Як настрій?", "Почнемо день?", 
-      "Сніданок чекає", "Прокидайся", "Смачного початку", "З новим днем", 
+      "Доброго ранку", "З добрим ранком", "Як спалося?", "Час снідати",
+      "Час підзарядитись", "Бадьорого ранку", "Як настрій?", "Почнемо день?",
+      "Сніданок чекає", "Прокидайся", "Смачного початку", "З новим днем",
       "Готовий?", "Ранок!", "Поїхали?"
     ],
     afternoon: [
-      "Добрий день", "Як успіхи?", "Час обіду", "Пора перекусити", 
-      "Як день?", "Не забудь поїсти", "Тримаєш ритм?", "Як справи?", 
-      "Час паузи", "Смачного", "Екватор!", "Продовжуємо?", 
+      "Добрий день", "Як успіхи?", "Час обіду", "Пора перекусити",
+      "Як день?", "Не забудь поїсти", "Тримаєш ритм?", "Як справи?",
+      "Час паузи", "Смачного", "Екватор!", "Продовжуємо?",
       "Все за планом?", "Потрібна перерва?", "Привіт!"
     ],
     evening: [
-      "Добрий вечір", "Як минув день?", "Час вечері", "Пора відпочити", 
-      "Затишного вечора", "Як підсумки?", "День майже все", "Час видихнути", 
-      "Гарного вечора", "Закриємо цілі?", "Як почуваєшся?", "Заслужений відпочинок", 
+      "Добрий вечір", "Як минув день?", "Час вечері", "Пора відпочити",
+      "Затишного вечора", "Як підсумки?", "День майже все", "Час видихнути",
+      "Гарного вечора", "Закриємо цілі?", "Як почуваєшся?", "Заслужений відпочинок",
       "Вечеряємо?", "Пора розслабитись", "Вечір!"
     ],
   }
@@ -286,12 +245,19 @@ function setGender(gender) {
   document.getElementById("gender-female").classList.toggle("active", gender === "female");
 }
 
+function applyProfileData(data) {
+  dailyNorm = data.daily_norm || 2000;
+  proteinTarget = data.protein_target || null;
+  fatTarget = data.fat_target || null;
+  carbsTarget = data.carbs_target || null;
+  currentUnits = data.units || "metric";
+}
+
 async function loadProfile() {
   try {
     const data = await apiFetch(`/api/profile/${tgId}`);
     if (!data) return;
-    dailyNorm = data.daily_norm || 2000;
-    currentUnits = data.units || "metric";
+    applyProfileData(data);
 
     if (data.language) {
       currentLang = data.language;
@@ -366,11 +332,10 @@ async function saveProfile() {
   };
   const result = await apiFetch("/api/profile", "POST", data);
   if (!result) return;
-  dailyNorm = result.daily_norm;
+  applyProfileData(result);
   document.getElementById("dailyNorm").textContent = Math.round(dailyNorm);
   updateProgress();
-  const msg = translate("profileSaved");
-  showToast(msg);
+  showToast(translate("profileSaved"));
 }
 
 // ── Today logs ────────────────────────────────────────────────────
@@ -380,11 +345,15 @@ async function loadTodayLogs() {
   const data = await apiFetch(`/api/logs/day/${tgId}/${todayStr}`);
   if (!data) return;
   logs = data.logs || [];
-  totalToday = data.total || 0;
+  totalToday = data.total_calories ?? data.total ?? 0;
+  // Refresh macro targets from the day response (keeps them in sync)
+  if (data.protein_target != null) proteinTarget = data.protein_target;
+  if (data.fat_target != null) fatTarget = data.fat_target;
+  if (data.carbs_target != null) carbsTarget = data.carbs_target;
   document.getElementById("totalToday").textContent = Math.round(totalToday);
   renderLogs();
   updateProgress();
-  if (macroMode === "detailed") updateMacroBars();
+  if (trackingMode === "full") updateMacroBars(data);
 }
 
 function updateProgress() {
@@ -411,33 +380,33 @@ function updateProgress() {
   document.getElementById("remaining").textContent = rem;
 }
 
-function updateMacroBars() {
-  const todayStr = toISODate(new Date());
-  updateMacroBarSection("macroBarProtein", "macroBarFat", "macroBarCarbs",
-    "macroValProtein", "macroValFat", "macroValCarbs", todayStr);
-}
-
-function updateMacroBarSection(barPId, barFId, barCId, valPId, valFId, valCId, dateStr) {
-  const totals = getMacrosForDay(dateStr);
-  const refP = Math.max(dailyNorm * 0.075, 50);
-  const refF = Math.max(dailyNorm * 0.033, 30);
-  const refC = Math.max(dailyNorm * 0.125, 100);
-
+// dayData is the full response object from /api/logs/day (has total_protein etc.)
+function updateMacroBars(dayData) {
+  if (!dayData) return;
   const g = translate("unitGrams") || "g";
 
-  const barP = document.getElementById(barPId);
-  const barF = document.getElementById(barFId);
-  const barC = document.getElementById(barCId);
-  const valP = document.getElementById(valPId);
-  const valF = document.getElementById(valFId);
-  const valC = document.getElementById(valCId);
+  const totP = dayData.total_protein || 0;
+  const totF = dayData.total_fat || 0;
+  const totC = dayData.total_carbs || 0;
 
-  if (barP) barP.style.width = `${Math.min(totals.protein / refP * 100, 100).toFixed(1)}%`;
-  if (barF) barF.style.width = `${Math.min(totals.fat / refF * 100, 100).toFixed(1)}%`;
-  if (barC) barC.style.width = `${Math.min(totals.carbs / refC * 100, 100).toFixed(1)}%`;
-  if (valP) valP.textContent = `${Math.round(totals.protein)} / ${Math.round(refP)} ${g}`;
-  if (valF) valF.textContent = `${Math.round(totals.fat)} / ${Math.round(refF)} ${g}`;
-  if (valC) valC.textContent = `${Math.round(totals.carbs)} / ${Math.round(refC)} ${g}`;
+  // Targets come from backend; fall back to simple percentage if profile not set yet
+  const refP = proteinTarget || Math.max(dailyNorm * 0.075, 50);
+  const refF = fatTarget     || Math.max(dailyNorm * 0.033, 30);
+  const refC = carbsTarget   || Math.max(dailyNorm * 0.125, 100);
+
+  const barP = document.getElementById("macroBarProtein");
+  const barF = document.getElementById("macroBarFat");
+  const barC = document.getElementById("macroBarCarbs");
+  const valP = document.getElementById("macroValProtein");
+  const valF = document.getElementById("macroValFat");
+  const valC = document.getElementById("macroValCarbs");
+
+  if (barP) barP.style.width = `${Math.min(totP / refP * 100, 100).toFixed(1)}%`;
+  if (barF) barF.style.width = `${Math.min(totF / refF * 100, 100).toFixed(1)}%`;
+  if (barC) barC.style.width = `${Math.min(totC / refC * 100, 100).toFixed(1)}%`;
+  if (valP) valP.textContent = `${Math.round(totP)} / ${Math.round(refP)} ${g}`;
+  if (valF) valF.textContent = `${Math.round(totF)} / ${Math.round(refF)} ${g}`;
+  if (valC) valC.textContent = `${Math.round(totC)} / ${Math.round(refC)} ${g}`;
 }
 
 function renderLogs() {
@@ -461,19 +430,16 @@ function renderLogs() {
     return;
   }
 
-  const todayStr = toISODate(new Date());
-
   logs.forEach(log => {
-    const macros = getMacrosForLog(log.id, todayStr);
-    const hasMacros = macros && (macros.protein > 0 || macros.fat > 0 || macros.carbs > 0);
+    const hasMacros = log.protein != null || log.fat != null || log.carbs != null;
     const g = translate("unitGrams") || "г";
 
     let macroHtml = "";
-    if (hasMacros) {
+    if (hasMacros && (log.protein > 0 || log.fat > 0 || log.carbs > 0)) {
       macroHtml = `
-          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(macros.protein)}${g}</span>
-          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(macros.fat)}${g}</span>
-          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(macros.carbs)}${g}</span>`;
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(log.protein || 0)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(log.fat || 0)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(log.carbs || 0)}${g}</span>`;
     }
 
     const div = document.createElement("div");
@@ -510,7 +476,7 @@ function openAddModal() {
   document.getElementById("addLogModal").classList.add("open");
   setModalTab("quick");
   const quickMacros = document.getElementById("quickMacros");
-  if (quickMacros) quickMacros.classList.toggle("hidden", macroMode !== "detailed");
+  if (quickMacros) quickMacros.classList.toggle("hidden", trackingMode !== "full");
 }
 
 function closeAddModal() {
@@ -521,7 +487,7 @@ function openAddFoodModal() {
   document.getElementById("addFoodModal").classList.add("open");
   setFoodType("fixed");
   const newFoodMacros = document.getElementById("newFoodMacros");
-  if (newFoodMacros) newFoodMacros.classList.toggle("hidden", macroMode !== "detailed");
+  if (newFoodMacros) newFoodMacros.classList.toggle("hidden", trackingMode !== "full");
 }
 
 function closeAddFoodModal() {
@@ -568,14 +534,13 @@ function renderFixedDishesList() {
   const kcal = translate("unitKcal");
   const g = translate("unitGrams") || "g";
   fixed.forEach(food => {
-    const fm = getFoodMacros(food.id);
-    const hasMacros = fm && (fm.protein > 0 || fm.fat > 0 || fm.carbs > 0);
+    const hasMacros = food.protein != null || food.fat != null || food.carbs != null;
     let macroHtml = "";
-    if (hasMacros) {
+    if (hasMacros && (food.protein > 0 || food.fat > 0 || food.carbs > 0)) {
       macroHtml = `
-          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(fm.protein)}${g}</span>
-          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(fm.fat)}${g}</span>
-          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(fm.carbs)}${g}</span>`;
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(food.protein || 0)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(food.fat || 0)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(food.carbs || 0)}${g}</span>`;
     }
     const div = document.createElement("div");
     div.className = "dish-row";
@@ -616,13 +581,14 @@ function renderPer100gDishesList() {
   const gLabel = translate("per100gLabel");
   const g = translate("unitGrams") || "g";
   byWeight.forEach(food => {
-    const fm = getFoodMacros(food.id);
     let macroHtml = "";
-    if (fm && (fm.protein > 0 || fm.fat > 0 || fm.carbs > 0)) {
-      macroHtml = `
-        <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(fm.protein)}${g}</span>
-        <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(fm.fat)}${g}</span>
-        <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(fm.carbs)}${g}</span>`;
+    if (food.protein != null || food.fat != null || food.carbs != null) {
+      if (food.protein > 0 || food.fat > 0 || food.carbs > 0) {
+        macroHtml = `
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(food.protein || 0)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(food.fat || 0)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(food.carbs || 0)}${g}</span>`;
+      }
     }
     const div = document.createElement("div");
     div.className = "dish-weight-row";
@@ -672,11 +638,8 @@ function updateBulkAddBtn() {
 
 async function logFixedDish(food) {
   const date = toISODate(new Date());
-  const result = await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: food.name, calories: food.calories, date });
-  if (result && result.id) {
-    const fm = getFoodMacros(food.id);
-    if (fm) setMacrosForLog(result.id, date, fm.protein, fm.fat, fm.carbs);
-  }
+  // Send food_id — backend copies calories and macros as a snapshot
+  await apiFetch("/api/log", "POST", { tg_id: tgId, food_id: food.id, date });
   closeAddModal();
   await loadTodayLogs();
 }
@@ -690,20 +653,10 @@ async function bulkLogPer100g() {
   if (!toLog.length) return;
 
   const date = toISODate(new Date());
+  // Send food_id + grams — backend scales calories and macros
   await Promise.all(toLog.map(async food => {
     const grams = parseFloat(document.getElementById(`weight-${food.id}`).value);
-    const calories = Math.round(food.calories * grams / 100);
-    const result = await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: `${food.name} (${grams}g)`, calories, date });
-    if (result && result.id) {
-      const fm = getFoodMacros(food.id);
-      if (fm) {
-        setMacrosForLog(result.id, date,
-          fm.protein * grams / 100,
-          fm.fat * grams / 100,
-          fm.carbs * grams / 100
-        );
-      }
-    }
+    await apiFetch("/api/log", "POST", { tg_id: tgId, food_id: food.id, grams, date });
   }));
   closeAddModal();
   await loadTodayLogs();
@@ -715,16 +668,18 @@ async function quickAddLog() {
   if (!calories || calories <= 0) return;
 
   const date = toISODate(new Date());
-  const result = await apiFetch("/api/log", "POST", { tg_id: tgId, food_name: name, calories, date });
+  const body = { tg_id: tgId, food_name: name, calories, date };
 
-  if (result && macroMode === "detailed") {
-    const protein = parseFloat(document.getElementById("quickProtein").value) || 0;
-    const fat     = parseFloat(document.getElementById("quickFat").value) || 0;
-    const carbs   = parseFloat(document.getElementById("quickCarbs").value) || 0;
-    if (protein > 0 || fat > 0 || carbs > 0) {
-      setMacrosForLog(result.id, date, protein, fat, carbs);
-    }
+  if (trackingMode === "full") {
+    const protein = parseFloat(document.getElementById("quickProtein").value) || null;
+    const fat     = parseFloat(document.getElementById("quickFat").value) || null;
+    const carbs   = parseFloat(document.getElementById("quickCarbs").value) || null;
+    if (protein != null) body.protein = protein;
+    if (fat != null)     body.fat = fat;
+    if (carbs != null)   body.carbs = carbs;
   }
+
+  await apiFetch("/api/log", "POST", body);
 
   document.getElementById("quickFoodName").value = "";
   document.getElementById("quickCalories").value = "";
@@ -801,13 +756,13 @@ function showBuilderCustomForm(name) {
   const box = document.getElementById("builderSuggestions");
   const kcalLabel = translate("builderCustomKcalPh");
   const addLabel  = translate("add");
-  const isMacros  = macroMode === "detailed";
+  const isFull    = trackingMode === "full";
 
   const wrap = document.createElement("div");
   wrap.className = "builder-custom-form grouped-card";
 
   let macroFields = "";
-  if (isMacros) {
+  if (isFull) {
     const g = translate("unitGrams") || "g";
     macroFields = `
       <div class="form-row labeled">
@@ -962,19 +917,24 @@ async function saveBuilderDish() {
   const totalKcal = builderIngredients.reduce((s, i) => s + i.kcalPer100g * i.grams / 100, 0);
   const kcalPer100g = Math.round(totalKcal / dishWeight * 100);
 
-  const result = await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories: kcalPer100g, per100g: true });
+  // Calculate per-100g macros for the saved Food template
+  const totalP = builderIngredients.reduce((s, i) => s + (i.macros?.protein || 0) * i.grams / 100, 0);
+  const totalF = builderIngredients.reduce((s, i) => s + (i.macros?.fat || 0) * i.grams / 100, 0);
+  const totalC = builderIngredients.reduce((s, i) => s + (i.macros?.carbs || 0) * i.grams / 100, 0);
+  const pPer100 = totalP > 0 ? totalP / dishWeight * 100 : null;
+  const fPer100 = totalF > 0 ? totalF / dishWeight * 100 : null;
+  const cPer100 = totalC > 0 ? totalC / dishWeight * 100 : null;
 
-  if (result && result.id) {
-    const totalP = builderIngredients.reduce((s, i) => s + (i.macros?.protein || 0) * i.grams / 100, 0);
-    const totalF = builderIngredients.reduce((s, i) => s + (i.macros?.fat || 0) * i.grams / 100, 0);
-    const totalC = builderIngredients.reduce((s, i) => s + (i.macros?.carbs || 0) * i.grams / 100, 0);
-    if (totalP > 0 || totalF > 0 || totalC > 0) {
-      const pPer100 = totalP / dishWeight * 100;
-      const fPer100 = totalF / dishWeight * 100;
-      const cPer100 = totalC / dishWeight * 100;
-      setFoodMacros(result.id, pPer100, fPer100, cPer100);
-    }
-  }
+  // Macros are sent directly to backend — no localStorage
+  await apiFetch("/api/foods", "POST", {
+    tg_id: tgId,
+    name,
+    calories: kcalPer100g,
+    per100g: true,
+    protein: pPer100,
+    fat: fPer100,
+    carbs: cPer100,
+  });
 
   resetBuilder();
   closeAddFoodModal();
@@ -1002,13 +962,14 @@ function renderFoods() {
     const badge = food.per100g
       ? `<span class="badge">${translate("foodTypePer100g")}</span>`
       : "";
-    const fm = getFoodMacros(food.id);
     let macroHtml = "";
-    if (fm && (fm.protein > 0 || fm.fat > 0 || fm.carbs > 0)) {
-      macroHtml = `
-          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(fm.protein)}${g}</span>
-          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(fm.fat)}${g}</span>
-          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(fm.carbs)}${g}</span>`;
+    if (food.protein != null || food.fat != null || food.carbs != null) {
+      if (food.protein > 0 || food.fat > 0 || food.carbs > 0) {
+        macroHtml = `
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(food.protein || 0)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(food.fat || 0)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(food.carbs || 0)}${g}</span>`;
+      }
     }
     const div = document.createElement("div");
     div.className = "list-row";
@@ -1037,15 +998,16 @@ async function addNewFood() {
     showToast(translate("fillFields"));
     return;
   }
-  const result = await apiFetch("/api/foods", "POST", { tg_id: tgId, name, calories, per100g: newFoodType === "per100g" });
-  if (result && result.id && macroMode === "detailed") {
-    const protein = parseFloat(document.getElementById("newFoodProtein").value) || 0;
-    const fat     = parseFloat(document.getElementById("newFoodFat").value) || 0;
-    const carbs   = parseFloat(document.getElementById("newFoodCarbs").value) || 0;
-    if (protein > 0 || fat > 0 || carbs > 0) {
-      setFoodMacros(result.id, protein, fat, carbs);
-    }
+  const body = { tg_id: tgId, name, calories, per100g: newFoodType === "per100g" };
+  if (trackingMode === "full") {
+    const protein = parseFloat(document.getElementById("newFoodProtein").value) || null;
+    const fat     = parseFloat(document.getElementById("newFoodFat").value) || null;
+    const carbs   = parseFloat(document.getElementById("newFoodCarbs").value) || null;
+    if (protein != null) body.protein = protein;
+    if (fat != null)     body.fat = fat;
+    if (carbs != null)   body.carbs = carbs;
   }
+  await apiFetch("/api/foods", "POST", body);
   document.getElementById("newFoodName").value = "";
   document.getElementById("newFoodCalories").value = "";
   document.getElementById("newFoodProtein").value = "";
@@ -1177,20 +1139,18 @@ async function selectDay(dateStr, cellEl) {
   const [y, m, d] = dateStr.split("-").map(Number);
   const months = translations[currentLang]?.months || translations.ru.months;
   document.getElementById("dayDetailDate").textContent = `${d} ${months[m - 1]} ${y}`;
-  const rem = Math.round(data.daily_norm - data.total);
-  document.getElementById("dayDetailEaten").textContent = `${Math.round(data.total)} ${kcal}`;
+  // total_calories is the new field name; fall back to legacy "total" if backend not yet deployed
+  const dayTotal = data.total_calories ?? data.total ?? 0;
+  const rem = Math.round(data.daily_norm - dayTotal);
+  document.getElementById("dayDetailEaten").textContent = `${Math.round(dayTotal)} ${kcal}`;
   document.getElementById("dayDetailRemaining").textContent = `${rem} ${kcal}`;
 
-  // Macro bars in history
+  // Macro bars in history — data comes fully from backend
   const macroSection = document.getElementById("dayDetailMacros");
   if (macroSection) {
-    if (macroMode === "detailed") {
+    if (trackingMode === "full") {
       macroSection.classList.remove("hidden");
-      updateMacroBarSection(
-        "histMacroBarProtein", "histMacroBarFat", "histMacroBarCarbs",
-        "histMacroValProtein", "histMacroValFat", "histMacroValCarbs",
-        dateStr
-      );
+      renderHistoryMacroBars(data);
     } else {
       macroSection.classList.add("hidden");
     }
@@ -1201,12 +1161,52 @@ async function selectDay(dateStr, cellEl) {
     logsContainer.innerHTML = `<p class="empty-hint">${translate("noLogsForDay")}</p>`;
     return;
   }
+  const g = translate("unitGrams") || "г";
   data.logs.forEach(log => {
     const row = document.createElement("div");
     row.className = "day-log-row";
-    row.innerHTML = `<span>${log.food_name}</span><span class="day-log-cal">${Math.round(log.calories)} ${kcal}</span>`;
+    let macroHtml = "";
+    if (log.protein != null || log.fat != null || log.carbs != null) {
+      if (log.protein > 0 || log.fat > 0 || log.carbs > 0) {
+        macroHtml = `
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(log.protein || 0)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(log.fat || 0)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(log.carbs || 0)}${g}</span>`;
+      }
+    }
+    row.innerHTML = `
+      <div>
+        <span>${log.food_name}</span>
+        ${macroHtml ? `<div class="list-row-sub-row" style="margin-top:3px">${macroHtml}</div>` : ""}
+      </div>
+      <span class="day-log-cal">${Math.round(log.calories)} ${kcal}</span>`;
     logsContainer.appendChild(row);
   });
+}
+
+function renderHistoryMacroBars(data) {
+  const g = translate("unitGrams") || "g";
+  const totP = data.total_protein || 0;
+  const totF = data.total_fat || 0;
+  const totC = data.total_carbs || 0;
+  const norm = data.daily_norm || 2000;
+  const refP = data.protein_target || proteinTarget || Math.max(norm * 0.075, 50);
+  const refF = data.fat_target     || fatTarget     || Math.max(norm * 0.033, 30);
+  const refC = data.carbs_target   || carbsTarget   || Math.max(norm * 0.125, 100);
+
+  const barP = document.getElementById("histMacroBarProtein");
+  const barF = document.getElementById("histMacroBarFat");
+  const barC = document.getElementById("histMacroBarCarbs");
+  const valP = document.getElementById("histMacroValProtein");
+  const valF = document.getElementById("histMacroValFat");
+  const valC = document.getElementById("histMacroValCarbs");
+
+  if (barP) barP.style.width = `${Math.min(totP / refP * 100, 100).toFixed(1)}%`;
+  if (barF) barF.style.width = `${Math.min(totF / refF * 100, 100).toFixed(1)}%`;
+  if (barC) barC.style.width = `${Math.min(totC / refC * 100, 100).toFixed(1)}%`;
+  if (valP) valP.textContent = `${Math.round(totP)} / ${Math.round(refP)} ${g}`;
+  if (valF) valF.textContent = `${Math.round(totF)} / ${Math.round(refF)} ${g}`;
+  if (valC) valC.textContent = `${Math.round(totC)} / ${Math.round(refC)} ${g}`;
 }
 
 function toISODate(d) {
@@ -1227,10 +1227,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   toggleGoalPercent();
   renderTodayHeader();
 
-  // Initialize macro mode toggle state
-  document.getElementById("macro-mode-simple").classList.toggle("active", macroMode === "simple");
-  document.getElementById("macro-mode-detailed").classList.toggle("active", macroMode === "detailed");
-  updateMacroModeUI();
+  // Initialize tracking mode toggle state
+  document.getElementById("tracking-mode-simple").classList.toggle("active", trackingMode === "simple");
+  document.getElementById("tracking-mode-full").classList.toggle("active", trackingMode === "full");
+  updateTrackingModeUI();
 
   // show skeleton state while loading
   const gaugeWrap = document.querySelector(".gauge-wrap");
