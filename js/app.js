@@ -79,62 +79,121 @@ const SUN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
 const GREETINGS = {
   ru: {
     morning: [
-      "С добрым утром", "Доброе утро", "Как спалось?", "Пора завтракать",
-      "Время подзаправиться", "Бодрого утра", "Как настрой?", "Начнем день?",
-      "Завтрак ждет", "Просыпайся", "Вкусного начала", "С новым днем",
-      "Готов к старту?", "Утро!", "Погнали?"
+      "Доброе утро! ☀️", "Подъём!", "Как спалось?", "Время кофе! ☕️",
+      "Бодрого утра!", "Просыпаемся!", "В планах подвиги?", "Утро!",
+      "Погнали?", "Начнем день!"
     ],
     afternoon: [
-      "Добрый день", "Как успехи?", "Время обеда", "Пора перекусить",
-      "Как день?", "Не забудь поесть", "Держишь ритм?", "Как дела?",
-      "Время паузы", "Приятного аппетита", "Экватор!", "Продолжаем?",
-      "Всё по плану?", "Нужен перерыв?", "Привет!"
+      "Добрый день!", "Обед? 🍕", "Как успехи?", "Пора поесть!",
+      "Как дела?", "Время паузы", "Держим ритм!", "Приятного!",
+      "Нужен перерыв?", "Привет!"
     ],
     evening: [
-      "Добрый вечер", "Как прошел день?", "Время ужина", "Пора отдыхать",
-      "Уютного вечера", "Как итоги?", "День почти всё", "Время выдохнуть",
-      "Хорошего вечера", "Закроем цели?", "Как самочувствие?", "Заслуженный отдых",
-      "Ужинаем?", "Пора расслабиться", "Вечер!"
+      "Добрый вечер!", "Время выдохнуть", "Как прошёл день?", "Ужинаем? 🍷",
+      "Пора отдыхать", "Уютного вечера", "День - всё!", "Заслуженный отдых",
+      "Расслабляемся!", "Вечер!"
     ],
   },
   en: {
     morning: [
-      "Good morning", "Morning!", "Sleep well?", "Breakfast time",
-      "Fuel up", "Rise and shine", "Ready for today?", "Let's start",
-      "Morning vibes", "Wake up", "First meal?", "New day!",
-      "Ready?", "Top of the morning", "Hey there"
+      "Good morning! ☀️", "Rise and shine!", "Sleep well?", "Need coffee? ☕️",
+      "Morning vibes", "Wakey wakey!", "Let's do this!", "Ready?",
+      "Top of the morning", "Hey there!"
     ],
     afternoon: [
-      "Good afternoon", "How's it going?", "Lunch time", "Snack break?",
-      "Busy day?", "Don't forget to eat", "On track?", "How's your day?",
-      "Take a break", "Enjoy your meal", "Halfway!", "Keep moving",
-      "All good?", "Need fuel?", "Hi!"
+      "Good afternoon!", "Lunch time? 🍕", "How’s it going?", "Stay hydrated!",
+      "Take a break", "On track?", "Looking good!", "Enjoy your meal!",
+      "Halfway there!", "Hi!"
     ],
     evening: [
-      "Good evening", "How was today?", "Dinner time", "Time to rest",
-      "Cozy evening", "Daily recap?", "Day is done", "Unwind now",
-      "Enjoy your night", "Close your goals?", "How do you feel?", "Well earned",
-      "Dinner?", "Relax time", "Evening!"
+      "Good evening!", "Unwind time", "How was today?", "Dinner? 🍷",
+      "Time to rest", "Cozy vibes", "Day is done!", "Well earned",
+      "Relax mode", "Evening!"
     ],
   },
   uk: {
     morning: [
-      "Доброго ранку", "З добрим ранком", "Як спалося?", "Час снідати",
-      "Час підзарядитись", "Бадьорого ранку", "Як настрій?", "Почнемо день?",
-      "Сніданок чекає", "Прокидайся", "Смачного початку", "З новим днем",
-      "Готовий?", "Ранок!", "Поїхали?"
+      "Доброго ранку! ☀️", "Прокидаємося!", "Як спалося?", "Час кави! ☕️",
+      "Бадьорого ранку!", "Поїхали!", "Як плани?", "Ранок!",
+      "Вже на ногах?", "Почнемо?"
     ],
     afternoon: [
-      "Добрий день", "Як успіхи?", "Час обіду", "Пора перекусити",
-      "Як день?", "Не забудь поїсти", "Тримаєш ритм?", "Як справи?",
-      "Час паузи", "Смачного", "Екватор!", "Продовжуємо?",
-      "Все за планом?", "Потрібна перерва?", "Привіт!"
+      "Добрий день!", "Час обіду? 🍕", "Як успіхи?", "Смачного!",
+      "Як справи?", "Час паузи", "Тримаємо ритм!", "Привіт!",
+      "Треба перерва?", "Все за планом?"
     ],
     evening: [
-      "Добрий вечір", "Як минув день?", "Час вечері", "Пора відпочити",
-      "Затишного вечора", "Як підсумки?", "День майже все", "Час видихнути",
-      "Гарного вечора", "Закриємо цілі?", "Як почуваєшся?", "Заслужений відпочинок",
-      "Вечеряємо?", "Пора розслабитись", "Вечір!"
+      "Добрий вечір!", "Час видихнути", "Як минув день?", "Вечеряємо? 🍷",
+      "Пора відпочити", "Затишного вечора", "День - все!", "Заслужений спокій",
+      "Розслабляємося!", "Вечір!"
+    ],
+  },
+  es: {
+    morning: [
+      "¡Buenos días! ☀️", "¡Arriba!", "¿Café? ☕️", "¿Qué tal el sueño?",
+      "¡A por el día!", "Hola, sol", "¡A despertar!", "¿Todo listo?",
+      "Energía pura", "¡Vamos!"
+    ],
+    afternoon: [
+      "¡Buenas tardes!", "¿Comemos? 🍕", "¿Cómo va todo?", "¡Buen provecho!",
+      "Toma un respiro", "A tope", "¿Todo bien?", "¡Dale!",
+      "Pausa necesaria", "¡Hola!"
+    ],
+    evening: [
+      "¡Buenas noches!", "A descansar", "¿Qué tal el día?", "¿Cenamos? 🍷",
+      "Momento relax", "Noche acogedora", "Día - fin!", "Desconecta",
+      "Paz total", "¡Hasta mañana!"
+    ],
+  },
+  de: {
+    morning: [
+      "Guten Morgen! ☀️", "Wach auf!", "Kaffee? ☕️", "Gut geschlafen?",
+      "Los geht's!", "Moin moin!", "Startklar?", "Morgen!",
+      "Energie!", "Bereit?"
+    ],
+    afternoon: [
+      "Mahlzeit! 🍕", "Pause?", "Läuft's?", "Guten Appetit!",
+      "Wie läuft der Tag?", "Dranbleiben!", "Alles klar?", "Hallo!",
+      "Kurzes Break?", "Halbzeit!"
+    ],
+    evening: [
+      "Guten Abend!", "Feierabend!", "Wie war's heute?", "Essen? 🍷",
+      "Zeit für Ruhe", "Gemütlich machen", "Tag - geschafft!", "Entspannung",
+      "Beine hoch!", "Abend!"
+    ],
+  },
+  fr: {
+    morning: [
+      "Salut! ☀️", "Réveil!", "Café? ☕️", "Bien dormi?",
+      "En forme?", "C'est parti!", "Bonne journée!", "Matin!",
+      "Allez hop!", "On y va?"
+    ],
+    afternoon: [
+      "Bonjour!", "Bon app! 🍕", "Ça roule?", "Un break?",
+      "On lâche rien!", "Ça avance?", "Pause café?", "Salut!",
+      "La forme?", "On continue?"
+    ],
+    evening: [
+      "Bonsoir!", "Enfin!", "Le bilan? ✨", "À table! 🍷",
+      "On décompresse", "Soirée zen", "Journée - finie!", "Repos",
+      "Détente!", "Douce nuit"
+    ],
+  },
+  be: {
+    morning: [
+      "Добрай раніцы! ☀️", "Устаём!", "Як спалася?", "Час кавы! ☕️",
+      "Бадзёрасці!", "Наперад!", "Як настрой?", "Раніца!",
+      "Гатоўнасць?", "Пагналі!"
+    ],
+    afternoon: [
+      "Добры дзень!", "Смачна есці! 🍕", "Як справы?", "Час абеду!",
+      "Трэба перадых", "Трымаем рытм!", "Усё добра?", "Прывіт!",
+      "Паўза?", "Экватар!"
+    ],
+    evening: [
+      "Добры вечір!", "Выдыхаем!", "Як прайшоў дзень?", "Вечараем? 🍷",
+      "Час адпачыць", "Зацішнага вечара", "Дзень - усё!", "Адпачынак",
+      "Дабранач!", "Вечар!"
     ],
   }
 };
