@@ -10,6 +10,8 @@ const translations = {
   ru: {
     flag: "ru", name: "Русский",
     title: "Трекер калорий",
+    busyLoading: "Загрузка…",
+    busySyncing: "Синхронизация данных",
     unitKcal: "ккал",
     unitGrams: "г",
     eaten: "Съедено",
@@ -107,6 +109,8 @@ const translations = {
   en: {
     flag: "gb", name: "English",
     title: "Calorie Tracker",
+    busyLoading: "Loading…",
+    busySyncing: "Syncing your data",
     unitKcal: "kcal",
     unitGrams: "g",
     eaten: "Eaten",
@@ -204,6 +208,8 @@ const translations = {
   uk: {
     flag: "ua", name: "Українська",
     title: "Трекер калорій",
+    busyLoading: "Завантаження…",
+    busySyncing: "Синхронізація даних",
     unitKcal: "ккал",
     unitGrams: "г",
     eaten: "З'їдено",
@@ -301,6 +307,8 @@ const translations = {
   es: {
     flag: "es", name: "Español",
     title: "Rastreador de calorías",
+    busyLoading: "Cargando…",
+    busySyncing: "Sincronizando tus datos",
     unitKcal: "kcal",
     unitGrams: "g",
     eaten: "Consumido",
@@ -398,6 +406,8 @@ const translations = {
   de: {
     flag: "de", name: "Deutsch",
     title: "Kalorien-Tracker",
+    busyLoading: "Wird geladen…",
+    busySyncing: "Synchronisieren deiner Daten",
     unitKcal: "kcal",
     unitGrams: "g",
     eaten: "Verzehrt",
@@ -495,6 +505,8 @@ const translations = {
   fr: {
     flag: "fr", name: "Français",
     title: "Suivi des calories",
+    busyLoading: "Chargement…",
+    busySyncing: "Synchronisation de vos données",
     unitKcal: "kcal",
     unitGrams: "g",
     eaten: "Consommé",
@@ -592,6 +604,8 @@ const translations = {
   be: {
     flag: "by", name: "Беларуская",
     title: "Трэкер калорый",
+    busyLoading: "Загрузка…",
+    busySyncing: "Сінхранізацыя даных",
     unitKcal: "ккал",
     unitGrams: "г",
     eaten: "З'едзена",

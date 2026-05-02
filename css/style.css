@@ -812,7 +812,7 @@ h2 {
   font-weight: 600;
   color: var(--text2);
   white-space: nowrap;
-  min-width: 3.6rem;
+  min-width: 4rem;
   text-align: right;
   flex-shrink: 0;
 }

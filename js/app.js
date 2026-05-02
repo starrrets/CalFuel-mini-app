@@ -22,6 +22,7 @@ let currentUnits = "metric";
 let newFoodType = "fixed";
 let foodsLoaded = false;
 let historyLoaded = false;
+let gaugeHideZeroTimer = null;
 
 // "simple" = calories only  |  "full" = calories + macros
 // Stored in localStorage as a pure UI preference (not nutrition data)
@@ -247,15 +248,55 @@ async function apiFetch(endpoint, method = "GET", body = null) {
   return response.json();
 }
 
-function setAppBusy(active, subtitle = "Syncing your data") {
+function getTransitionMs(el) {
+  if (!el) return 0;
+
+  const style = window.getComputedStyle(el);
+
+  const toMs = value => {
+    const v = value.trim();
+    if (!v) return 0;
+    return v.endsWith("ms") ? parseFloat(v) : parseFloat(v) * 1000;
+  };
+
+  const durations = style.transitionDuration.split(",").map(toMs);
+  const delays = style.transitionDelay.split(",").map(toMs);
+
+  const count = Math.max(durations.length, delays.length);
+  let max = 0;
+
+  for (let i = 0; i < count; i++) {
+    const duration = durations[i] ?? durations[durations.length - 1] ?? 0;
+    const delay = delays[i] ?? delays[delays.length - 1] ?? 0;
+    max = Math.max(max, duration + delay);
+  }
+
+  return max;
+}
+
+function setAppBusy(active, subtitleKey = "busySyncing") {
   const overlay = document.getElementById("app-busy-overlay");
 
   if (overlay) {
     overlay.classList.toggle("open", active);
     overlay.setAttribute("aria-hidden", active ? "false" : "true");
 
-    const sub = overlay.querySelector(".app-busy-subtitle");
-    if (sub && subtitle) sub.textContent = subtitle;
+    const titleEl = overlay.querySelector(".app-busy-title");
+    const subtitleEl = overlay.querySelector(".app-busy-subtitle");
+
+    if (titleEl) {
+      titleEl.textContent =
+        typeof translate === "function"
+          ? translate("busyLoading")
+          : "Loading…";
+    }
+
+    if (subtitleEl) {
+      subtitleEl.textContent =
+        typeof translate === "function"
+          ? translate(subtitleKey)
+          : "Syncing your data";
+    }
   }
 
   document.body.classList.toggle("is-busy", active);
@@ -501,7 +542,7 @@ async function loadTodayLogs() {
 
 function updateProgress() {
   const track = document.getElementById("gaugeTrack");
-  const fill  = document.getElementById("gaugeFill");
+  const fill = document.getElementById("gaugeFill");
   const pct = dailyNorm > 0 ? Math.max(0, Math.min(totalToday / dailyNorm, 1)) : 0;
   const targetOffset = GAUGE_CIRCUMFERENCE * (1 - pct);
 
@@ -511,10 +552,41 @@ function updateProgress() {
   }
 
   if (fill) {
-    if (isBootstrapping) {
+    if (gaugeHideZeroTimer) {
+      clearTimeout(gaugeHideZeroTimer);
+      gaugeHideZeroTimer = null;
+    }
+
+    fill.style.strokeDasharray = `${GAUGE_CIRCUMFERENCE} ${GAUGE_CIRCUMFERENCE}`;
+
+    if (pct <= 0) {
+      fill.style.opacity = "1";
       fill.style.strokeDashoffset = `${GAUGE_CIRCUMFERENCE}`;
+
+      const hideIfStillZero = () => {
+        const currentPct =
+          dailyNorm > 0 ? Math.max(0, Math.min(totalToday / dailyNorm, 1)) : 0;
+
+        if (currentPct <= 0) {
+          fill.style.opacity = "0";
+        }
+      };
+
+      if (isBootstrapping) {
+        hideIfStillZero();
+      } else {
+        const waitMs = getTransitionMs(fill);
+        if (waitMs > 0) {
+          gaugeHideZeroTimer = window.setTimeout(hideIfStillZero, waitMs);
+        } else {
+          hideIfStillZero();
+        }
+      }
     } else {
-      fill.style.strokeDashoffset = `${targetOffset.toFixed(2)}`;
+      fill.style.opacity = "1";
+      fill.style.strokeDashoffset = isBootstrapping
+        ? `${GAUGE_CIRCUMFERENCE}`
+        : `${targetOffset.toFixed(2)}`;
     }
   }
 
@@ -1373,6 +1445,7 @@ function toISODate(d) {
   const dd = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${dd}`;
 }
+
 function initGauge() {
   const track = document.getElementById("gaugeTrack");
   const fill = document.getElementById("gaugeFill");
@@ -1383,6 +1456,7 @@ function initGauge() {
 
   fill.style.strokeDasharray = `${GAUGE_CIRCUMFERENCE} ${GAUGE_CIRCUMFERENCE}`;
   fill.style.strokeDashoffset = `${GAUGE_CIRCUMFERENCE}`;
+  fill.style.opacity = "0";
 }
 
 // ── Init ──────────────────────────────────────────────────────────
