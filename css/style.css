@@ -366,6 +366,7 @@ h2 {
   background: var(--badgeBG); color: var(--badge);
   padding: 0px 7px; border-radius: 9999px;
   vertical-align: middle; margin-left: 5px;
+  white-space: nowrap;
 }
 
 .empty-hint {
@@ -747,7 +748,7 @@ h2 {
 /* ── Macro progress bars ───────────────────────────────────────── */
 
 .macro-bars {
-  padding: 0.5rem 1rem 0.75rem;
+  padding: 0.5rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
