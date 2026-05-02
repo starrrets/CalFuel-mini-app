@@ -7,6 +7,7 @@
   --bg3: #2c2c2e;
   --bg4: #3a3a3c;
   --sep: rgba(255, 255, 255, 0.08);
+  --gauge-sep: #0a0a0a;
   --text: #ffffff;
   --text2: #ebebf5cc;
   --badge: #ebebf5;
@@ -31,6 +32,13 @@
   --macro-fat-bg: #57b5ab26;
   --macro-carbs-bg: #b78bdd26;
 
+  --macro-protein-fill-start: #f2cd69;
+  --macro-protein-fill-end: #be8523;
+  --macro-fat-fill-start: #6bd1c6;
+  --macro-fat-fill-end: #2a837b;
+  --macro-carbs-fill-start: #c39aeb;
+  --macro-carbs-fill-end: #7e55ad;
+
   color-scheme: dark;
 }
 
@@ -40,6 +48,7 @@
   --bg3: #ebebf0;
   --bg4: #d1d1d6;
   --sep: rgba(60, 60, 67, 0.1);
+  --gauge-sep: #e9e9e9;
   --text: #000000;
   --text2: rgba(60, 60, 67, 0.85);
   --badge: rgb(60, 60, 67);
@@ -63,6 +72,13 @@
   --macro-protein-bg: #9d5f0040;
   --macro-fat-bg: #006d6740;
   --macro-carbs-bg: #7841a040;
+
+  --macro-protein-fill-start: #d48815;
+  --macro-protein-fill-end: #9b5b01;
+  --macro-fat-fill-start: #1a9b90;
+  --macro-fat-fill-end: #015f5a;
+  --macro-carbs-fill-start: #9b60c5;
+  --macro-carbs-fill-end: #69388b;
 
   color-scheme: light;
 }
@@ -142,17 +158,19 @@ h2 {
 /* ── Gauge ─────────────────────────────────────────────────────── */
 
 .gauge-wrap {
-  width: min(310px, 92vw);
+  width: 85vw;
+  max-width: 400px;
   margin: 0 auto 1rem;
 }
 .gauge-svg { width: 100%; display: block; }
 
-.gauge-track { stroke: rgba(232,80,10,0.18); stroke-width: 13; }
+.gauge-track { stroke: rgba(232,80,10,0.18); stroke-width: 12; }
 .gauge-fill  {
-  stroke-width: 13;
+  stroke-width: 12;
   transform: rotate(-90deg);
   transform-origin: 130px 130px;
-  transition: stroke-dasharray 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
 }
 
 .g-norm {
@@ -173,11 +191,14 @@ h2 {
   fill: var(--text3); font-family: inherit;
   letter-spacing: 0.05em; text-transform: uppercase;
 }
-.g-sep { stroke: var(--sep); stroke-width: 1; }
+.g-sep { stroke: var(--gauge-sep); stroke-width: 2; stroke-linecap: round; }
 
 /* loading skeleton pulse on track */
 .gauge-loading .gauge-track {
   animation: gaugeSkeletonPulse 1.4s ease-in-out infinite;
+}
+.gauge-loading .gauge-fill {
+  opacity: 0;
 }
 @keyframes gaugeSkeletonPulse {
   0%, 100% { stroke: rgba(232,80,10,0.12); }
@@ -224,7 +245,7 @@ h2 {
 .grouped-card {
   background: var(--bg2);
   border-radius: var(--r);
-  border: 2px solid var(--sep);
+  border: 0.5px solid var(--sep);
   overflow: hidden;
   margin-bottom: 0.5rem;
 }
@@ -456,6 +477,7 @@ h2 {
 .day-detail-stat.remaining { color: var(--badge); }
 .day-detail-stat-label { font-weight: 500; color: inherit; opacity: 0.75; }
 .day-log-row {
+  font-weight: 600;
   display: flex; justify-content: space-between; align-items: center;
   padding: 0.75rem 1rem; border-bottom: 1px solid var(--sep); font-size: 0.88rem;
 }
@@ -749,7 +771,7 @@ h2 {
 .macro-bar-label.carbs   { color: var(--macro-carbs); }
 .macro-bar-track {
   flex: 1;
-  height: 9px;
+  height: 7px;
   background: var(--bg3);
   border-radius: 9999px;
   overflow: hidden;
@@ -763,9 +785,27 @@ h2 {
   transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 0;
 }
-.macro-bar-fill.protein { background: var(--macro-protein); }
-.macro-bar-fill.fat     { background: var(--macro-fat); }
-.macro-bar-fill.carbs   { background: var(--macro-carbs); }
+.macro-bar-fill.protein {
+  background: linear-gradient(
+    90deg,
+    var(--macro-protein-fill-start) 0%,
+    var(--macro-protein-fill-end) 100%
+  );
+}
+.macro-bar-fill.fat {
+  background: linear-gradient(
+    90deg,
+    var(--macro-fat-fill-start) 0%,
+    var(--macro-fat-fill-end) 100%
+  );
+}
+.macro-bar-fill.carbs {
+  background: linear-gradient(
+    90deg,
+    var(--macro-carbs-fill-start) 0%,
+    var(--macro-carbs-fill-end) 100%
+  );
+}
 .macro-bar-val {
   font-size: 0.72rem;
   font-weight: 600;
@@ -809,7 +849,7 @@ h2 {
 
 .list-row-sub-row {
   display: flex; align-items: center; flex-wrap: wrap;
-  gap: 0.3rem; margin-top: 3px;
+  gap: 0.3rem; margin-top: 6px;
 }
 
 .macro-pill {

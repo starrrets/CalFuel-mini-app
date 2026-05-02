@@ -5,6 +5,8 @@ if (window.Telegram && window.Telegram.WebApp) {
   tg.ready();
   tg.expand();
 }
+const GAUGE_R = 108;
+const GAUGE_CIRCUMFERENCE = 2 * Math.PI * GAUGE_R;
 
 const tgId = tg ? (tg.initDataUnsafe?.user?.id || 123456789) : 123456789;
 const API_BASE = "https://web-production-fcefd.up.railway.app";
@@ -498,23 +500,22 @@ async function loadTodayLogs() {
 }
 
 function updateProgress() {
-  const R = 108;
-  const circumference = 2 * Math.PI * R;
-
   const track = document.getElementById("gaugeTrack");
   const fill  = document.getElementById("gaugeFill");
+  const pct = dailyNorm > 0 ? Math.max(0, Math.min(totalToday / dailyNorm, 1)) : 0;
+  const targetOffset = GAUGE_CIRCUMFERENCE * (1 - pct);
 
   if (track) {
-    track.style.strokeDasharray = `${circumference}`;
+    track.style.strokeDasharray = `${GAUGE_CIRCUMFERENCE} ${GAUGE_CIRCUMFERENCE}`;
     track.style.strokeDashoffset = "0";
   }
 
   if (fill) {
-    const pct = dailyNorm > 0 ? Math.min(totalToday / dailyNorm, 1) : 0;
-    const drawn = pct * circumference;
-    fill.style.strokeDasharray  = `${drawn.toFixed(2)} ${circumference.toFixed(2)}`;
-    fill.style.strokeDashoffset = "0";
-    fill.style.visibility = pct === 0 ? "hidden" : "visible";
+    if (isBootstrapping) {
+      fill.style.strokeDashoffset = `${GAUGE_CIRCUMFERENCE}`;
+    } else {
+      fill.style.strokeDashoffset = `${targetOffset.toFixed(2)}`;
+    }
   }
 
   const rem = Math.round(dailyNorm - totalToday);
@@ -689,7 +690,7 @@ function renderFixedDishesList() {
     div.innerHTML = `
       <div>
         <span class="list-row-name">${food.name}</span>
-        <div class="list-row-sub-row" style="margin-top:3px">
+        <div class="list-row-sub-row" style="margin-top:6px">
           <span class="dish-row-cal">${Math.round(food.calories)} ${kcal}</span>
           ${macroHtml}
         </div>
@@ -737,7 +738,7 @@ function renderPer100gDishesList() {
     div.innerHTML = `
       <div class="dish-weight-row-header">
         <span class="list-row-name">${food.name}</span>
-        <div class="list-row-sub-row" style="margin-top:3px">
+        <div class="list-row-sub-row" style="margin-top:6px">
           <span class="dish-row-cal" style="font-size:0.72rem">${Math.round(food.calories)} ${kcal}/${gLabel}</span>
           ${macroHtml}
         </div>
@@ -1334,7 +1335,7 @@ async function selectDay(dateStr, cellEl) {
     row.innerHTML = `
       <div>
         <span>${log.food_name}</span>
-        ${macroHtml ? `<div class="list-row-sub-row" style="margin-top:3px">${macroHtml}</div>` : ""}
+        ${macroHtml ? `<div class="list-row-sub-row" style="margin-top:6px">${macroHtml}</div>` : ""}
       </div>
       <span class="day-log-cal">${Math.round(log.calories)} ${kcal}</span>`;
     logsContainer.appendChild(row);
@@ -1372,6 +1373,17 @@ function toISODate(d) {
   const dd = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${dd}`;
 }
+function initGauge() {
+  const track = document.getElementById("gaugeTrack");
+  const fill = document.getElementById("gaugeFill");
+  if (!track || !fill) return;
+
+  track.style.strokeDasharray = `${GAUGE_CIRCUMFERENCE} ${GAUGE_CIRCUMFERENCE}`;
+  track.style.strokeDashoffset = "0";
+
+  fill.style.strokeDasharray = `${GAUGE_CIRCUMFERENCE} ${GAUGE_CIRCUMFERENCE}`;
+  fill.style.strokeDashoffset = `${GAUGE_CIRCUMFERENCE}`;
+}
 
 // ── Init ──────────────────────────────────────────────────────────
 
@@ -1380,6 +1392,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const gaugeWrap = document.querySelector(".gauge-wrap");
   if (gaugeWrap) gaugeWrap.classList.add("gauge-loading");
+
+  initGauge();
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
@@ -1472,5 +1486,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     isBootstrapping = false;
     if (gaugeWrap) gaugeWrap.classList.remove("gauge-loading");
     setAppBusy(false);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        updateProgress();
+        if (trackingMode === "full" && lastTodayData) {
+          updateMacroBars(lastTodayData);
+        }
+      });
+    });
   }
 });
