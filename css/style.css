@@ -368,6 +368,7 @@ h2 {
   background: var(--accentBG); border-radius: 5px;
   padding: 1px 6px;
   border: 1px solid;
+  margin-right: 0.3rem;
 }
 
 .badge {
@@ -527,7 +528,7 @@ h2 {
 .builder-ing-row:last-of-type { border-bottom: none; }
 .builder-ing-info { flex: 1; min-width: 0; }
 .builder-ing-name { font-size: 0.88rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
-.builder-ing-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 6px; }
+.builder-ing-pills { display: flex; flex-wrap: nowrap; margin-top: 6px; }
 .builder-ing-controls { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
 .builder-ing-weight {
   width: 54px; flex-shrink: 0;
@@ -861,7 +862,7 @@ h2 {
 
 .list-row-sub-row {
   display: flex; align-items: center; flex-wrap: wrap;
-  gap: 0.3rem; margin-top: 6px;
+  margin-top: 6px;
 }
 
 .macro-pill {
@@ -872,10 +873,12 @@ h2 {
   padding: 1px 6px;
   border: 1px solid;
 }
-.macro-pill-p { color: var(--macro-protein); background: var(--macro-protein-bg); }
-.macro-pill-f { color: var(--macro-fat); background: var(--macro-fat-bg); }
-.macro-pill-c { color: var(--macro-carbs); background: var(--macro-carbs-bg); }
-
+.macro-pill-p { color: var(--macro-protein); background: var(--macro-protein-bg); border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.macro-pill-f { color: var(--macro-fat); background: var(--macro-fat-bg); border-left: none; border-right: none; border-radius: 0;  }
+.macro-pill-c { color: var(--macro-carbs); background: var(--macro-carbs-bg); border-left: none; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.builder-ing-pills .macro-pill-p {
+  margin-left: 0.25rem;
+}
 /* pills inside dish-row / dish-weight-row (bg3) need darker bg to be visible */
 /* .dish-row .macro-pill,
 .dish-row .list-row-cal,
