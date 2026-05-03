@@ -353,7 +353,7 @@ h2 {
 
 .list-row {
   display: flex; justify-content: space-between; align-items: center;
-  background: var(--bg2); padding: 0.75rem 1rem;
+  background: var(--bg2); padding: 0.6rem 0.9rem;
   border-radius: var(--r); margin-bottom: 0.5rem;
   border: 1px solid var(--sep);
 }
@@ -414,7 +414,7 @@ h2 {
 /* dish rows */
 .dish-row {
   display: flex; justify-content: space-between; align-items: center;
-  background: var(--bg5); padding: 0.875rem 1rem;
+  background: var(--bg5); padding: 0.6rem 0.9rem;
   border-radius: var(--r); margin-bottom: 0.4rem;
   cursor: pointer; transition: opacity 0.12s;
   border: 1px solid var(--sep);
@@ -584,7 +584,7 @@ h2 {
 /* ── Per-100g bulk add row ─────────────────────────────────────── */
 
 .dish-weight-row {
-  background: var(--bg5); padding: 0.875rem 1rem;
+  background: var(--bg5); padding: 0.6rem 0.9rem;
   border-radius: var(--r); margin-bottom: 0.4rem;
   border: 1px solid var(--sep);
   transition: border-color 0.18s;
