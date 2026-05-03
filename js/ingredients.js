@@ -241,7 +241,9 @@ let ingredientFuseLang = null;
 function getIngredientAliases(ing) {
   const t = INGREDIENT_TRANSLATIONS[ing.name];
 
-  return Array.from(new Set([ing.name, ...(t ? Object.values(t) : [])]));
+  return Array.from(new Set([ing.name, ...(t ? Object.values(t) : [])])).map(
+    normalizeIngredientSearchText
+  );
 }
 
 function buildIngredientFuse() {
@@ -249,8 +251,8 @@ function buildIngredientFuse() {
 
   const indexed = INGREDIENTS.map(ing => ({
     ref: ing,
-    name: ing.name,
-    localizedName: getIngredientName(ing),
+    name: normalizeIngredientSearchText(ing.name),
+    localizedName: normalizeIngredientSearchText(getIngredientName(ing)),
     aliases: getIngredientAliases(ing),
   }));
 
@@ -271,19 +273,33 @@ function getIngredientFuse() {
   return ingredientFuse;
 }
 
+function normalizeIngredientSearchText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/[\u00AD\u200B-\u200D\u2060\uFEFF]/g, "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
 function searchIngredients(q) {
-  const query = q.trim();
+  const query = normalizeIngredientSearchText(q);
   if (!query) return [];
 
   const fallbackSearch = () => {
-    const lq = query.toLowerCase();
-
     return INGREDIENTS.filter(ing =>
-      getIngredientAliases(ing).some(alias =>
-        alias.toLowerCase().includes(lq)
-      )
+      getIngredientAliases(ing).some(alias => alias.includes(query))
     ).slice(0, 5);
   };
+
+  const directMatches = INGREDIENTS.filter(ing =>
+    getIngredientAliases(ing).some(alias => alias.includes(query))
+  ).slice(0, 5);
+
+  if (directMatches.length) {
+    return directMatches;
+  }
 
   if (query.length < 2) {
     return fallbackSearch();

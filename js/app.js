@@ -11,24 +11,52 @@ const GAUGE_CIRCUMFERENCE = 2 * Math.PI * GAUGE_R;
 const FOOD_FUSE_OPTIONS = {
   includeScore: true,
   shouldSort: true,
-  threshold: 0.3,
+  threshold: 0.35,
   ignoreLocation: true,
   ignoreDiacritics: true,
   minMatchCharLength: 2,
-  keys: [{ name: "name", weight: 1 }],
+  keys: [
+    { name: "_searchName", weight: 0.85 },
+    { name: "name", weight: 0.15 },
+  ],
 };
 
-function fuzzySearchFoods(items, query) {
-  const q = query.trim();
-  if (!q) return items;
+function cleanUserText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/[\u00AD\u200B-\u200D\u2060\uFEFF]/g, "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-  if (typeof Fuse === "undefined" || q.length < 2) {
-    const lq = q.toLowerCase();
-    return items.filter(item => item.name.toLowerCase().includes(lq));
+function normalizeSearchText(value) {
+  return cleanUserText(value).toLowerCase();
+}
+
+function fuzzySearchFoods(items, query) {
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) return items;
+
+  const indexedItems = items.map(item => ({
+    ...item,
+    _searchName: normalizeSearchText(item.name),
+  }));
+
+  const directMatches = indexedItems.filter(item =>
+    item._searchName.includes(normalizedQuery)
+  );
+
+  if (directMatches.length) {
+    return directMatches;
   }
 
-  return new Fuse(items, FOOD_FUSE_OPTIONS)
-    .search(q)
+  if (typeof Fuse === "undefined" || normalizedQuery.length < 2) {
+    return [];
+  }
+
+  return new Fuse(indexedItems, FOOD_FUSE_OPTIONS)
+    .search(normalizedQuery)
     .map(result => result.item);
 }
 
@@ -1023,7 +1051,7 @@ async function bulkLogPer100g() {
 
 async function quickAddLog() {
   const name =
-    document.getElementById("quickFoodName").value.trim() ||
+    cleanUserText(document.getElementById("quickFoodName").value) ||
     translate("whatDidYouEat");
   const calories = parseFloat(document.getElementById("quickCalories").value);
   if (!calories || calories <= 0) return;
@@ -1176,7 +1204,7 @@ function confirmBuilderCustom(name) {
   const protein = parseFloat(document.getElementById("builderCustomProtein")?.value) || 0;
   const fat     = parseFloat(document.getElementById("builderCustomFat")?.value) || 0;
   const carbs   = parseFloat(document.getElementById("builderCustomCarbs")?.value) || 0;
-  addBuilderIngredient(name, kcal, true, { protein, fat, carbs });
+  addBuilderIngredient(cleanUserText(name), kcal, true, { protein, fat, carbs });
   document.getElementById("builderSuggestions").innerHTML = "";
 }
 
@@ -1274,7 +1302,7 @@ function resetBuilder() {
 }
 
 async function saveBuilderDish() {
-  const name = document.getElementById("builderDishName").value.trim();
+  const name = cleanUserText(document.getElementById("builderDishName").value);
   const dishWeight = parseFloat(document.getElementById("builderDishWeight").value);
   if (!name || !builderIngredients.length || !dishWeight || dishWeight <= 0) {
     showToast(translate("fillFields"));
@@ -1362,7 +1390,7 @@ function renderFoods() {
 }
 
 async function addNewFood() {
-  const name = document.getElementById("newFoodName").value.trim();
+  const name = cleanUserText(document.getElementById("newFoodName").value);
   const calories = parseFloat(document.getElementById("newFoodCalories").value);
   if (!name || !calories || calories <= 0) {
     showToast(translate("fillFields"));
