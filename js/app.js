@@ -746,8 +746,13 @@ function updateProgress() {
     }
   }
 
-  const rem = Math.round(dailyNorm - totalToday);
-  document.getElementById("remaining").textContent = rem;
+  const remainingEl = document.getElementById("remaining");
+
+  if (remainingEl) {
+    remainingEl.textContent = lastTodayData
+      ? Math.round(dailyNorm - totalToday)
+      : "—";
+  }
 }
 
 // dayData is the full response object from /api/logs/day (has total_protein etc.)
