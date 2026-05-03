@@ -425,6 +425,7 @@ h2 {
   background: var(--accentBG); border-radius: 5px;
   padding: 1px 6px;
   border: 1px solid;
+  margin-right: 0.3rem;
 }
 
 /* ── Calendar ──────────────────────────────────────────────────── */
@@ -529,6 +530,7 @@ h2 {
 .builder-ing-info { flex: 1; min-width: 0; }
 .builder-ing-name { font-size: 0.88rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
 .builder-ing-pills { display: flex; flex-wrap: nowrap; margin-top: 6px; }
+.builder-ing-pills-macros { margin-top: 6px; }
 .builder-ing-controls { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
 .builder-ing-weight {
   width: 54px; flex-shrink: 0;
@@ -696,9 +698,11 @@ h2 {
 /* ── Modal search bar ──────────────────────────────────────────── */
 
 .modal-search-wrap {
-  position: sticky; top: 0; z-index: 2;
-  padding: 0 0 0.75rem;
+  padding: 0.75rem 0 0;
   background: var(--bg2);
+}
+.modal-search-sticky {
+  position: sticky; bottom: 0; z-index: 2;
 }
 .modal-search-inner {
   display: flex; align-items: center; gap: 0.5rem;
@@ -722,7 +726,6 @@ h2 {
   border: none; outline: none; font: inherit; font-size: 0.9rem;
 }
 .modal-search-inner input::placeholder { color: var(--text3); }
-#fixedDishesList { padding-top: 0.25rem; }
 
 /* ── Toast notifications ───────────────────────────────────────── */
 
@@ -876,9 +879,6 @@ h2 {
 .macro-pill-p { color: var(--macro-protein); background: var(--macro-protein-bg); border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; }
 .macro-pill-f { color: var(--macro-fat); background: var(--macro-fat-bg); border-left: none; border-right: none; border-radius: 0;  }
 .macro-pill-c { color: var(--macro-carbs); background: var(--macro-carbs-bg); border-left: none; border-top-left-radius: 0; border-bottom-left-radius: 0; }
-.builder-ing-pills .macro-pill-p {
-  margin-left: 0.25rem;
-}
 /* pills inside dish-row / dish-weight-row (bg3) need darker bg to be visible */
 /* .dish-row .macro-pill,
 .dish-row .list-row-cal,

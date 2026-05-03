@@ -309,7 +309,8 @@
             </div>
           </div>
           <div id="modal-fixed" class="hidden">
-            <div class="modal-search-wrap">
+            <div id="fixedDishesList"></div>
+            <div class="modal-search-wrap modal-search-sticky">
               <div class="modal-search-inner">
                 <span class="modal-search-icon">
                   <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -319,9 +320,20 @@
                 <input id="fixedSearch" type="search" data-i18n-placeholder="search" oninput="filterFixedDishes(this.value)" autocomplete="off">
               </div>
             </div>
-            <div id="fixedDishesList"></div>
           </div>
-          <div id="modal-per100g" class="hidden"><div id="per100gDishesList"></div></div>
+          <div id="modal-per100g" class="hidden">
+            <div id="per100gDishesList"></div>
+            <div class="modal-search-wrap modal-search-sticky">
+              <div class="modal-search-inner">
+                <span class="modal-search-icon">
+                  <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.5 0a6.5 6.5 0 1 0 4.054 11.54l3.7 3.7a.75.75 0 0 0 1.06-1.06l-3.7-3.7A6.5 6.5 0 0 0 6.5 0Zm-5 6.5a5 5 0 1 1 10 0 5 5 0 0 1-10 0Z"/>
+                  </svg>
+                </span>
+                <input id="per100gSearch" type="search" data-i18n-placeholder="search" oninput="filterPer100gDishes(this.value)" autocomplete="off">
+              </div>
+            </div>
+          </div>
         </div>
 
         <div id="modal-add-btn-wrap" class="modal-add-wrap">

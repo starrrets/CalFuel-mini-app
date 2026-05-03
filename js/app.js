@@ -8,10 +8,12 @@ if (window.Telegram && window.Telegram.WebApp) {
 const GAUGE_R = 108;
 const GAUGE_CIRCUMFERENCE = 2 * Math.PI * GAUGE_R;
 
+const DEV_INIT_DATA = "";
+
 // initData is the signed payload the backend uses to authenticate requests.
 // In a real Telegram WebApp this is always non-empty; an empty string here
 // means the app was opened outside Telegram (development/testing only).
-const initData = tg ? (tg.initData || "") : "";
+const initData = (tg && tg.initData) ? tg.initData : DEV_INIT_DATA;
 const API_BASE = "https://web-production-fcefd.up.railway.app";
 
 let dailyNorm = 2000;
@@ -794,6 +796,10 @@ function setModalTab(tab) {
   document.getElementById("modal-add-btn-wrap").classList.toggle("hidden", tab === "fixed");
   const btn = document.getElementById("modal-add-btn");
   if (btn) btn.textContent = translate("add");
+  const fixedSearch = document.getElementById("fixedSearch");
+  if (fixedSearch) fixedSearch.value = "";
+  const per100gSearch = document.getElementById("per100gSearch");
+  if (per100gSearch) per100gSearch.value = "";
   if (tab === "fixed")   renderFixedDishesList();
   if (tab === "per100g") renderPer100gDishesList();
 }
@@ -848,6 +854,14 @@ function filterFixedDishes(query) {
   });
 }
 
+function filterPer100gDishes(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll("#per100gDishesList .dish-weight-row").forEach(row => {
+    const name = row.querySelector(".list-row-name")?.textContent.toLowerCase() || "";
+    row.classList.toggle("hidden", q.length > 0 && !name.includes(q));
+  });
+}
+
 function renderPer100gDishesList() {
   const container = document.getElementById("per100gDishesList");
   container.innerHTML = "";
@@ -877,7 +891,7 @@ function renderPer100gDishesList() {
       <div class="dish-weight-row-header">
         <span class="list-row-name">${food.name}</span>
         <div class="list-row-sub-row" style="margin-top:6px">
-          <span class="dish-row-cal" style="font-size:0.72rem">${Math.round(food.calories)} ${kcal}/${gLabel}</span>
+          <span class="dish-row-cal">${Math.round(food.calories)} ${kcal}/${gLabel}</span>
           ${macroHtml}
         </div>
       </div>
@@ -1147,18 +1161,22 @@ function renderBuilderIngredients() {
     const g = translate("unitGrams") || "г";
     const kcalPerLabel = `${ing.kcalPer100g} ${kcal}/100${g}`;
 
-    let pillsHtml = `<span class="macro-pill">${kcalPerLabel}</span>`;
+    let calPillHtml = `<span class="macro-pill">${kcalPerLabel}</span>`;
+    let macroPillsHtml = "";
     if (ing.macros && (ing.macros.protein > 0 || ing.macros.fat > 0 || ing.macros.carbs > 0)) {
-      pillsHtml += `
-        <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(ing.macros.protein)}${g}</span>
-        <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(ing.macros.fat)}${g}</span>
-        <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(ing.macros.carbs)}${g}</span>`;
+      macroPillsHtml = `
+        <div class="builder-ing-pills builder-ing-pills-macros">
+          <span class="macro-pill macro-pill-p">${translate("proteinsShort")} ${Math.round(ing.macros.protein)}${g}</span>
+          <span class="macro-pill macro-pill-f">${translate("fatsShort")} ${Math.round(ing.macros.fat)}${g}</span>
+          <span class="macro-pill macro-pill-c">${translate("carbsShort")} ${Math.round(ing.macros.carbs)}${g}</span>
+        </div>`;
     }
 
     row.innerHTML = `
       <div class="builder-ing-info">
         <span class="builder-ing-name">${displayName}</span>
-        <div class="builder-ing-pills">${pillsHtml}</div>
+        <div class="builder-ing-pills">${calPillHtml}</div>
+        ${macroPillsHtml}
       </div>
       <div class="builder-ing-controls">
         <input class="builder-ing-weight" type="number" value="${ing.grams || ""}" placeholder="${g}"
