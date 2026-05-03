@@ -353,7 +353,7 @@ h2 {
 
 .list-row {
   display: flex; justify-content: space-between; align-items: center;
-  background: var(--bg2); padding: 0.6rem 0.9rem;
+  background: var(--bg2); padding: 0.6rem;
   border-radius: var(--r); margin-bottom: 0.5rem;
   border: 1px solid var(--sep);
 }
@@ -414,7 +414,7 @@ h2 {
 /* dish rows */
 .dish-row {
   display: flex; justify-content: space-between; align-items: center;
-  background: var(--bg5); padding: 0.6rem 0.9rem;
+  background: var(--bg5); padding: 0.6rem;
   border-radius: var(--r); margin-bottom: 0.4rem;
   cursor: pointer; transition: opacity 0.12s;
   border: 1px solid var(--sep);
@@ -528,7 +528,7 @@ h2 {
 
 .builder-ing-row {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 0.5rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--sep);
+  gap: 0.5rem; padding: 0.6rem; border-bottom: 1px solid var(--sep);
   background-color: var(--bg5);
 }
 .builder-ing-row:last-of-type { border-bottom: none; }
@@ -546,7 +546,7 @@ h2 {
 }
 .builder-ing-total { font-size: 0.72rem; color: var(--text3); white-space: nowrap; min-width: 2.5rem; text-align: right; }
 .builder-total-row {
-  padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600;
+  padding: 0.6rem; font-size: 0.85rem; font-weight: 600;
   color: var(--text2); display: flex; justify-content: space-between;
   background-color: var(--bg5);
 }
@@ -584,7 +584,7 @@ h2 {
 /* ── Per-100g bulk add row ─────────────────────────────────────── */
 
 .dish-weight-row {
-  background: var(--bg5); padding: 0.6rem 0.9rem;
+  background: var(--bg5); padding: 0.6rem;
   border-radius: var(--r); margin-bottom: 0.4rem;
   border: 1px solid var(--sep);
   transition: border-color 0.18s;
