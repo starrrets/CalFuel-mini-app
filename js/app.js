@@ -8,7 +8,7 @@ if (window.Telegram && window.Telegram.WebApp) {
 const GAUGE_R = 108;
 const GAUGE_CIRCUMFERENCE = 2 * Math.PI * GAUGE_R;
 
-const DEV_INIT_DATA = "";
+const DEV_INIT_DATA = "auth_date=1777806836&user=%7B%22id%22%3A123456789%2C%22first_name%22%3A%22Dev%22%7D&hash=ce1fd18dcb7f760d612bc6121dacb7fb0bc493c4485ef42c42c9146c8691a561";
 
 // initData is the signed payload the backend uses to authenticate requests.
 // In a real Telegram WebApp this is always non-empty; an empty string here

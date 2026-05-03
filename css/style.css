@@ -698,11 +698,11 @@ h2 {
 /* ── Modal search bar ──────────────────────────────────────────── */
 
 .modal-search-wrap {
-  padding: 0.75rem 0 0;
+  padding-top: 0.4rem;
   background: var(--bg2);
 }
 .modal-search-sticky {
-  position: sticky; bottom: 0; z-index: 2;
+  position: sticky; bottom: -8px; z-index: 2;
 }
 .modal-search-inner {
   display: flex; align-items: center; gap: 0.5rem;
