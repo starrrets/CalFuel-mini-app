@@ -8,7 +8,10 @@ if (window.Telegram && window.Telegram.WebApp) {
 const GAUGE_R = 108;
 const GAUGE_CIRCUMFERENCE = 2 * Math.PI * GAUGE_R;
 
-const tgId = tg ? (tg.initDataUnsafe?.user?.id || 123456789) : 123456789;
+// initData is the signed payload the backend uses to authenticate requests.
+// In a real Telegram WebApp this is always non-empty; an empty string here
+// means the app was opened outside Telegram (development/testing only).
+const initData = tg ? (tg.initData || "") : "";
 const API_BASE = "https://web-production-fcefd.up.railway.app";
 
 let dailyNorm = 2000;
@@ -297,7 +300,13 @@ function convertWeight(value, fromUnit, toUnit) {
 
 async function apiFetch(endpoint, method = "GET", body = null) {
   const url = API_BASE + endpoint;
-  const options = { method, headers: { "Content-Type": "application/json" } };
+  const options = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Telegram-InitData": initData,
+    },
+  };
   if (body) options.body = JSON.stringify(body);
   const response = await fetch(url, options);
   if (!response.ok) {
@@ -455,7 +464,7 @@ function applyBootstrapFoods(items) {
 }
 
 async function bootstrapApp() {
-  const data = await apiFetch(`/api/bootstrap/${tgId}`);
+  const data = await apiFetch("/api/bootstrap");
   if (!data) return false;
 
   applyBootstrapProfile(data.profile);
@@ -469,7 +478,6 @@ async function bootstrapApp() {
 async function sendTimezoneInBackground() {
   try {
     await apiFetch("/api/profile/timezone", "POST", {
-      tg_id: tgId,
       utc_offset: -new Date().getTimezoneOffset(),
     });
   } catch (e) {
@@ -497,7 +505,7 @@ function applyProfileData(data) {
 
 async function loadProfile() {
   try {
-    const data = await apiFetch(`/api/profile/${tgId}`);
+    const data = await apiFetch("/api/profile");
     if (!data) return;
     applyProfileData(data);
 
@@ -562,7 +570,6 @@ async function saveProfile() {
   const weightMetric = convertWeight(parseFloat(document.getElementById("weight").value) || 0, currentUnits, "metric");
   const goalType = document.getElementById("goalType").value;
   const data = {
-    tg_id: tgId,
     gender: currentGender,
     age: parseInt(document.getElementById("age").value, 10),
     height: heightMetric,
@@ -584,7 +591,7 @@ async function saveProfile() {
 
 async function loadTodayLogs() {
   const todayStr = toISODate(new Date());
-  const data = await apiFetch(`/api/logs/day/${tgId}/${todayStr}`);
+  const data = await apiFetch(`/api/logs/day/${todayStr}`);
   if (!data) return;
   lastTodayData = data;
   logs = data.logs || [];
@@ -911,7 +918,7 @@ function updateBulkAddBtn() {
 
 async function logFixedDish(food) {
   const date = toISODate(new Date());
-  await apiFetch("/api/log", "POST", { tg_id: tgId, food_id: food.id, date });
+  await apiFetch("/api/log", "POST", { food_id: food.id, date });
   closeAddModal();
   await Promise.all([loadTodayLogs(), loadHistory(true)]);
 }
@@ -928,7 +935,7 @@ async function bulkLogPer100g() {
   await Promise.all(
     toLog.map(async food => {
       const grams = parseFloat(document.getElementById(`weight-${food.id}`).value);
-      await apiFetch("/api/log", "POST", { tg_id: tgId, food_id: food.id, grams, date });
+      await apiFetch("/api/log", "POST", { food_id: food.id, grams, date });
     })
   );
 
@@ -944,7 +951,7 @@ async function quickAddLog() {
   if (!calories || calories <= 0) return;
 
   const date = toISODate(new Date());
-  const body = { tg_id: tgId, food_name: name, calories, date };
+  const body = { food_name: name, calories, date };
 
   if (trackingMode === "full") {
     const protein = parseFloat(document.getElementById("quickProtein").value) || null;
@@ -1202,9 +1209,7 @@ async function saveBuilderDish() {
   const fPer100 = totalF > 0 ? totalF / dishWeight * 100 : null;
   const cPer100 = totalC > 0 ? totalC / dishWeight * 100 : null;
 
-  // Macros are sent directly to backend — no localStorage
   await apiFetch("/api/foods", "POST", {
-    tg_id: tgId,
     name,
     calories: kcalPer100g,
     per100g: true,
@@ -1223,7 +1228,7 @@ async function saveBuilderDish() {
 async function loadFoods(force = false) {
   if (foodsLoaded && !force) return;
 
-  const data = await apiFetch(`/api/foods/${tgId}`);
+  const data = await apiFetch("/api/foods");
   if (!data) return;
 
   foods = data;
@@ -1281,7 +1286,7 @@ async function addNewFood() {
     showToast(translate("fillFields"));
     return;
   }
-  const body = { tg_id: tgId, name, calories, per100g: newFoodType === "per100g" };
+  const body = { name, calories, per100g: newFoodType === "per100g" };
   if (trackingMode === "full") {
     const protein = parseFloat(document.getElementById("newFoodProtein").value) || null;
     const fat     = parseFloat(document.getElementById("newFoodFat").value) || null;
@@ -1318,7 +1323,7 @@ let calOffset = 0;
 
 async function loadHistory(force = false) {
   if (!historyLoaded || force) {
-    const data = await apiFetch(`/api/history/${tgId}`);
+    const data = await apiFetch("/api/history");
     if (!data) return;
 
     historyData = data;
@@ -1422,7 +1427,7 @@ async function selectDay(dateStr, cellEl) {
   detail.classList.remove("hidden");
   logsContainer.innerHTML = `<p class="empty-hint">…</p>`;
 
-  const data = await apiFetch(`/api/logs/day/${tgId}/${dateStr}`);
+  const data = await apiFetch(`/api/logs/day/${dateStr}`);
   if (!data) { detail.classList.add("hidden"); return; }
 
   const kcal = translate("unitKcal");
