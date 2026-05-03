@@ -1384,7 +1384,7 @@ function renderFoods() {
       ? `${Math.round(food.calories)} ${kcal}/${per100}`
       : `${Math.round(food.calories)} ${kcal}`;
     const badge = food.per100g
-      ? `<div style="display: flex;margin-bottom:6px;"><span class="badge">${translate("foodTypePer100g")}</span></div>`
+      ? `<div style="display: flex;margin-bottom:7px;"><span class="badge">${translate("foodTypePer100g")}</span></div>`
       : "";
     let macroHtml = "";
     if (food.protein != null || food.fat != null || food.carbs != null) {

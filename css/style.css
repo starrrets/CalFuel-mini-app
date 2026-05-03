@@ -380,7 +380,6 @@ h2 {
   padding: 1px 6px; border-radius: 5px;
   vertical-align: middle;
   white-space: nowrap;
-  border: 1px solid;
 }
 
 .empty-hint {
@@ -534,8 +533,8 @@ h2 {
 .builder-ing-row:last-of-type { border-bottom: none; }
 .builder-ing-info { flex: 1; min-width: 0; }
 .builder-ing-name { font-size: 0.88rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
-.builder-ing-pills { display: flex; flex-wrap: nowrap; margin-top: 6px; }
-.builder-ing-pills-macros { margin-top: 6px; }
+.builder-ing-pills { display: flex; flex-wrap: nowrap; margin-top: 7px; }
+.builder-ing-pills-macros { margin-top: 7px; }
 .builder-ing-controls { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
 .builder-ing-weight {
   width: 54px; flex-shrink: 0;
@@ -874,7 +873,7 @@ h2 {
 
 .list-row-sub-row {
   display: flex; align-items: center; flex-wrap: wrap;
-  margin-top: 6px;
+  margin-top: 7px;
 }
 
 .macro-pill {
