@@ -3,9 +3,10 @@
 :root,
 [data-theme="dark"] {
   --bg: #000000;
-  --bg2: #1c1c1e;
-  --bg3: #2c2c2e;
-  --bg4: #3a3a3c;
+  --bg2: #1c1c1c;
+  --bg3: #2e2e2e;
+  --bg4: #3a3a3a;
+  --bg5: #262626;
   --sep: rgba(255, 255, 255, 0.08);
   --gauge-sep: #0a0a0a;
   --text: #ffffff;
@@ -44,10 +45,11 @@
 }
 
 [data-theme="light"] {
-  --bg: #f2f2f7;
+  --bg: #f2f2f2;
   --bg2: #ffffff;
-  --bg3: #ebebf0;
-  --bg4: #d1d1d6;
+  --bg3: #e9e9e9;
+  --bg4: #d1d1d1;
+  --bg5: #f4f4f4;
   --sep: rgba(60, 60, 67, 0.1);
   --gauge-sep: #e9e9e9;
   --text: #000000;
@@ -258,6 +260,7 @@ h2 {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--sep);
   min-height: 44px;
+  background-color: var(--bg5);
 }
 #goal-type-row {
   border: none;
@@ -358,7 +361,7 @@ h2 {
   font-weight: 600; 
   font-size: 0.95rem; 
   line-height: 0.95rem;
-  margin-left: 2px;
+  margin-left: 1px;
 }
 .list-row-sub  { font-size: 0.82rem; color: var(--text3); margin-top: 2px; }
 .list-row-cal  {
@@ -396,7 +399,7 @@ h2 {
 .modal-sheet {
   background: var(--bg2); width: 100%;
   border-radius: 12px 12px 0 0;
-  padding: 0 1rem;
+  padding: 0 1rem 1.3rem 1rem;
   max-height: 82svh; display: flex; flex-direction: column;
 }
 .modal-handle {
@@ -411,7 +414,7 @@ h2 {
 /* dish rows */
 .dish-row {
   display: flex; justify-content: space-between; align-items: center;
-  background: var(--bg3); padding: 0.875rem 1rem;
+  background: var(--bg5); padding: 0.875rem 1rem;
   border-radius: var(--r); margin-bottom: 0.4rem;
   cursor: pointer; transition: opacity 0.12s;
   border: 1px solid var(--sep);
@@ -505,12 +508,14 @@ h2 {
   background: var(--bg3); border-radius: var(--r); overflow: hidden;
   margin: 0 0 0.25rem;
 }
-.builder-custom-form { margin: 0 0 0.25rem; }
+.builder-custom-form { margin: 0 0 0.5rem; }
 .builder-suggestions > div,
 .builder-custom-form {
-  background: var(--bg3); overflow: hidden;
+  background: var(--bg5); overflow: hidden;
 }
-
+#tab-profile .form-row {
+  background-color: var(--bg2);
+}
 .builder-suggestion-row {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0.7rem 1rem; cursor: pointer;
@@ -524,6 +529,7 @@ h2 {
 .builder-ing-row {
   display: flex; align-items: center; justify-content: space-between;
   gap: 0.5rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--sep);
+  background-color: var(--bg5);
 }
 .builder-ing-row:last-of-type { border-bottom: none; }
 .builder-ing-info { flex: 1; min-width: 0; }
@@ -533,7 +539,7 @@ h2 {
 .builder-ing-controls { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
 .builder-ing-weight {
   width: 54px; flex-shrink: 0;
-  background: var(--bg4); border-radius: 8px;
+  background: var(--bg3); border-radius: 8px;
   padding: 0.28rem 0.4rem; text-align: center;
   color: var(--text); font: inherit; font-size: 0.85rem;
   border: 1px solid var(--sep); outline: none;
@@ -542,6 +548,7 @@ h2 {
 .builder-total-row {
   padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600;
   color: var(--text2); display: flex; justify-content: space-between;
+  background-color: var(--bg5);
 }
 
 #builderIngredients{
@@ -577,7 +584,7 @@ h2 {
 /* ── Per-100g bulk add row ─────────────────────────────────────── */
 
 .dish-weight-row {
-  background: var(--bg3); padding: 0.875rem 1rem;
+  background: var(--bg5); padding: 0.875rem 1rem;
   border-radius: var(--r); margin-bottom: 0.4rem;
   border: 1px solid var(--sep);
   transition: border-color 0.18s;
@@ -593,7 +600,7 @@ h2 {
 /* ── Per-100g weight input (stronger active border) ────────────── */
 
 .dish-weight-inline-input {
-  width: 100%; background: var(--bg4); color: var(--text);
+  width: 100%; background: var(--bg3); color: var(--text);
   padding: 0.5rem 0.75rem; border-radius: 8px;
   border: none; font: inherit; font-size: 0.95rem; outline: none;
   text-align: right;
@@ -697,7 +704,7 @@ h2 {
 /* ── Modal search bar ──────────────────────────────────────────── */
 
 .modal-search-wrap {
-  padding: 0.4rem 0 0.42rem 0;
+  padding: 0.6rem 0 0.42rem 0;
   background: var(--bg2);
 }
 #modal-per100g .modal-search-wrap {

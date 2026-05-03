@@ -1196,7 +1196,7 @@ function showBuilderCustomForm(name) {
           <span class="input-suffix">${g}</span>
         </div>
       </div>
-      <div class="form-row labeled" style="border-bottom:none">
+      <div class="form-row labeled">
         <span class="row-label">${translate("carbs")}</span>
         <div class="input-suffix-wrap">
           <input id="builderCustomCarbs" type="number" step="0.1" placeholder="${translate("carbsPlaceholder")}">
