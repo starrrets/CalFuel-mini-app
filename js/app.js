@@ -8,6 +8,66 @@ if (window.Telegram && window.Telegram.WebApp) {
 const GAUGE_R = 108;
 const GAUGE_CIRCUMFERENCE = 2 * Math.PI * GAUGE_R;
 
+const FOOD_FUSE_OPTIONS = {
+  includeScore: true,
+  shouldSort: true,
+  threshold: 0.3,
+  ignoreLocation: true,
+  ignoreDiacritics: true,
+  minMatchCharLength: 2,
+  keys: [{ name: "name", weight: 1 }],
+};
+
+function fuzzySearchFoods(items, query) {
+  const q = query.trim();
+  if (!q) return items;
+
+  if (typeof Fuse === "undefined" || q.length < 2) {
+    const lq = q.toLowerCase();
+    return items.filter(item => item.name.toLowerCase().includes(lq));
+  }
+
+  return new Fuse(items, FOOD_FUSE_OPTIONS)
+    .search(q)
+    .map(result => result.item);
+}
+
+function applyDishSearch(container, rowSelector, items, query) {
+  if (!container) return;
+
+  const q = query.trim();
+
+  if (!q) {
+    items.forEach(item => {
+      const row = container.querySelector(
+        `${rowSelector}[data-food-id="${item.id}"]`
+      );
+
+      if (row) {
+        row.classList.remove("hidden");
+        container.appendChild(row);
+      }
+    });
+
+    return;
+  }
+
+  const matched = fuzzySearchFoods(items, q);
+  const matchedIds = new Set(matched.map(item => String(item.id)));
+
+  container.querySelectorAll(rowSelector).forEach(row => {
+    row.classList.toggle("hidden", !matchedIds.has(String(row.dataset.foodId)));
+  });
+
+  matched.forEach(item => {
+    const row = container.querySelector(
+      `${rowSelector}[data-food-id="${item.id}"]`
+    );
+
+    if (row) container.appendChild(row);
+  });
+}
+
 const DEV_INIT_DATA = "auth_date=1777806836&user=%7B%22id%22%3A123456789%2C%22first_name%22%3A%22Dev%22%7D&hash=ce1fd18dcb7f760d612bc6121dacb7fb0bc493c4485ef42c42c9146c8691a561";
 
 // initData is the signed payload the backend uses to authenticate requests.
@@ -830,6 +890,7 @@ function renderFixedDishesList() {
     }
     const div = document.createElement("div");
     div.className = "dish-row";
+    div.dataset.foodId = String(food.id);
     div.dataset.name = food.name.toLowerCase();
     div.innerHTML = `
       <div>
@@ -848,18 +909,21 @@ function renderFixedDishesList() {
 }
 
 function filterFixedDishes(query) {
-  const q = query.toLowerCase().trim();
-  document.querySelectorAll("#fixedDishesList .dish-row").forEach(row => {
-    row.classList.toggle("hidden", q.length > 0 && !row.dataset.name.includes(q));
-  });
+  applyDishSearch(
+    document.getElementById("fixedDishesList"),
+    ".dish-row",
+    foods.filter(food => !food.per100g),
+    query
+  );
 }
 
 function filterPer100gDishes(query) {
-  const q = query.toLowerCase().trim();
-  document.querySelectorAll("#per100gDishesList .dish-weight-row").forEach(row => {
-    const name = row.querySelector(".list-row-name")?.textContent.toLowerCase() || "";
-    row.classList.toggle("hidden", q.length > 0 && !name.includes(q));
-  });
+  applyDishSearch(
+    document.getElementById("per100gDishesList"),
+    ".dish-weight-row",
+    foods.filter(food => food.per100g),
+    query
+  );
 }
 
 function renderPer100gDishesList() {

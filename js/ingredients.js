@@ -221,12 +221,76 @@ function getIngredientName(ing) {
   return t[typeof currentLang !== "undefined" ? currentLang : "en"] || ing.name;
 }
 
+const INGREDIENT_FUSE_OPTIONS = {
+  includeScore: true,
+  shouldSort: true,
+  threshold: 0.3,
+  ignoreLocation: true,
+  ignoreDiacritics: true,
+  minMatchCharLength: 2,
+  keys: [
+    { name: "localizedName", weight: 0.45 },
+    { name: "name", weight: 0.3 },
+    { name: "aliases", weight: 0.25 },
+  ],
+};
+
+let ingredientFuse = null;
+let ingredientFuseLang = null;
+
+function getIngredientAliases(ing) {
+  const t = INGREDIENT_TRANSLATIONS[ing.name];
+
+  return Array.from(new Set([ing.name, ...(t ? Object.values(t) : [])]));
+}
+
+function buildIngredientFuse() {
+  if (typeof Fuse === "undefined") return null;
+
+  const indexed = INGREDIENTS.map(ing => ({
+    ref: ing,
+    name: ing.name,
+    localizedName: getIngredientName(ing),
+    aliases: getIngredientAliases(ing),
+  }));
+
+  ingredientFuse = new Fuse(indexed, INGREDIENT_FUSE_OPTIONS);
+  ingredientFuseLang =
+    typeof currentLang !== "undefined" ? currentLang : "en";
+
+  return ingredientFuse;
+}
+
+function getIngredientFuse() {
+  const lang = typeof currentLang !== "undefined" ? currentLang : "en";
+
+  if (!ingredientFuse || ingredientFuseLang !== lang) {
+    return buildIngredientFuse();
+  }
+
+  return ingredientFuse;
+}
+
 function searchIngredients(q) {
-  const lq = q.toLowerCase();
-  return INGREDIENTS.filter(i => {
-    if (i.name.toLowerCase().includes(lq)) return true;
-    const t = INGREDIENT_TRANSLATIONS[i.name];
-    if (!t) return false;
-    return Object.values(t).some(v => v.toLowerCase().includes(lq));
-  }).slice(0, 5);
+  const query = q.trim();
+  if (!query) return [];
+
+  const fallbackSearch = () => {
+    const lq = query.toLowerCase();
+
+    return INGREDIENTS.filter(ing =>
+      getIngredientAliases(ing).some(alias =>
+        alias.toLowerCase().includes(lq)
+      )
+    ).slice(0, 5);
+  };
+
+  if (query.length < 2) {
+    return fallbackSearch();
+  }
+
+  const fuse = getIngredientFuse();
+  if (!fuse) return fallbackSearch();
+
+  return fuse.search(query, { limit: 5 }).map(result => result.item.ref);
 }

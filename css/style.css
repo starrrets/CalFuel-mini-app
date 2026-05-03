@@ -396,9 +396,8 @@ h2 {
 .modal-sheet {
   background: var(--bg2); width: 100%;
   border-radius: 12px 12px 0 0;
-  padding: 0 1rem 1rem;
+  padding: 0 1rem;
   max-height: 82svh; display: flex; flex-direction: column;
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
 }
 .modal-handle {
   width: 36px; height: 5px; border-radius: 9999px;
@@ -698,8 +697,11 @@ h2 {
 /* ── Modal search bar ──────────────────────────────────────────── */
 
 .modal-search-wrap {
-  padding-top: 0.4rem;
+  padding: 0.4rem 0 0.42rem 0;
   background: var(--bg2);
+}
+#modal-per100g .modal-search-wrap {
+  padding: 0.45rem 0 0 0;
 }
 .modal-search-sticky {
   position: sticky; bottom: -8px; z-index: 2;
