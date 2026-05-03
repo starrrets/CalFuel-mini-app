@@ -656,9 +656,18 @@ function toggleGoalPercent() {
 }
 
 async function saveProfile() {
-  const heightMetric = convertHeight(parseFloat(document.getElementById("height").value) || 0, currentUnits, "metric");
-  const weightMetric = convertWeight(parseFloat(document.getElementById("weight").value) || 0, currentUnits, "metric");
+  const heightMetric = convertHeight(
+    parseFloat(document.getElementById("height").value) || 0,
+    currentUnits,
+    "metric"
+  );
+  const weightMetric = convertWeight(
+    parseFloat(document.getElementById("weight").value) || 0,
+    currentUnits,
+    "metric"
+  );
   const goalType = document.getElementById("goalType").value;
+
   const data = {
     gender: currentGender,
     age: parseInt(document.getElementById("age").value, 10),
@@ -666,14 +675,27 @@ async function saveProfile() {
     weight: weightMetric,
     activity: parseFloat(document.getElementById("activity").value),
     goal_type: goalType,
-    goal_percent: goalType === "maintain" ? 0 : (parseFloat(document.getElementById("goalPercent").value) || 0),
+    goal_percent:
+      goalType === "maintain"
+        ? 0
+        : parseFloat(document.getElementById("goalPercent").value) || 0,
     units: currentUnits,
   };
+
   const result = await apiFetch("/api/profile", "POST", data);
   if (!result) return;
+
+  // 1. Обновляем глобальные переменные таргетов
   applyProfileData(result);
-  document.getElementById("dailyNorm").textContent = Math.round(dailyNorm);
-  updateProgress();
+
+  // 2. Обновляем текст нормы калорий в UI
+  const dailyNormEl = document.getElementById("dailyNorm");
+  if (dailyNormEl) dailyNormEl.textContent = Math.round(dailyNorm);
+
+  // 3. САМОЕ ВАЖНОЕ: Загружаем данные дня заново, чтобы подтянулись новые таргеты БЖУ
+  // и обновились все прогресс-бары (updateMacroBars и updateProgress вызываются внутри)
+  await loadTodayLogs();
+
   showToast(translate("profileSaved"));
 }
 
