@@ -656,6 +656,8 @@ function toggleGoalPercent() {
 }
 
 async function saveProfile() {
+  setAppBusy(true);
+
   const heightMetric = convertHeight(
     parseFloat(document.getElementById("height").value) || 0,
     currentUnits,
@@ -683,20 +685,18 @@ async function saveProfile() {
   };
 
   const result = await apiFetch("/api/profile", "POST", data);
-  if (!result) return;
 
-  // 1. Обновляем глобальные переменные таргетов
+  if (result) {
   applyProfileData(result);
-
-  // 2. Обновляем текст нормы калорий в UI
   const dailyNormEl = document.getElementById("dailyNorm");
   if (dailyNormEl) dailyNormEl.textContent = Math.round(dailyNorm);
 
-  // 3. САМОЕ ВАЖНОЕ: Загружаем данные дня заново, чтобы подтянулись новые таргеты БЖУ
-  // и обновились все прогресс-бары (updateMacroBars и updateProgress вызываются внутри)
   await loadTodayLogs();
 
   showToast(translate("profileSaved"));
+  }
+
+  setAppBusy(false);
 }
 
 // ── Today logs ────────────────────────────────────────────────────
